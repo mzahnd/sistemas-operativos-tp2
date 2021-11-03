@@ -92,6 +92,12 @@ void syscallHandler(registerStruct * registers) {
     //rdi -> indice de la tecla de funcion (de 1 (F1) a 10 (F10))
     //rsi -> puntero a la funcion tipo void foo()
     setFunctionKeyMethod(registers->rdi, (void (*)())registers->rsi);
+
+    case 14:
+    //rdi -> indice en la tabla de metodos del timer tick
+    //rsi -> cada cuantos ticks se tiene que ejecutar la funcion
+    //rdx -> puntero a la funcion
+    setTickMethod(registers->rdi, registers->rsi, (void (*)())registers->rdx);
   }
 }
 

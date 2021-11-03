@@ -6,8 +6,10 @@
 #include <stdio.h>
 #include <shells.h>
 #include <commands.h>
+#include <time.h>
 #include <stdlib.h>
 #include <syscalls_asm.h>
+#include <clock.h>
 
 #define TOTAL_LINES 63
 #define MAX_LINE_LENGTH 128
@@ -34,6 +36,7 @@ char commandsNames[][MAX_ARG_LEN]={"datetime", "help", "inforeg", "printmem", "d
 void  (* run[])(char args[MAX_ARGS][MAX_ARG_LEN]) = {dateTime, help, infoReg, printmem, divzero, invalidopcode, clear, echo};
 static int totalCommands = 8;
 
+
 void init_shell(uint64_t errCode) {
     for (int i = 0; i < TOTAL_LINES; i++) {
         for (int j = 0; j < MAX_LINE_LENGTH; j++) {
@@ -43,6 +46,7 @@ void init_shell(uint64_t errCode) {
     }
 
     //setFunctionKey(1,changeActiveShell);
+    setTimerFunction(0, 18, drawClock);
     setConsoleUpdateFunction(updateShell);
 
     if (errCode < 32) {
@@ -67,10 +71,10 @@ void init_shell(uint64_t errCode) {
         printf("CS: %X - FLAGS: %X\n", registers[2], registers[1]);
         printf("RSP: %X\n", registers[0]);
     } else {
-        printf("Welcome to the Computer Architecture Project 2021 - Q2 \n");
-        printf("Created by Pedrito\n");
-        printf("To enter the Help Center, type \"help\" and press ENTER.\n");
-        printf("Which command would you like to run?\n");
+        // printf("Welcome to the Computer Architecture Project 2021 - Q2 \n");
+        // printf("Created by Pedrito\n");
+        // printf("To enter the Help Center, type \"help\" and press ENTER.\n");
+        // printf("Which command would you like to run?\n");
     }
 
     drawShellLines();

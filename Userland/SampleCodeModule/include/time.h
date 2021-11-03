@@ -10,5 +10,6 @@ int getDays();
 int getMonth();
 int getYear();
 int getTicks();
+void setTimerFunction(int index, int tickInterval, void(*)());
 
 #endif

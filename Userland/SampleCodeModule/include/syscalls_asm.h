@@ -14,5 +14,6 @@ void getTicksSyscall(uint64_t *ticks);
 void getRegistersSyscall(uint64_t * registers);
 void getMemSyscall(uint64_t, uint64_t*, uint8_t);
 void readErrorSyscall(uint64_t * err);
+void setTimerFunctionSyscall(int index, int tickInterval, void(*)());
 
 #endif

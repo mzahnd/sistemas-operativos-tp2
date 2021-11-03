@@ -44,3 +44,7 @@ int getTicks() {
     getTicksSyscall(&ticks);
     return ticks;
 }
+
+void setTimerFunction(int index, int tickInterval, void(*func)()) {
+  setTimerFunctionSyscall(index, tickInterval, func);
+}

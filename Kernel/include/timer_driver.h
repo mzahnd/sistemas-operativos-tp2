@@ -6,5 +6,7 @@
 void timeHandler();
 uint64_t getTicks();
 int secondsElapsed();
+void initializeTickMethods();
+void setTickMethod(int methodIndex, int tickInterval, void (*function)());
 
 #endif

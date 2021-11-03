@@ -10,7 +10,7 @@
 #include <syscalls_asm.h>
 
 #define TOTAL_LINES 63
-#define MAX_LINE_LENGTH 65
+#define MAX_LINE_LENGTH 128
 void updateShell(char * buff, int dim);
 void writeToLines(char * buff, int dim);
 void changeActiveShell();
@@ -28,7 +28,7 @@ static int isCommand(char * name);
 static char lines[2][TOTAL_LINES][MAX_LINE_LENGTH];
 static int currentLine[] = {0, 0};
 static int lineCursor[] = {0, 0};
-static int activeShell = 1;
+static int activeShell = 0;
 
 char commandsNames[][MAX_ARG_LEN]={"datetime", "help", "inforeg", "printmem", "divzero", "invalidopcode", "clear", "echo"};
 void  (* run[])(char args[MAX_ARGS][MAX_ARG_LEN]) = {dateTime, help, infoReg, printmem, divzero, invalidopcode, clear, echo};
@@ -36,13 +36,13 @@ static int totalCommands = 8;
 
 void init_shell(uint64_t errCode) {
     for (int i = 0; i < TOTAL_LINES; i++) {
-        for (int j = 0; j < TOTAL_LINES; j++) {
+        for (int j = 0; j < MAX_LINE_LENGTH; j++) {
             lines[0][i][j] = 0;
             lines[1][i][j] = 0;
         }
     }
 
-    setFunctionKey(1,changeActiveShell);
+    //setFunctionKey(1,changeActiveShell);
     setConsoleUpdateFunction(updateShell);
 
     if (errCode < 32) {
@@ -67,8 +67,8 @@ void init_shell(uint64_t errCode) {
         printf("CS: %X - FLAGS: %X\n", registers[2], registers[1]);
         printf("RSP: %X\n", registers[0]);
     } else {
-        printf("Welcome to the Computer Architecture Project 2021 - Q1\n");
-        printf("Created by De Luca, Kim and Lopez Guzman\n");
+        printf("Welcome to the Computer Architecture Project 2021 - Q2 \n");
+        printf("Created by Pedrito\n");
         printf("To enter the Help Center, type \"help\" and press ENTER.\n");
         printf("Which command would you like to run?\n");
     }
@@ -125,11 +125,11 @@ static void clearShellLine(int line) {
 
 void drawShellLines() {
     drawShell0Lines();
-    drawShell1Lines();
+    //drawShell1Lines();
 }
 
 static void drawShell0Lines() {
-    drawRect(0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT, BUTTERFLY_BUSH);
+    drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BUTTERFLY_BUSH);
     int y = SCREEN_HEIGHT;
     int x = 0;
     for (int i = 0; i >= -TOTAL_LINES && i >= -currentLine[0]; i--) {
@@ -181,7 +181,7 @@ static void drawBottomLine() {
 static void drawBottomLine0() {
   int x = 0;
   int bkgColor = BUTTERFLY_BUSH;
-  drawRect(x, SCREEN_HEIGHT-BASE_CHAR_HEIGHT, SCREEN_WIDTH/2, BASE_CHAR_HEIGHT, bkgColor);
+  drawRect(x, SCREEN_HEIGHT-BASE_CHAR_HEIGHT, SCREEN_WIDTH, BASE_CHAR_HEIGHT, bkgColor);
   int fontColor = WHITE;
   int arrowColor = 0xF2E124;
   if (activeShell == 0) {

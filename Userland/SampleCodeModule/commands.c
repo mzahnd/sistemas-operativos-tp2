@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <syscalls_asm.h>
 #include <exceptions_asm.h>
+#include <four_windows.h>
 
 void dateTime(char args[MAX_ARGS][MAX_ARG_LEN]) {
     putChar('\n');
@@ -102,4 +103,9 @@ void divzero(char args[MAX_ARGS][MAX_ARG_LEN]) {
 
 void invalidopcode(char args[MAX_ARGS][MAX_ARG_LEN]) {
     _invalidopcode();
+}
+
+void windows(char args[MAX_ARGS][MAX_ARG_LEN]) {
+  init_apps();
+  putChar('\n');
 }

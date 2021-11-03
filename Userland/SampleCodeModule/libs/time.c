@@ -48,3 +48,7 @@ int getTicks() {
 void setTimerFunction(int index, int tickInterval, void(*func)()) {
   setTimerFunctionSyscall(index, tickInterval, func);
 }
+
+void deleteTimerFunction(int index) {
+  deleteTimerFunctionSyscall(index);
+}

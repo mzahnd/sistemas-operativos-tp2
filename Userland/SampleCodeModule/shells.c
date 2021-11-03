@@ -33,9 +33,9 @@ static int currentLine[] = {0, 0};
 static int lineCursor[] = {0, 0};
 static int activeShell = 0;
 
-char commandsNames[][MAX_ARG_LEN]={"datetime", "help", "inforeg", "printmem", "divzero", "invalidopcode", "clear", "echo"};
-void  (* run[])(char args[MAX_ARGS][MAX_ARG_LEN]) = {dateTime, help, infoReg, printmem, divzero, invalidopcode, clear, echo};
-static int totalCommands = 8;
+char commandsNames[][MAX_ARG_LEN]={"datetime", "help", "inforeg", "printmem", "divzero", "invalidopcode", "clear", "echo", "windows"};
+void  (* run[])(char args[MAX_ARGS][MAX_ARG_LEN]) = {dateTime, help, infoReg, printmem, divzero, invalidopcode, clear, echo, windows};
+static int totalCommands = 9;
 
 
 void init_shell(uint64_t errCode) {
@@ -48,8 +48,7 @@ void init_shell(uint64_t errCode) {
 
     startTimer();
     //setFunctionKey(1,changeActiveShell);
-    setTimerFunction(0, 18, drawClock);
-    setTimerFunction(1, 3, drawTimer);
+
     setConsoleUpdateFunction(updateShell);
 
     if (errCode < 32) {
@@ -64,7 +63,7 @@ void init_shell(uint64_t errCode) {
         }
         printf("REGISTERS STATUS:\n");
         printf("R15: %X - R14: %X\n", registers[18], registers[17]);
-	    printf("R13: %X - R12: %X\n", registers[16], registers[15]);
+	       printf("R13: %X - R12: %X\n", registers[16], registers[15]);
         printf("R11: %X - R10: %X\n", registers[14], registers[13]);
         printf("R9: %X - R8: %X\n", registers[12], registers[11]);
         printf("RSI: %X - RDI: %X\n", registers[10], registers[9]);

@@ -8,5 +8,6 @@ uint64_t getTicks();
 int secondsElapsed();
 void initializeTickMethods();
 void setTickMethod(int methodIndex, int tickInterval, void (*function)());
+void deleteTickMethod(int methodIndex);
 
 #endif

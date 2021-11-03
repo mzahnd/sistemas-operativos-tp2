@@ -41,6 +41,13 @@ void setTickMethod(int methodIndex, int tickInterval, void (*function)()) {
   }
 }
 
+void deleteTickMethod(int methodIndex) {
+  if (methodIndex < TOTAL_METHODS) {
+    intervalTicks[methodIndex] = 0;
+    ticksMethods[methodIndex] = 0;
+  }
+}
+
 
 
 

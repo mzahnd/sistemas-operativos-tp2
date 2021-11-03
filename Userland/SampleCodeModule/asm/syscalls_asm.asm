@@ -10,6 +10,7 @@ GLOBAL getRegistersSyscall
 GLOBAL getMemSyscall
 GLOBAL readErrorSyscall
 GLOBAL setTimerFunctionSyscall
+GLOBAL deleteTimerFunctionSyscall
 
 section .text
 
@@ -144,6 +145,17 @@ setTimerFunctionSyscall:
     mov rbp, rsp
 
     mov rax, 14 ;ID readError
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+deleteTimerFunctionSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 15 ;ID readError
     int 80h
 
     mov rsp, rbp

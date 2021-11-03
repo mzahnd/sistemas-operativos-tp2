@@ -8,6 +8,7 @@
 #include <commands.h>
 #include <time.h>
 #include <stdlib.h>
+#include <timer.h>
 #include <syscalls_asm.h>
 #include <clock.h>
 
@@ -45,8 +46,10 @@ void init_shell(uint64_t errCode) {
         }
     }
 
+    startTimer();
     //setFunctionKey(1,changeActiveShell);
     setTimerFunction(0, 18, drawClock);
+    setTimerFunction(1, 3, drawTimer);
     setConsoleUpdateFunction(updateShell);
 
     if (errCode < 32) {

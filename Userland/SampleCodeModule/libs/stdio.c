@@ -118,5 +118,15 @@ uint64_t getError() {
   return err;
 }
 
+void format(char *str, int value) {
+    if (value < 10) {
+        str[1] = value + '0';
+    } else {
+        str[0] = (value / 10) + '0';
+        str[1] = (value % 10) + '0';
+    }
+    str[2] = 0;
+}
+
 
 #endif

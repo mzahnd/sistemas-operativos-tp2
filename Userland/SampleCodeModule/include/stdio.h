@@ -10,5 +10,6 @@ void putChar(char ch);
 void setFunctionKey(int index, void(*func)());
 char getChar();
 uint64_t getError();
+void format(char *str, int value);
 
 #endif

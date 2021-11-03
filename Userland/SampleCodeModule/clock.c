@@ -3,16 +3,8 @@
 #include <time.h>
 #include <stdGraphics.h>
 #include <colors.h>
+#include <stdio.h>
 #include <clock.h>
-static void format(char *str, int value) {
-    if (value < 10) {
-        str[1] = value + '0';
-    } else {
-        str[0] = (value / 10) + '0';
-        str[1] = (value % 10) + '0';
-    }
-    str[2] = 0;
-}
 
 void drawClock() {
   char str[9] = "00:00:00";
@@ -30,7 +22,7 @@ void drawClock() {
   str[7] = seconds[1];
 
   drawRect(0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, LIGHT_GRAY);
-  drawString(100, 100, str, 9, WHITE, LIGHT_GRAY, 2, 1);
+  drawString(SCREEN_WIDTH/4 - 4*BASE_CHAR_WIDTH*2, SCREEN_HEIGHT/4 - BASE_CHAR_HEIGHT, str, 9, WHITE, LIGHT_GRAY, 2, 1);
 }
 
 

@@ -9,8 +9,6 @@
 #include <syscalls_asm.h>
 #include <exceptions_asm.h>
 
-static void format(char *str, int value);
-
 void dateTime(char args[MAX_ARGS][MAX_ARG_LEN]) {
     putChar('\n');
     char days[] = "00";
@@ -26,16 +24,6 @@ void dateTime(char args[MAX_ARGS][MAX_ARG_LEN]) {
     format(minutes, getMinutes());
     format(seconds, getSeconds());
     printf("%s/%s/20%s %s:%s:%s", days, month, year, hours, minutes, seconds);
-}
-
-static void format(char *str, int value) {
-    if (value < 10) {
-        str[1] = value + '0';
-    } else {
-        str[0] = (value / 10) + '0';
-        str[1] = (value % 10) + '0';
-    }
-    str[2] = 0;
 }
 
 void infoReg(char args[MAX_ARGS][MAX_ARG_LEN]) {

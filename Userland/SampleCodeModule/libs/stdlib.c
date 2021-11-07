@@ -124,4 +124,21 @@ int round(double number) {
   }
   return (int)number;
 }
+
+int isalpha(char ch) {
+  if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
+    return 1;
+  }
+  return 0;
+}
+
+void reverseStr(char str[]) {
+    int n = strlen(str);
+    for (int i = 0; i < n / 2; i++) {
+      char aux = str[i];
+      str[i] = str[n-i-1];
+      str[n-i-1] = aux;
+    }
+}
+
 #endif

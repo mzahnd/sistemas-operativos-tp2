@@ -12,5 +12,7 @@ int atohex(char * str);
 char toUpper(char letter);
 char toLower(char letter);
 int round(double number);
+int isalpha(char ch);
+void reverseStr(char str[]);
 
 #endif

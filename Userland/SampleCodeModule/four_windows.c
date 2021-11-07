@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <four_windows.h>
 #include <shells.h>
+#include <ahorcado.h>
 #include <sudoku.h>
 
 static int running = 0;
@@ -17,15 +18,22 @@ void init_apps() {
   setFunctionKey(1, stop_apps);
   drawClock();
   init_sudoku();
+  init_ahorcado();
   startTimer();
   draw_sudoku();
+  draw_background();
+  draw_lives();
+  draw_word();
   while(running) {
     char ch = getChar();
     if (keyPressedSudoku(ch)) {
       draw_sudoku();
       highlightCurrent();
+    } else {
+      keyPressedAhorcado(ch);
     }
   }
+  drawShellLines();
 }
 
 void stop_apps() {

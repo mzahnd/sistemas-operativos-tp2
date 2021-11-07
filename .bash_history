@@ -215,3 +215,115 @@ make clean
 make
 quit
 exit
+cd root/
+make clean
+cd Toolchain/
+make clean
+make
+cd ..
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+make clean
+make
+quit
+exit
+make clean
+cd root/
+make clean
+make all
+make all
+make clean 
+make al
+make all
+make clean 
+make all
+make clean
+make all
+make all
+make clean
+make all
+make clean
+make all
+quit
+exit
+cd root
+make clean
+make
+make
+make
+make clean
+make
+make
+make
+make
+make
+make clean
+make all
+make clean
+make
+make clean
+make
+make clen
+make clean
+make

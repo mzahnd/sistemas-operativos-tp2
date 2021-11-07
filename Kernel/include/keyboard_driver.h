@@ -13,6 +13,11 @@
 #define F1 59
 #define F12 88
 
+#define KEY_UP 72
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+#define KEY_DOWN 80
+
 #include <regi.h>
 #include <stdint.h>
 

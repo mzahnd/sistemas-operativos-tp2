@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <four_windows.h>
 #include <shells.h>
+#include <sudoku.h>
 
 static int running = 0;
 
@@ -15,9 +16,15 @@ void init_apps() {
   setTimerFunction(1, 3, drawTimer);
   setFunctionKey(1, stop_apps);
   drawClock();
+  init_sudoku();
   startTimer();
+  draw_sudoku();
   while(running) {
     char ch = getChar();
+    if (keyPressedSudoku(ch)) {
+      draw_sudoku();
+      highlightCurrent();
+    }
   }
 }
 

@@ -118,4 +118,10 @@ char * strcpy(char * dest, char * src) {
   return dest;
 }
 
+int round(double number) {
+  if ((number - (int)number) > 0.5) {
+    return (int)number + 1;
+  }
+  return (int)number;
+}
 #endif

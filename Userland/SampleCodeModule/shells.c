@@ -251,7 +251,9 @@ void keyPressedShell(char ch) {
     if (ch == '\n' && lineCursor[activeShell] > 0) {
       exeCommand(lines[activeShell][(currentLine[activeShell])%(TOTAL_LINES-1)]);
     }
-    putChar(ch);
+    if (ch >= 0 && ch < 128) {
+      putChar(ch);
+    }
   }
 }
 

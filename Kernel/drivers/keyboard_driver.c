@@ -34,6 +34,14 @@ void keyboardHandler(registerStruct * registers) {
     shiftR = 0;
   } else if (keyCode == F12) {
     saveRegisters(registers);
+  } else if (keyCode == KEY_UP){
+    BUFFER[(endIndex++)%BUFFER_SIZE] = KEY_UP + KEY_RELEASED;
+  } else if (keyCode == KEY_DOWN){
+    BUFFER[(endIndex++)%BUFFER_SIZE] = KEY_DOWN + KEY_RELEASED;
+  } else if (keyCode == KEY_LEFT){
+    BUFFER[(endIndex++)%BUFFER_SIZE] = KEY_LEFT + KEY_RELEASED;
+  } else if (keyCode == KEY_RIGHT){
+    BUFFER[(endIndex++)%BUFFER_SIZE] = KEY_RIGHT + KEY_RELEASED;
   } else if ( keyCode >= 59 && keyCode < 69) {
     int index = keyCode - F1;
     if (functionKeysMethodsInitialized[index]) {

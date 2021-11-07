@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+#define KEY_UP (char)200
+#define KEY_LEFT (char)203
+#define KEY_RIGHT (char)205
+#define KEY_DOWN (char)208
+
 void scanf(char * buffer);
 void printf(char * fmt, ...);
 void setConsoleUpdateFunction(void (*f)(char *, int));

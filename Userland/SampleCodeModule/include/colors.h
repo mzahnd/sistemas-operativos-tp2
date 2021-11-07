@@ -8,6 +8,12 @@
 #define YELLOW 0xFFF2000
 #define BLACK 0x000000
 #define LIGHT_GRAY 0xCDCDCD
+#define GRAY 0x515151
+#define LIGHT_APPLE 0xa4e685
+#define DARK_APPLE 0x75a65e
+#define PALE_YELLOW 0xd9e67c
+#define DARK_PALE_YELLOW 0xb2bd62
 #define BUTTERFLY_BUSH 0x5151A0
+#define PALE_PINK 0xd982d0
 
 #endif

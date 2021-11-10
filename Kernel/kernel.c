@@ -8,6 +8,7 @@
 #include <date_driver.h>
 #include <video_driver.h>
 #include <keyboard_driver.h>
+#include <interrupts.h>
 #include <idtLoader.h>
 
 extern uint8_t text;
@@ -94,10 +95,10 @@ int main()
 	initializeTickMethods();
 
 	//Test para printmem
-	// uint8_t * pos = 0x12345678;
-	// for (uint8_t i = 0; i < 32; i++) {
-	// 	*(pos+i) = 0x10 + i;
-	// }
+	uint8_t * pos = (uint8_t*)0x12345678;
+	for (uint8_t i = 0; i < 32; i++) {
+		*(pos+i) = 0x10 + i;
+	}
 
 	ncPrint("[Kernel Main]");
 	ncNewline();

@@ -4,6 +4,7 @@
 #include <naiveConsole.h>
 #include <keyboard_driver.h>
 #include <timer_driver.h>
+#include <interrupts.h>
 #include <regi.h>
 #include <syscalls.h>
 

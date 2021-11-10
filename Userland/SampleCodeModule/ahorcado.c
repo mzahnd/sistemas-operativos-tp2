@@ -91,16 +91,6 @@ int keyPressedAhorcado(char ch) {
   if (won) {
     draw_win();
   }
-  char str[strlen(ahorcado_words[ahorcado_choice])];
-  int i;
-  for (i = 0; i < strlen(ahorcado_words[ahorcado_choice]); i++) {
-    if (ahorcado_guess[i] == 0) {
-      str[i] = '-';
-    } else {
-      str[i] = ahorcado_words[ahorcado_choice][i];
-    }
-  }
-  str[i] = 0;
   return 1;
 }
 

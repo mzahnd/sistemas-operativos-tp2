@@ -13,16 +13,10 @@
 
 char std_in[STD_BUFFER_SIZE] = {0};
 char std_out[STD_BUFFER_SIZE] = {0};
-static char std_io_initialized = 0;
-static char buffered_std_out = 1;
 static int updateConsoleInitialized = 0;
 
 void (*updateConsolePointer)(char *, int);
 
-// void stdio_init() {
-//     if(!std_io_initialized)
-//     std_io_initialized = 1;
-// }
 
 void scanf(char * buffer) {
     int aux = 0;
@@ -79,18 +73,6 @@ void printf(char * fmt, ...) {
   }
   updateConsolePointer(buffer, j);
 }
-
-// int readKeyboard(char * buffer, int size) {
-//     if(size == 0)
-//         return 0;
-//     uint64_t aux;
-//     isKeyboardEmptySyscall(&aux);
-//     if(aux) {
-//         //readKeyboardSysCall(buffer, (uint8_t) size);
-//         return 1;
-//     }
-//     return 0;
-// }
 
 void setConsoleUpdateFunction(void (*f)(char *, int)) {
   updateConsolePointer = f;

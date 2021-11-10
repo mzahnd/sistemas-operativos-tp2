@@ -10,7 +10,7 @@
 static long init_ticks = 0;
 
 void startTimer() {
-  long init_ticks = getTicks();
+  init_ticks = getTicks();
 }
 
 void drawTimer() {

@@ -27,9 +27,11 @@ void init_apps() {
   while(running) {
     char ch = getChar();
     if (keyPressedSudoku(ch)) {
-      draw_sudoku();
-      highlightCurrent();
-    } else {
+      if (running) {
+        draw_sudoku();
+        highlightCurrent();
+      }
+    } else if (running) {
       keyPressedAhorcado(ch);
     }
   }

@@ -1,14 +1,12 @@
-# TPE ARQUITECTURA DE COMPUTADORAS - 1er CUATRIMESTRE 2021
+# TPE ARQUITECTURA DE COMPUTADORAS - 2er CUATRIMESTRE 2021
 ***
 ## Autores:
-* De Luca, Juan Manuel - 60103 - jdeluca@itba.edu.ar
-* Kim, Azul Candelaria - 60264 - azkim@itba.edu.ar
 * López Guzmán, Pedro Jeremías - 60711 - pelopez@itba.edu.ar
 ***
 ## Manual de usuario:
 
 ### Prerrequisitos
-* Contar con el archivo _60103-60264-60711.zip_ descargado y descomprimido en su computadora.
+* Contar con el archivo _TPE-60711.zip_ descargado y descomprimido en su computadora.
 * Contar con el programa qemu instalado.
 * Contar con el programa docker instalado.
 * Contar con acceso a la terminal de su computadora.
@@ -33,10 +31,10 @@
 * `echo [ARGUMENTO]` Imprime en pantalla el string provisto en el argumento.
 * `divzero` Fuerza una división por 0 para que se prodzca una excepción. Luego reinicia la shell y muestra el mensaje de error correspondiente junto con el estado de los registros.
 * `invalidopcode` Fuerza un código de operación inválido para que se produzca una excepción. Luego reinicia la shell y muestra el mensaje de error correspondiente junto con el estado de los registros.
+* `windows` Muestra un reloj en tiempo real, comienza un cronómetro, un juego de sudoku y un juego de ahorcado en simultáneo.
 * `help` Despliega el centro de ayuda.
 
 #### Teclas especiales
-* F1 - Sirve para cambiar la terminal seleccionada.
 * F12 - Sirve para guardar el estado de los registros.
 
 Además, un progrmador podría setear la funcionalidad que quiera para las teclas F1 a F10 mediante punteros a función.
@@ -60,6 +58,8 @@ Las syscalls a disposición del usuario son las siguientes: <br>
 | 11   | isKeyboardEmpty      | uint64_t * target    | -                | -                 | -               | -                  | -                 | -                 | -                 |
 | 12   | readError            | uint64_t * err       | -                | -                 | -               | -                  | -                 | -                 | -                 |
 | 13   | setFunctionKeyMethod | uint64_t index       | void(*)()        | -                 | -               | -                  | -                 | -                 | -                 |
+| 14   | setTickMethod        | uint64_t index       | void(*)()        | -                 | -               | -                  | -                 | -                 | -                 |
+| 15   | deleteTickMethod     | uint64_t index       |                  | -                 | -               | -                  | -                 | -                 | -                 |
 
 #### stdio
 Las funciones implementadas son:
@@ -70,6 +70,7 @@ Las funciones implementadas son:
 * `void setFunctionKey(int index, void(*func)())` setea en una tecla especial (F1-F10) la funcionalidad deseada
 * `void putChar(char ch)` imprime un char
 * `uint64_t getError()` devuelve el error de la última excepcion, sino devuelve 32
+* `void format(char *str, int value)` guarda en el buffer str el numero value completado con 0's a la izquierda
 
 #### stdlib
 Las funciones implementadas son:
@@ -83,6 +84,9 @@ Las funciones implementadas son:
 * `int atohex(char * str)` convierte un hex ASCII a entero
 * `char toUpper(char letter)` pasa el string a mayúscula
 * `char toLower(char letter)` pasa el string a minúscula
+* `int round(double number)` redondea number a su entero mas cercano
+* `int isalpha(char ch)` devuelve 1 si ch es un caracter alfabético, 0 sino
+* `void reverseStr(char str[])` revierte el string dado como argumento
 
 #### stdGraphics
 Las funciones implementadas son:
@@ -99,3 +103,5 @@ Las funciones implementadas son:
 * `int getMonth()` devuelve el mes de la fecha actual
 * `int getYear()` devuelve el año de la fecha actual
 * `int getTicks()` devuelve la cantidad total de ticks del Timer Tick
+* `void setTimerFunction(int index, int tickInterval, void(*)())` agrega en la posición index del vector de funciones del timer tick una función que será llamada cada tickInterval ticks
+* `void deleteTimerFunction(int index)` elimina la función en la posición index del vector de funciones del timer tick

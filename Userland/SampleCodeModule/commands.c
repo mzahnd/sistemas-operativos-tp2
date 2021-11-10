@@ -54,7 +54,7 @@ void printmem(char args[MAX_ARGS][MAX_ARG_LEN]) {
     uint64_t bytes[32];
     getMemSyscall(aux, bytes, 32);
     for (int i = 0; i < 4; i++) {
-      printf("0x%x: ", aux + i*4);
+      printf("0x%x: ", aux + i*8);
       for (int j = 0; j < 8; j++) {
         printf("%x ", bytes[i*8 + j]);
       }
@@ -68,21 +68,17 @@ void help(char args[MAX_ARGS][MAX_ARG_LEN]) {
     putChar('\n');
     printf("This is the Help Center\n");
     printf("\tSpecial keys:\n");
-    printf("\t* F1 - switch between shells\n");
     printf("\t* F12 - saves the values of the registers\n");
     printf("\tCommands:\n");
     printf("\t* datetime - displays the current date and time of the OS\n");
     printf("\t* inforeg - displays the values of each register\n");
-    printf("\t(F12 must have been pressed before this command is used for\n");
-    printf("\tit to work correctly)\n");
     printf("\t* printmem [ARGUMENT] - displays 32 bytes of memory,\n");
     printf("\tstarting from the address given in the argument\n");
     printf("\t* clear - clears the current shell\n");
     printf("\t* echo [ARGUMENT] - prints the given argument\n");
-    printf("\t* divzero - forces a division by zero and shows the\n");
-    printf("\tgenerated exception\n");
-    printf("\t* invalidopcode - forces an invalid OP code and shows\n");
-    printf("\tthe generated exception\n");
+    printf("\t* divzero - forces a division by zero\n");
+    printf("\t* invalidopcode - forces an invalid OP code\n");
+    printf("\t* windows - open a four window application\n");
 }
 
 void clear(char args[MAX_ARGS][MAX_ARG_LEN]){

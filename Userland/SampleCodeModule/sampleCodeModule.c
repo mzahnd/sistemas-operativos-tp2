@@ -1,9 +1,9 @@
 /* sampleCodeModule.c */
 
-// includes de prueba
 #include <syscalls_asm.h>
 #include <colors.h>
 #include <shells.h>
+#include <stdio.h>
 #include <stdint.h>
 
 char * v = (char*)0xB8000 + 79 * 2;

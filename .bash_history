@@ -327,3 +327,116 @@ make
 make clen
 make clean
 make
+cd root/
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clear
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make clean
+make all
+make celan
+make clean
+make all
+make clean
+make clean
+make all
+make clean
+clean
+sudo apt-get install fish
+apt-get install fish
+clear
+clear
+make all
+make clean\
+make all
+make all
+make clean
+clear
+make all
+make clean
+make
+make clean
+make all
+make clean
+make all
+make clean
+make all
+alias makeR='make clean; make'
+makeR
+makeR
+make clean
+make
+makeR
+makeR
+make clean
+make all
+makeR
+make clena
+makeT
+makeR
+make clean
+make
+makeR
+make clean
+make all
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+makeR
+exit

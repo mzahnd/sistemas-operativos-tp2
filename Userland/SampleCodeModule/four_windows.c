@@ -11,39 +11,41 @@
 
 static int running = 0;
 
-void init_apps() {
-  running = 1;
-  setTimerFunction(0, 18, drawClock);
-  setTimerFunction(1, 3, drawTimer);
-  setFunctionKey(1, stop_apps);
-  drawClock();
-  init_sudoku();
-  init_ahorcado();
-  startTimer();
-  draw_sudoku();
-  draw_background();
-  draw_lives();
-  draw_word();
-  while(running) {
-    char ch = getChar();
-    if (keyPressedSudoku(ch)) {
-      if (running) {
+void init_apps()
+{
+        running = 1;
+        setTimerFunction(0, 18, drawClock);
+        setTimerFunction(1, 3, drawTimer);
+        setFunctionKey(1, stop_apps);
+        drawClock();
+        init_sudoku();
+        init_ahorcado();
+        startTimer();
         draw_sudoku();
-        highlightCurrent();
-      }
-    } else if (running) {
-      keyPressedAhorcado(ch);
-    }
-  }
-  drawShellLines();
+        draw_background();
+        draw_lives();
+        draw_word();
+        while (running) {
+                char ch = getChar();
+                if (keyPressedSudoku(ch)) {
+                        if (running) {
+                                draw_sudoku();
+                                highlightCurrent();
+                        }
+                } else if (running) {
+                        keyPressedAhorcado(ch);
+                }
+        }
+        drawShellLines();
 }
 
-void stop_apps() {
-  running = 0;
-  deleteTimerFunction(0);
-  deleteTimerFunction(1);
-  drawShellLines();
-  putChar('\n');
+void stop_apps()
+{
+        running = 0;
+        deleteTimerFunction(0);
+        deleteTimerFunction(1);
+        drawShellLines();
+        putChar('\n');
 }
 
 #endif

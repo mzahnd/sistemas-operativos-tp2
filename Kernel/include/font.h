@@ -258,4 +258,4 @@
 #define XXXXXXX_ 0xFE
 #define XXXXXXXX 0xFF
 
-unsigned char * charBitmap(int c);
+unsigned char *charBitmap(int c);

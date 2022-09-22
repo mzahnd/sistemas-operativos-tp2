@@ -3,6 +3,6 @@
 #include <stdint.h>
 #include <regi.h>
 
-void syscallHandler(registerStruct * registers);
+void syscallHandler(registerStruct *registers);
 
 #endif

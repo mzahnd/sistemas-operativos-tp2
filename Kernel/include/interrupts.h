@@ -13,7 +13,7 @@ void _irq01Handler(void);
 void _irq80Handler(void);
 void _exception00Handler(void);
 void _exception06Handler(void);
-void saveInitialConditions(void* address);
+void saveInitialConditions(void *address);
 void _sendEOI(void);
 
 #endif

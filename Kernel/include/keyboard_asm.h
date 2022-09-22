@@ -5,5 +5,4 @@
 uint8_t keyActivated();
 uint8_t getKeyCode();
 
-
 #endif

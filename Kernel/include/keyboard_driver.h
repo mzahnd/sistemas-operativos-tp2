@@ -22,9 +22,9 @@
 #include <stdint.h>
 
 void keyboardHandler(registerStruct *);
-void readKeyboard(char * buff, uint64_t size, uint64_t * count);
-void bufferEmpty(uint64_t * target);
-void isMayus(uint64_t * target);
+void readKeyboard(char *buff, uint64_t size, uint64_t *count);
+void bufferEmpty(uint64_t *target);
+void isMayus(uint64_t *target);
 void initializeFunctionKeys();
 void setFunctionKeyMethod(uint64_t index, void (*function)());
 #endif

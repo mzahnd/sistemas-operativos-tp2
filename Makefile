@@ -1,5 +1,5 @@
 
-all:  bootloader kernel userland image
+all:  bootloader kernel userland image test
 
 bootloader:
 	cd Bootloader; make all

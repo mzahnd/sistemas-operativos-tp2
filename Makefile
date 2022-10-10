@@ -13,6 +13,9 @@ userland:
 image: kernel bootloader userland
 	cd Image; make all
 
+test: bootloader kernel userland image
+	cd test; make all
+
 clean:
 	cd Bootloader; make clean
 	cd Image; make clean

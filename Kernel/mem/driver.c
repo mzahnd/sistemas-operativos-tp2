@@ -49,14 +49,14 @@ void *somemset(void *dest, int c, size_t len)
                 // Big chunks first
                 chunk_len = len / (OPSIZ * 8);
                 while (chunk_len > 0) {
-                        dest_op[0] = c_op;
-                        dest_op[1] = c_op;
-                        dest_op[2] = c_op;
-                        dest_op[3] = c_op;
-                        dest_op[4] = c_op;
-                        dest_op[5] = c_op;
-                        dest_op[6] = c_op;
-                        dest_op[7] = c_op;
+                        ((op_t*) dest_op)[0] = c_op;
+                        ((op_t*) dest_op)[1] = c_op;
+                        ((op_t*) dest_op)[2] = c_op;
+                        ((op_t*) dest_op)[3] = c_op;
+                        ((op_t*) dest_op)[4] = c_op;
+                        ((op_t*) dest_op)[5] = c_op;
+                        ((op_t*) dest_op)[6] = c_op;
+                        ((op_t*) dest_op)[7] = c_op;
 
                         dest_op += 8 * OPSIZ;
                         chunk_len--;
@@ -67,7 +67,7 @@ void *somemset(void *dest, int c, size_t len)
                 // Write 'op_t' until less than OPSIZ bytes remain
                 chunk_len = len / OPSIZ;
                 while (chunk_len > 0) {
-                        dest_op[0] = c_op;
+                        ((op_t*) dest_op)[0] = c_op;
 
                         dest_op += OPSIZ;
                         chunk_len--;
@@ -110,14 +110,14 @@ void *somemcpy(void *dest, void *src, size_t len)
                 // Big chunks first
                 chunk_len = len / (OPSIZ * 8);
                 while (chunk_len > 0) {
-                        dest_op[0] = src_op[0];
-                        dest_op[1] = src_op[1];
-                        dest_op[2] = src_op[2];
-                        dest_op[3] = src_op[3];
-                        dest_op[4] = src_op[4];
-                        dest_op[5] = src_op[5];
-                        dest_op[6] = src_op[6];
-                        dest_op[7] = src_op[7];
+                        ((op_t*) dest_op)[0] = ((op_t*) src_op)[0];
+                        ((op_t*) dest_op)[1] = ((op_t*) src_op)[1];
+                        ((op_t*) dest_op)[2] = ((op_t*) src_op)[2];
+                        ((op_t*) dest_op)[3] = ((op_t*) src_op)[3];
+                        ((op_t*) dest_op)[4] = ((op_t*) src_op)[4];
+                        ((op_t*) dest_op)[5] = ((op_t*) src_op)[5];
+                        ((op_t*) dest_op)[6] = ((op_t*) src_op)[6];
+                        ((op_t*) dest_op)[7] = ((op_t*) src_op)[7];
 
                         dest_op += 8 * OPSIZ;
                         src_op += 8 * OPSIZ;
@@ -129,7 +129,7 @@ void *somemcpy(void *dest, void *src, size_t len)
                 // Write 'op_t' until less than OPSIZ bytes remain
                 chunk_len = len / OPSIZ;
                 while (chunk_len > 0) {
-                        dest_op[0] = src_op[0];
+                        ((op_t*) dest_op)[0] = ((op_t*) src_op)[0];
 
                         dest_op += OPSIZ;
                         src_op += OPSIZ;
@@ -140,7 +140,7 @@ void *somemcpy(void *dest, void *src, size_t len)
 
         // Bytes left
         while (len > 0) {
-                ((uint8_t *)dest_op)[0] = src_op[0];
+                ((uint8_t *)dest_op)[0] = ((uint8_t *)src_op)[0];
 
                 dest_op++;
                 src_op++;

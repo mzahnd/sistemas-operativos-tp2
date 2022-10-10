@@ -11,6 +11,7 @@
 #ifndef DRIVER_H
 #define DRIVER_H
 
+#include <stddef.h> /* size_t */
 #include <stdint.h>
 
 /* Type to use for aligned memory operations.

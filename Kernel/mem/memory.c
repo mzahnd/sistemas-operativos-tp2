@@ -16,7 +16,7 @@
 
 /* Prototypes */
 static void mem_init();
-static memory_block *request_more_space(uint32_t nu);
+// static memory_block *request_more_space(uint32_t nu);
 
 /* Globals */
 static memory_block *heap_freep = NULL;
@@ -77,7 +77,7 @@ void *sorealloc(void *ptr, size_t size)
         else if (ptr == NULL)
                 return somalloc(size);
         else if (size == 0) {
-                free(ptr);
+                sofree(ptr);
                 return NULL;
         }
 
@@ -104,23 +104,24 @@ void *sorealloc(void *ptr, size_t size)
                 sofree(new_block);
 
                 block->size = size;
-        } else {
-                // Use the same block
-                return ptr;
         }
+
+        // Use the same block
+        return ptr;
 }
 
 void sofree(void *ptr)
 {
-        if (ptr < MEM_HEAP_START_ADDR || ptr > MEM_HEAP_FINAL_ADDR)
+        if (ptr < (void *)MEM_HEAP_START_ADDR ||
+            ptr > (void *)MEM_HEAP_FINAL_ADDR)
                 return;
 
         memory_block *block = (memory_block *)ptr - 1;
         memory_block *p = NULL;
 
         // Avoid memory overrun
-        if (block + block->size > MEM_HEAP_FINAL_ADDR)
-                block->size = MEM_HEAP_FINAL_ADDR - block;
+        if ((void *)(block + block->size) > (void *)MEM_HEAP_FINAL_ADDR)
+                block->size = MEM_HEAP_FINAL_ADDR - (size_t)block;
 
         for (p = heap_freep; !(block > p && block < p->ptr); p = p->ptr) {
                 if (p >= p->ptr && (block > p || block < p->ptr))
@@ -134,8 +135,8 @@ void sofree(void *ptr)
                 block->ptr = p->ptr->ptr;
 
                 // Avoid possible memory overrun
-                if (block + block->size > MEM_HEAP_FINAL_ADDR)
-                        block->size = MEM_HEAP_FINAL_ADDR - block;
+                if ((void *)(block + block->size) > (void *)MEM_HEAP_FINAL_ADDR)
+                        block->size = MEM_HEAP_FINAL_ADDR - (size_t)block;
         } else {
                 block->ptr = p->ptr;
         }
@@ -146,8 +147,8 @@ void sofree(void *ptr)
                 p->ptr = block->ptr;
 
                 // Avoid possible memory overrun
-                if (p + p->size > MEM_HEAP_FINAL_ADDR)
-                        p->size = MEM_HEAP_FINAL_ADDR - p;
+                if ((void *)(p + p->size) > (void *)MEM_HEAP_FINAL_ADDR)
+                        p->size = MEM_HEAP_FINAL_ADDR - (size_t)p;
         } else {
                 p->ptr = block;
         }
@@ -157,7 +158,7 @@ void sofree(void *ptr)
 
 static void mem_init()
 {
-        heap_freep = MEM_HEAP_START_ADDR;
+        heap_freep = (memory_block *)MEM_HEAP_START_ADDR;
         heap_freep->size = (MEM_HEAP_SIZE + sizeof(memory_block) - 1) /
                                    sizeof(memory_block) +
                            1;

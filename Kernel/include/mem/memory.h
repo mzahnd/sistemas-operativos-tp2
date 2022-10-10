@@ -16,16 +16,18 @@
 
 // Pure64 free memory starts at 0x100000. Leave 256 MiB for non-heap stuff
 #define MEM_HEAP_START_ADDR (0x100000 << 8)
-#define MEM_HEAP_SIZE (1 << 8 * 1024 * 1024) // 256 MiB
+#define MEM_HEAP_SIZE (256 * 1024 * 1024) // 256 MiB
 
-typedef union MEMORY_BLOCK {
+typedef union MEMORY_BLOCK memory_block;
+
+union MEMORY_BLOCK {
         struct {
                 memory_block *ptr;
                 uint32_t size;
         };
 
         uint64_t __to_align; /* Do not use */
-} memory_block;
+};
 
 void *somalloc(size_t size);
 

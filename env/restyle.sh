@@ -24,7 +24,14 @@
 readonly SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
 pushd $SCRIPT_DIR &> /dev/null
 
-SOURCES=("../Bootloader" "../Image" "../Kernel" "../Toolchain" "../Userland")
+SOURCES=(\
+    "../Bootloader" \
+    "../Image" \
+    "../Kernel" \
+    "../Toolchain" \
+    "../Userland" \
+    "../test" \
+)
 
 for folder in "${SOURCES[@]}"; do
     echo -e "\e[34m\e[1mFormatting files in $folder\e[0m"

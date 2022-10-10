@@ -16,7 +16,7 @@
 
 /* Prototypes */
 static void mem_init();
-// static memory_block *request_more_space(uint32_t nu);
+// static memory_block *request_more_space(uint32_t nu); // Not implemented
 
 /* Globals */
 static memory_block *heap_freep = NULL;

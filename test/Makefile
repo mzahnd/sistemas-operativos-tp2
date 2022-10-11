@@ -17,14 +17,15 @@ OBJS_TEST	:= $(SRCS_TEST:.c=.o)
 SRCS_KERNEL	:= $(wildcard Kernel/mem/*.c)
 OBJS_KERNEL	:= $(SRCS_KERNEL:.c=.o) $(wildcard ../Kernel/mem/*.o)
 
+ALL_OBJS	:= $(OBJS_KERNEL) $(OBJS_TEST)
+
 CCSTD	:= gnu11
 
 CCFLAGS	:=	-fdiagnostics-color=auto --std=$(CCSTD) -Wall \
 			--pedantic -g -fno-exceptions -fno-asynchronous-unwind-tables \
-			-mno-mmx -mno-sse -mno-sse2 -msse -msse2 -msse3 -msse4 \
-			-fno-builtin-malloc -fno-builtin-free -fno-builtin-realloc \
+			-msse -msse2 -msse3 -msse4 \
 			-mno-red-zone -ffreestanding -Wno-int-to-pointer-cast \
-			-fno-common -D_POSIX_C_SOURCE=200809L
+			-fno-common -D_POSIX_C_SOURCE=200809L -DTESTING
 
 LDFLAGS	:=	-g --std=$(CCSTD) -Wall -z max-page-size=0x1000 \
 			-D_POSIX_C_SOURCE=200809L -lm
@@ -33,12 +34,12 @@ LDFLAGS	:=	-g --std=$(CCSTD) -Wall -z max-page-size=0x1000 \
 
 all: $(EXE_TEST)
 
-$(EXE_TEST): $(OBJS_KERNEL) $(OBJS_TEST)
+$(EXE_TEST): $(ALL_OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 %.o: %.c
 	$(CC) -c $(CCFLAGS) -I$(INCLUDE) $< -o $@
 
 clean:
-	$(RMDIR) $(EXE_TEST) *.o
+	$(RMDIR) $(EXE_TEST) $(ALL_OBJS)
 

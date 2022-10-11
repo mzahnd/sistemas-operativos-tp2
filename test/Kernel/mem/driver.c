@@ -21,6 +21,7 @@ CuSuite *test_get_driver_suite(void)
 
         /* somemset */
         SUITE_ADD_TEST(suite, test_somemset);
+        /* somemcpy */
         SUITE_ADD_TEST(suite, test_somemcpy);
 
         return suite;

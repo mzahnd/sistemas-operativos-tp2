@@ -36,7 +36,8 @@ void *somemset(void *dest, int c, size_t len)
                 c_op |= c_op << 8;
                 c_op |= c_op << 16;
                 if (OPSIZ > 4)
-                        c_op |= (c << 16) << 16;
+                        // Two steps to avoid warning (false positive)
+                        c_op |= (c_op << 16) << 16;
 
                 // Align
                 while (dest_op % OPSIZ != 0) {

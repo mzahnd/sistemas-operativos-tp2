@@ -8,15 +8,23 @@
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
  */
-
 #include <mem/driver.h>
 #include <mem/memory.h>
+
+#ifdef TESTING
+#pragma message("TESTING defined")
+#undef MEM_HEAP_START_ADDR
+#define MEM_HEAP_START_ADDR (test_get_mem_heap_start_addr())
+#endif
 
 #define MEM_HEAP_FINAL_ADDR (MEM_HEAP_START_ADDR + MEM_HEAP_SIZE)
 
 /* Prototypes */
 static void mem_init();
 // static memory_block *request_more_space(uint32_t nu); // Not implemented
+#ifdef TESTING
+static uint64_t test_get_mem_heap_start_addr();
+#endif
 
 /* Globals */
 static memory_block *heap_freep = NULL;
@@ -186,3 +194,12 @@ static memory_block *request_more_space(uint32_t nu)
         return heap_freep;
 }
 */
+
+#ifdef TESTING
+static uint64_t test_get_mem_heap_start_addr()
+{
+        static uint64_t heap_mem_addr[MEM_HEAP_SIZE] = {0};
+
+        return (uint64_t)&heap_mem_addr;
+}
+#endif

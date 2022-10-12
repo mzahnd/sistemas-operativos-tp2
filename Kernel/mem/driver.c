@@ -10,7 +10,9 @@
  */
 
 #include <stdint.h>
-#include <mem/driver.h>
+#include "mem/driver.h"
+
+/* ------------------------------ */
 
 /*
  * TODO: Implement
@@ -19,6 +21,8 @@ void *sosbrk(uint64_t size)
         return NULL;
 }
 */
+
+/* ------------------------------ */
 
 void *somemset(void *dest, int c, size_t len)
 {
@@ -86,6 +90,8 @@ void *somemset(void *dest, int c, size_t len)
 
         return dest;
 }
+
+/* ------------------------------ */
 
 void *somemcpy(void *dest, void *src, size_t len)
 {

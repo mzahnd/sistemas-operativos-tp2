@@ -4,10 +4,10 @@
 #include <string.h>
 
 /* Header to test */
-#include "../../../Kernel/include/mem/driver.h"
+#include "../../Kernel/include/lib.h"
 
 /* This file's header */
-#include "driver.h"
+#include "lib.h"
 
 #define TEST_MEMORY_SIZE 1024
 #define WRITTEN_VALUE '#'
@@ -15,8 +15,9 @@
 void test_somemset(CuTest *const ct);
 void test_somemcpy(CuTest *const ct);
 
-CuSuite *test_get_driver_suite(void)
+CuSuite *test_get_lib_suite(void)
 {
+        printf("[INFO] Running lib suite.\n");
         CuSuite *const suite = CuSuiteNew();
 
         /* somemset */
@@ -24,6 +25,7 @@ CuSuite *test_get_driver_suite(void)
         /* somemcpy */
         SUITE_ADD_TEST(suite, test_somemcpy);
 
+        printf("[INFO] Done lib suite.\n");
         return suite;
 }
 

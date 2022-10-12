@@ -12,7 +12,7 @@
  *
  * See: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/portable/MemMang/heap_4.c
  */
-#include "mem/driver.h"
+#include "lib.h"
 #include "mem/memory.h"
 
 /* ------------------------------ */

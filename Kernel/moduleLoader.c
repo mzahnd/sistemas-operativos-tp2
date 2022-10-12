@@ -28,7 +28,7 @@ static void loadModule(uint8_t **module, void *targetModuleAddress)
         ncPrintDec(moduleSize);
         ncPrint(" bytes)");
 
-        memcpy(targetModuleAddress, *module, moduleSize);
+        somemcpy(targetModuleAddress, *module, moduleSize);
         *module += moduleSize;
 
         ncPrint(" [Done]");

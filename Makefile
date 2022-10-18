@@ -1,5 +1,5 @@
 
-all:  bootloader kernel userland image
+all: bootloader kernel userland image
 
 bootloader:
 	cd Bootloader; make all
@@ -13,10 +13,15 @@ userland:
 image: kernel bootloader userland
 	cd Image; make all
 
+test:
+	cd Kernel; make EXTRA_CFLAGS="-DTESTING" all
+	cd test; make all
+
 clean:
 	cd Bootloader; make clean
 	cd Image; make clean
 	cd Kernel; make clean
 	cd Userland; make clean
+	cd test; make clean
 
-.PHONY: bootloader image collections kernel userland all clean
+.PHONY: bootloader image collections kernel userland all clean test

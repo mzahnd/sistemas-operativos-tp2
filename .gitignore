@@ -471,3 +471,6 @@ output.txt
 
 #Object files
 *.o
+
+# clangd
+compile_commands.json

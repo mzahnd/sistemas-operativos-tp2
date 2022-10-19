@@ -10,6 +10,8 @@
 #include <keyboard_driver.h>
 #include <interrupts.h>
 #include <idtLoader.h>
+#include <scheduler/scheduler.h>
+#include <mem/memory.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -64,18 +66,18 @@ void *initializeKernelBinary()
 
         clearBSS(&bss, &endOfKernel - &bss);
 
-        ncPrint("  text: 0x");
-        ncPrintHex((uint64_t)&text);
-        ncNewline();
-        ncPrint("  rodata: 0x");
-        ncPrintHex((uint64_t)&rodata);
-        ncNewline();
-        ncPrint("  data: 0x");
-        ncPrintHex((uint64_t)&data);
-        ncNewline();
-        ncPrint("  bss: 0x");
-        ncPrintHex((uint64_t)&bss);
-        ncNewline();
+        // ncPrint("  text: 0x");
+        // ncPrintHex((uint64_t)&text);
+        // ncNewline();
+        // ncPrint("  rodata: 0x");
+        // ncPrintHex((uint64_t)&rodata);
+        // ncNewline();
+        // ncPrint("  data: 0x");
+        // ncPrintHex((uint64_t)&data);
+        // ncNewline();
+        // ncPrint("  bss: 0x");
+        // ncPrintHex((uint64_t)&bss);
+        // ncNewline();
 
         ncPrint("[Done]");
         ncNewline();
@@ -96,25 +98,30 @@ int main()
                 *(pos + i) = 0x10 + i;
         }
 
-        ncPrint("[Kernel Main]");
-        ncNewline();
-        ncPrint("  Sample code module at 0x");
-        ncPrintHex((uint64_t)sampleCodeModuleAddress);
-        ncNewline();
-        ncPrint("  Calling the sample code module returned: ");
+        // ncPrint("[Kernel Main]");
+        // ncNewline();
+        // ncPrint("  Sample code module at 0x");
+        // ncPrintHex((uint64_t)sampleCodeModuleAddress);
+        // ncNewline();
+        // ncPrint("  Calling the sample code module returned: ");
         saveInitialConditions(sampleCodeModuleAddress);
-        ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-        ncNewline();
-        ncNewline();
+        
+        initScheduler();
+        TEMP_testProcess();
+        // ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
+        // ncNewline();
+        // ncNewline();
 
-        ncPrint("  Sample data module at 0x");
-        ncPrintHex((uint64_t)sampleDataModuleAddress);
-        ncNewline();
-        ncPrint("  Sample data module contents: ");
-        ncPrint((char *)sampleDataModuleAddress);
-        ncNewline();
+        // ncPrint("  Sample data module at 0x");
+        // ncPrintHex((uint64_t)sampleDataModuleAddress);
+        // ncNewline();
+        // ncPrint("  Sample data module contents: ");
+        // ncPrint((char *)sampleDataModuleAddress);
+        // ncNewline();
 
-        ncPrint("[Finished]");
+        // ncPrint("[Finished]");
+
+        while(1);
 
         return 0;
 }

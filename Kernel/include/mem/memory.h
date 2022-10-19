@@ -19,7 +19,7 @@
 
 // HEAP_SIZE can be externally defined
 #ifndef MEM_HEAP_SIZE
-#define MEM_HEAP_SIZE (256 * 1024 * 1024) // 256 MiB
+#define MEM_HEAP_SIZE (1 * 1024 * 1024) // 1 MiB
 #endif
 
 void *somalloc(size_t size);

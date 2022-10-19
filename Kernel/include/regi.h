@@ -6,6 +6,8 @@
 #define TOTAL_REGISTERS 19
 
 typedef struct registers {
+        uint64_t gs;
+	uint64_t fs;
         uint64_t r15;
         uint64_t r14;
         uint64_t r13;
@@ -25,6 +27,8 @@ typedef struct registers {
         uint64_t cs;
         uint64_t flags;
         uint64_t rsp;
+        uint64_t ss;
+	uint64_t base;
 } registerStruct;
 
 #endif

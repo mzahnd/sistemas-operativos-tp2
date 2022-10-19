@@ -13,6 +13,7 @@ GLOBAL _hlt
 
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
+EXTERN schedule
 
 SECTION .text
 
@@ -32,9 +33,13 @@ SECTION .text
 	push r13
 	push r14
 	push r15
+	push fs
+	push gs
 %endmacro
 
 %macro popState 0
+	pop gs
+	pop fs
 	pop r15
 	pop r14
 	pop r13
@@ -60,9 +65,9 @@ SECTION .text
 
 	call irqDispatcher
 
-	; signal pic EOI (End of Interrupt)
-	; mov al, 20h
-	; out 20h, al
+	;signal pic EOI (End of Interrupt)
+	mov al, 20h
+	out 20h, al
 
 	popState
 	iretq
@@ -112,7 +117,23 @@ picSlaveMask:
 
 ; Timer Tick
 _irq00Handler:
-    irqHandlerMaster 0
+    pushState
+
+	mov rsi, rsp ; pasaje del "vector" de registros
+	mov rdi, 0 ; pasaje de parametro
+
+	;call irqDispatcher
+
+	mov rdi, rsp; Paso el rsp como parametro
+	call schedule
+	mov rsp, rax; Guardo el rsp que me devolvio
+
+	;signal pic EOI (End of Interrupt)
+	mov al, 20h
+	out 20h, al
+
+	popState
+	iretq
 
 ; Keyboard
 _irq01Handler:

@@ -32,12 +32,17 @@ uint64_t schedule(uint64_t rsp) {
     if (!scheduler_initialized) {
         return rsp;
     }
-    // if (current == NULL) {
-    //     ncPrint("NULLC-");
-    //     return rsp;
-    // }
+    if (current == NULL) {
+        return rsp;
+    }
+
+    //Guardo el rsp en current
+    current->rsp = rsp;
+
+    //Cambio al siguiente;
+
+    //Retorno el RSP de mi current
     return current->rsp;
-    return rsp;
 }
 
 

@@ -1,9 +1,9 @@
-target remote 192.168.0.1:1234
-add-symbol-file ~/kernel/kernel.elf 0x100000
-add-symbol-file ~/kernel/0000-sampleCodeModule.elf 0x400000
+target remote 
+add-symbol-file Kernel/kernel.elf 0x100000
+add-symbol-file Userland/0000-sampleCodeModule.elf 0x400000
 
 define src-prof
-    dashborad -layout source expressions stack variables
+    dashboard -layout source expressions stack variables
     dashboard source -style height 20
 end
 

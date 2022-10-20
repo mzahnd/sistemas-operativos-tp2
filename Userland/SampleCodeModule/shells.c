@@ -15,7 +15,7 @@
 #define TOTAL_LINES 63
 #define MAX_LINE_LENGTH 128
 
-#define ARRAYSIZE(a) (sizeof(a)/sizeof(*(a)))
+#define ARRAYSIZE(a) (sizeof(a) / sizeof(*(a)))
 
 void updateShell(char *buff, int dim);
 void writeToLines(char *buff, int dim);

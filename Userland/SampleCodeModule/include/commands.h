@@ -12,5 +12,7 @@ void printmem(char args[MAX_ARGS][MAX_ARG_LEN]);
 void divzero(char args[MAX_ARGS][MAX_ARG_LEN]);
 void invalidopcode(char args[MAX_ARGS][MAX_ARG_LEN]);
 void windows(char args[MAX_ARGS][MAX_ARG_LEN]);
+void twomallocs(char args[MAX_ARGS][MAX_ARG_LEN]);
+void twofrees(char args[MAX_ARGS][MAX_ARG_LEN]);
 
 #endif

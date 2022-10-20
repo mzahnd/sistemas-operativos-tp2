@@ -11,6 +11,9 @@ GLOBAL getMemSyscall
 GLOBAL readErrorSyscall
 GLOBAL setTimerFunctionSyscall
 GLOBAL deleteTimerFunctionSyscall
+GLOBAL mallocSyscall
+GLOBAL callocSyscall
+GLOBAL freeSyscall
 
 section .text
 
@@ -161,3 +164,37 @@ deleteTimerFunctionSyscall:
     mov rsp, rbp
     pop rbp
     ret
+
+mallocSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 16 ;sys_somalloc
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+callocSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 17 ;sys_socalloc
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+freeSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 18 ;sys_sofree
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+

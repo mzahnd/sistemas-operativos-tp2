@@ -14,6 +14,9 @@
 
 #define TOTAL_LINES 63
 #define MAX_LINE_LENGTH 128
+
+#define ARRAYSIZE(a) (sizeof(a)/sizeof(*(a)))
+
 void updateShell(char *buff, int dim);
 void writeToLines(char *buff, int dim);
 void addLine();
@@ -30,14 +33,15 @@ static int currentLine[] = { 0, 0 };
 static int lineCursor[] = { 0, 0 };
 static int activeShell = 0;
 
-char commandsNames[][MAX_ARG_LEN] = { "datetime", "help",    "inforeg",
-                                      "printmem", "divzero", "invalidopcode",
-                                      "clear",    "echo",    "windows" };
+char commandsNames[][MAX_ARG_LEN] = { "datetime",   "help",    "inforeg",
+                                      "printmem",   "divzero", "invalidopcode",
+                                      "clear",      "echo",    "windows",
+                                      "twomallocs", "twofrees" };
 void (*run[])(char args[MAX_ARGS][MAX_ARG_LEN]) = {
-        dateTime,      help,  infoReg, printmem, divzero,
-        invalidopcode, clear, echo,    windows
+        dateTime, help, infoReg, printmem,   divzero, invalidopcode,
+        clear,    echo, windows, twomallocs, twofrees
 };
-static int totalCommands = 9;
+static int totalCommands = ARRAYSIZE(run);
 
 void init_shell(uint64_t errCode)
 {

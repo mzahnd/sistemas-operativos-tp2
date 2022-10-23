@@ -6,10 +6,11 @@
 #include <stdint.h>
 #include <regi.h>
 #include <naiveConsole.h>
+#include <interrupts.h>
 #include <utils.h>
 
-static void processWrapper(int(*mainF)(int, char **), int argc, char ** agrv);
-static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char**), int argc, char ** argv);
+static void mainFunctionWrapper(int(*mainF)(int, char **), int argc, char ** agrv, uint64_t *processStatus);
+static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char**), int argc, char ** argv, uint64_t *processStatus);
 
 process createProcess(char * name, uint64_t pid, uint64_t ppid, int(* mainF)(int, char**), int argc, char** argv) {
     process p = somalloc(sizeof(process_t));
@@ -24,12 +25,12 @@ process createProcess(char * name, uint64_t pid, uint64_t ppid, int(* mainF)(int
     p->status = READY;
     p->sleepingCyclesLeft = 0;
 
-    initStack(p->rbp, p->rsp, mainF, argc, argv);
+    initStack(p->rbp, p->rsp, mainF, argc, argv, &(p->status));
 
     return p;
 }
 
-static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char**), int argc, char ** argv) {
+static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char**), int argc, char ** argv, uint64_t *processStatus) {
     registerStruct * stack_frame = (registerStruct *)rsp;
     stack_frame->gs = 0x001;
     stack_frame->fs = 0x002;
@@ -45,9 +46,10 @@ static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char
     stack_frame->rdi = (uint64_t)processMainFunction; //address of the instruction to "return"
     stack_frame->rbp = 0x00A; // Dummy rbp
     stack_frame->rdx = (uint64_t)argv;
+    stack_frame->rcx = (uint64_t) processStatus;
     stack_frame->rbx = 0x010;
     stack_frame->rax = 0x11;
-    stack_frame->rip = (uint64_t)processWrapper;
+    stack_frame->rip = (uint64_t)mainFunctionWrapper;
     stack_frame->cs = 0x008;
     stack_frame->flags = 0x202;
     stack_frame->rsp = (uint64_t) (&stack_frame->base);
@@ -56,8 +58,10 @@ static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char
     
 }
 
-static void processWrapper(int(*mainF)(int, char **), int argc, char ** agrv) {
+static void mainFunctionWrapper(int(*mainF)(int, char **), int argc, char ** agrv, uint64_t* processStatus) {
     int result = mainF(argc, agrv);
+    *processStatus = KILLED;
+    forceTimerTick();
     return;
 }
 

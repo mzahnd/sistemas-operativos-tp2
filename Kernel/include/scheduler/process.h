@@ -5,6 +5,7 @@
 
 #define READY 1
 #define BLOCKED 2
+#define KILLED 3
 
 #include <stdint.h>
 

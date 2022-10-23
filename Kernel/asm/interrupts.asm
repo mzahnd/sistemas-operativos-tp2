@@ -10,6 +10,7 @@ GLOBAL _exception06Handler
 GLOBAL saveInitialConditions
 GLOBAL _sendEOI
 GLOBAL _hlt
+GLOBAL forceTimerTick
 
 EXTERN irqDispatcher
 EXTERN exceptionDispatcher
@@ -164,6 +165,10 @@ _sendEOI:
 	mov al, 20h
 	out 20h, al
 	pop rax
+	ret
+
+forceTimerTick:
+	int 20h
 	ret
 
 

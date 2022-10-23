@@ -8,10 +8,10 @@ uint64_t schedule(uint64_t rsp);
 void initScheduler();
 void TEMP_testProcess();
 void addProcess(process p);
-void createAndAddProcess(char * name, int (*mainF)(int, char**), int argc, char** argv);
+void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
+                         char **argv);
 void lockCurrentProcess();
 void unlockCurrentProcess();
 void unlockProcessByPID(uint64_t pid);
-
 
 #endif

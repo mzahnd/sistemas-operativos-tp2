@@ -107,7 +107,7 @@ int main()
         // ncNewline();
         // ncPrint("  Calling the sample code module returned: ");
         saveInitialConditions(sampleCodeModuleAddress);
-        
+
         initScheduler();
         initTestProcesses();
         // ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
@@ -123,33 +123,36 @@ int main()
 
         // ncPrint("[Finished]");
 
-        while(1);
+        while (1)
+                ;
 
         return 0;
 }
 
-int printA(int argc, char** argv) {
-    while(1) {
-        for (int i = 0; i < 100; i++) {
-            ncPrint("A");
-            putProcessToSleep(1);
+int printA(int argc, char **argv)
+{
+        while (1) {
+                for (int i = 0; i < 100; i++) {
+                        ncPrint("A");
+                        putProcessToSleep(1);
+                }
+                ncClear();
         }
-        ncClear();
-    }
 }
 
-int printB(int argc, char** argv) {
-    int i = 0;
-    while (i < 2) {
-        ncPrint("B");
-        putProcessToSleep(1);
-        i++;
-    }
-    ncPrint("Done");
+int printB(int argc, char **argv)
+{
+        int i = 0;
+        while (i < 2) {
+                ncPrint("B");
+                putProcessToSleep(1);
+                i++;
+        }
+        ncPrint("Done");
 }
 
-void initTestProcesses() {
+void initTestProcesses()
+{
         createAndAddProcess("Print A", printA, 0, NULL);
         createAndAddProcess("Print B", printB, 0, NULL);
-
 }

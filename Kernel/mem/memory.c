@@ -92,8 +92,18 @@ void *somalloc(size_t wanted_size)
                 extra_space_required = memblock_size + BYTE_ALIGNMENT -
                                        (wanted_size & BYTE_ALIGNMENT_MASK);
 
+        while (wanted_size + extra_space_required < MINIMUM_BLOCK_SIZE) {
+                wanted_size++;
+
+                // Calculate again
+                if (wanted_size > 0)
+                        extra_space_required =
+                                memblock_size + BYTE_ALIGNMENT -
+                                (wanted_size & BYTE_ALIGNMENT_MASK);
+        }
+
         if (ADD_WILL_OVERFLOW(wanted_size, extra_space_required) == 0 &&
-            wanted_size + extra_space_required > MINIMUM_BLOCK_SIZE) {
+            wanted_size + extra_space_required >= MINIMUM_BLOCK_SIZE) {
                 int found_valid_block = 0;
 
                 wanted_size += extra_space_required;

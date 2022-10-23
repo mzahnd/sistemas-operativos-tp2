@@ -13,16 +13,23 @@
 #define MAX_TEST_ALLOCATIONS 512
 
 #define TEST_ALLOC_SIZE 1024
+#define TEST_SMALL_ALLOC_SIZE 1
 #define WRITTEN_VALUE '#'
 
 /* ---------- somalloc ---------- */
 void test_somalloc_simple_alloc(CuTest *const ct);
 void test_somalloc_multiple_alloc(CuTest *const ct);
 void test_somalloc_write(CuTest *const ct);
+void test_somalloc_small_simple_alloc(CuTest *const ct);
+void test_somalloc_small_multiple_alloc(CuTest *const ct);
+void test_somalloc_small_write(CuTest *const ct);
 /* ---------- socalloc ---------- */
 void test_socalloc_simple_alloc(CuTest *const ct);
 void test_socalloc_multiple_alloc(CuTest *const ct);
 void test_socalloc_write(CuTest *const ct);
+void test_socalloc_small_simple_alloc(CuTest *const ct);
+void test_socalloc_small_multiple_alloc(CuTest *const ct);
+void test_socalloc_small_write(CuTest *const ct);
 /* ---------- sofree ---------- */
 void test_sofree_free_old_allocs(CuTest *const ct);
 void test_sofree_free_all_heap(CuTest *const ct);
@@ -59,11 +66,17 @@ CuSuite *test_get_memory_suite(void)
         SUITE_ADD_TEST(suite, test_somalloc_simple_alloc);
         SUITE_ADD_TEST(suite, test_somalloc_multiple_alloc);
         SUITE_ADD_TEST(suite, test_somalloc_write);
+        SUITE_ADD_TEST(suite, test_somalloc_small_simple_alloc);
+        SUITE_ADD_TEST(suite, test_somalloc_small_multiple_alloc);
+        SUITE_ADD_TEST(suite, test_somalloc_small_write);
 
         /* socalloc */
         SUITE_ADD_TEST(suite, test_socalloc_simple_alloc);
         SUITE_ADD_TEST(suite, test_socalloc_multiple_alloc);
         SUITE_ADD_TEST(suite, test_socalloc_write);
+        SUITE_ADD_TEST(suite, test_socalloc_small_simple_alloc);
+        SUITE_ADD_TEST(suite, test_socalloc_small_multiple_alloc);
+        SUITE_ADD_TEST(suite, test_socalloc_small_write);
 
         /* sofree */
         SUITE_ADD_TEST(suite, test_sofree_free_old_allocs);
@@ -118,6 +131,50 @@ void test_somalloc_write(CuTest *const ct)
         allocated[n_allocated++] = somalloc_ptr;
 }
 
+void test_somalloc_small_simple_alloc(CuTest *const ct)
+{
+        uint8_t *somalloc_ptr =
+                (uint8_t *)somalloc(TEST_SMALL_ALLOC_SIZE * sizeof(uint8_t));
+
+        CuAssertPtrNotNull(ct, somalloc_ptr);
+
+        allocated[n_allocated++] = somalloc_ptr;
+}
+
+void test_somalloc_small_multiple_alloc(CuTest *const ct)
+{
+        uint8_t *somalloc_ptr_1 =
+                (uint8_t *)somalloc(TEST_SMALL_ALLOC_SIZE * sizeof(uint8_t));
+        uint8_t *somalloc_ptr_2 =
+                (uint8_t *)somalloc(TEST_SMALL_ALLOC_SIZE * sizeof(uint8_t));
+
+        CuAssertPtrNotNull(ct, somalloc_ptr_1);
+        CuAssertPtrNotNull(ct, somalloc_ptr_2);
+
+        CuAssertTrue(ct, somalloc_ptr_1 != somalloc_ptr_2);
+
+        allocated[n_allocated++] = somalloc_ptr_1;
+        allocated[n_allocated++] = somalloc_ptr_2;
+}
+
+void test_somalloc_small_write(CuTest *const ct)
+{
+        uint8_t ok_str[TEST_SMALL_ALLOC_SIZE] = { 0 };
+        uint8_t *somalloc_ptr =
+                (uint8_t *)somalloc(TEST_SMALL_ALLOC_SIZE * sizeof(uint8_t));
+
+        CuAssertPtrNotNull(ct, somalloc_ptr);
+
+        memset(&ok_str, WRITTEN_VALUE, TEST_SMALL_ALLOC_SIZE);
+        memset(somalloc_ptr, WRITTEN_VALUE, TEST_SMALL_ALLOC_SIZE);
+
+        for (int i = 0; i < TEST_SMALL_ALLOC_SIZE; i++) {
+                CuAssertIntEquals(ct, (int)ok_str[i], (int)somalloc_ptr[i]);
+        }
+
+        allocated[n_allocated++] = somalloc_ptr;
+}
+
 /* ---------- socalloc ---------- */
 void test_socalloc_simple_alloc(CuTest *const ct)
 {
@@ -157,6 +214,50 @@ void test_socalloc_write(CuTest *const ct)
         memset(socalloc_ptr, WRITTEN_VALUE, TEST_ALLOC_SIZE - 1);
 
         CuAssertStrEquals(ct, ok_str, (char *)socalloc_ptr);
+
+        allocated[n_allocated++] = socalloc_ptr;
+}
+
+void test_socalloc_small_simple_alloc(CuTest *const ct)
+{
+        uint8_t *socalloc_ptr =
+                (uint8_t *)socalloc(TEST_SMALL_ALLOC_SIZE, sizeof(uint8_t));
+
+        CuAssertPtrNotNull(ct, socalloc_ptr);
+
+        allocated[n_allocated++] = socalloc_ptr;
+}
+
+void test_socalloc_small_multiple_alloc(CuTest *const ct)
+{
+        uint8_t *socalloc_ptr_1 =
+                (uint8_t *)socalloc(TEST_SMALL_ALLOC_SIZE, sizeof(uint8_t));
+        uint8_t *socalloc_ptr_2 =
+                (uint8_t *)socalloc(TEST_SMALL_ALLOC_SIZE, sizeof(uint8_t));
+
+        CuAssertPtrNotNull(ct, socalloc_ptr_1);
+        CuAssertPtrNotNull(ct, socalloc_ptr_2);
+
+        CuAssertTrue(ct, socalloc_ptr_1 != socalloc_ptr_2);
+
+        allocated[n_allocated++] = socalloc_ptr_1;
+        allocated[n_allocated++] = socalloc_ptr_2;
+}
+
+void test_socalloc_small_write(CuTest *const ct)
+{
+        uint8_t ok_str[TEST_SMALL_ALLOC_SIZE] = { 0 };
+        uint8_t *socalloc_ptr =
+                (uint8_t *)socalloc(TEST_SMALL_ALLOC_SIZE, sizeof(uint8_t));
+
+        CuAssertPtrNotNull(ct, socalloc_ptr);
+
+        memset(&ok_str, WRITTEN_VALUE, TEST_SMALL_ALLOC_SIZE);
+        memset(socalloc_ptr, WRITTEN_VALUE, TEST_SMALL_ALLOC_SIZE);
+
+        for (int i = 0; i < TEST_SMALL_ALLOC_SIZE; i++) {
+                CuAssertIntEquals(ct, (int)ok_str[i], (int)socalloc_ptr[i]);
+        }
 
         allocated[n_allocated++] = socalloc_ptr;
 }

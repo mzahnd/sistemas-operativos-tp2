@@ -15,5 +15,6 @@ void _exception00Handler(void);
 void _exception06Handler(void);
 void saveInitialConditions(void *address);
 void _sendEOI(void);
+void forceTimerTick(void);
 
 #endif

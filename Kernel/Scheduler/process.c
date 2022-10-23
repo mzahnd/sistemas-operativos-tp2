@@ -8,7 +8,7 @@
 #include <naiveConsole.h>
 #include <utils.h>
 
-static void process_wrapper(int(*mainF)(int, char **), int argc, char ** agrv);
+static void processWrapper(int(*mainF)(int, char **), int argc, char ** agrv);
 static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char**), int argc, char ** argv);
 
 process createProcess(char * name, uint64_t pid, uint64_t ppid, int(* mainF)(int, char**), int argc, char** argv) {
@@ -21,6 +21,8 @@ process createProcess(char * name, uint64_t pid, uint64_t ppid, int(* mainF)(int
     p->stackPointer = (void *)somalloc(PROCESS_STACK_SIZE);
     p->rbp = (void *)((char *) p->stackPointer + PROCESS_STACK_SIZE - 1); //Highest stack address
     p->rsp = (void *)((registerStruct *)p->rbp - 1); //rbp + size of stackFrame
+    p->status = READY;
+    p->sleepingCyclesLeft = 0;
 
     initStack(p->rbp, p->rsp, mainF, argc, argv);
 
@@ -45,7 +47,7 @@ static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char
     stack_frame->rdx = (uint64_t)argv;
     stack_frame->rbx = 0x010;
     stack_frame->rax = 0x11;
-    stack_frame->rip = (uint64_t)process_wrapper;
+    stack_frame->rip = (uint64_t)processWrapper;
     stack_frame->cs = 0x008;
     stack_frame->flags = 0x202;
     stack_frame->rsp = (uint64_t) (&stack_frame->base);
@@ -54,9 +56,14 @@ static void initStack(reg_t rbp, reg_t rsp, int(* processMainFunction)(int, char
     
 }
 
-static void process_wrapper(int(*mainF)(int, char **), int argc, char ** agrv) {
+static void processWrapper(int(*mainF)(int, char **), int argc, char ** agrv) {
     int result = mainF(argc, agrv);
     return;
+}
+
+void freeProcess(process p) {
+    sofree(p->stackPointer);
+    sofree(p);
 }
 
 #endif

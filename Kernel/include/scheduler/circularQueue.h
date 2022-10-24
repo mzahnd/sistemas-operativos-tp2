@@ -5,7 +5,6 @@
 typedef struct node_t {
         struct node_t *next;
         process pcb;
-        int space_filler[64]; //TODO Erase Space Filler
 } node_t;
 
 typedef node_t *node;
@@ -14,7 +13,6 @@ typedef struct circularQueue_t {
         node first;
         node last;
         int size;
-        int space_filler[64]; //TODO Erase Space FillerS
 } circularQueue_t;
 
 typedef circularQueue_t *circularQueue;

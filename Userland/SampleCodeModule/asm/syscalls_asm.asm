@@ -11,6 +11,7 @@ GLOBAL getMemSyscall
 GLOBAL readErrorSyscall
 GLOBAL setTimerFunctionSyscall
 GLOBAL deleteTimerFunctionSyscall
+GLOBAL createProcessSyscall
 
 section .text
 
@@ -156,6 +157,19 @@ deleteTimerFunctionSyscall:
     mov rbp, rsp
 
     mov rax, 15 ;ID readError
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+
+
+createProcessSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 20 ;ID createProcess
     int 80h
 
     mov rsp, rbp

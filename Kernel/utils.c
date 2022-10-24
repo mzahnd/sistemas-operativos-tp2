@@ -31,7 +31,7 @@ char *kernel_strcpy(char *destination, const char *source)
         return ptr;
 }
 
-int strlen(const char *string)
+int kernel_strlen(const char *string)
 {
         if (string == NULL) {
                 return 0;

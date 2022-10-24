@@ -60,6 +60,8 @@ RUN echo "deb http://ftp.de.debian.org/debian stretch main" | \
 RUN apt update \
     && apt install --only-upgrade --force-yes -y gdb
 
+# Install bear to generate compile_commands.json for text editors
+RUN apt install -y bear
 
 RUN yes password | passwd
 

@@ -13,7 +13,7 @@
  * See: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/portable/MemMang/heap_4.c
  */
 #include "lib.h"
-#include <mem/memory.h>
+#include "mem/memory.h"
 
 /* ------------------------------ */
 
@@ -282,7 +282,6 @@ static void mem_init()
         heap_freep->user_size = 0;
         heap_freep->next = heap_freep;
 }
-
 /* ------------------------------ */
 
 inline static memory_block *move_to_free_header_to_real_start(void *ptr)

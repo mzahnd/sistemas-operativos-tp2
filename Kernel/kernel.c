@@ -10,6 +10,8 @@
 #include <keyboard_driver.h>
 #include <interrupts.h>
 #include <idtLoader.h>
+#include <scheduler/scheduler.h>
+#include <mem/memory.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -24,6 +26,8 @@ static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
 
 typedef int (*EntryPoint)();
+
+void initTestProcesses();
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -64,18 +68,18 @@ void *initializeKernelBinary()
 
         clearBSS(&bss, &endOfKernel - &bss);
 
-        ncPrint("  text: 0x");
-        ncPrintHex((uint64_t)&text);
-        ncNewline();
-        ncPrint("  rodata: 0x");
-        ncPrintHex((uint64_t)&rodata);
-        ncNewline();
-        ncPrint("  data: 0x");
-        ncPrintHex((uint64_t)&data);
-        ncNewline();
-        ncPrint("  bss: 0x");
-        ncPrintHex((uint64_t)&bss);
-        ncNewline();
+        // ncPrint("  text: 0x");
+        // ncPrintHex((uint64_t)&text);
+        // ncNewline();
+        // ncPrint("  rodata: 0x");
+        // ncPrintHex((uint64_t)&rodata);
+        // ncNewline();
+        // ncPrint("  data: 0x");
+        // ncPrintHex((uint64_t)&data);
+        // ncNewline();
+        // ncPrint("  bss: 0x");
+        // ncPrintHex((uint64_t)&bss);
+        // ncNewline();
 
         ncPrint("[Done]");
         ncNewline();
@@ -96,25 +100,59 @@ int main()
                 *(pos + i) = 0x10 + i;
         }
 
-        ncPrint("[Kernel Main]");
-        ncNewline();
-        ncPrint("  Sample code module at 0x");
-        ncPrintHex((uint64_t)sampleCodeModuleAddress);
-        ncNewline();
-        ncPrint("  Calling the sample code module returned: ");
+        // ncPrint("[Kernel Main]");
+        // ncNewline();
+        // ncPrint("  Sample code module at 0x");
+        // ncPrintHex((uint64_t)sampleCodeModuleAddress);
+        // ncNewline();
+        // ncPrint("  Calling the sample code module returned: ");
         saveInitialConditions(sampleCodeModuleAddress);
-        ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-        ncNewline();
-        ncNewline();
 
-        ncPrint("  Sample data module at 0x");
-        ncPrintHex((uint64_t)sampleDataModuleAddress);
-        ncNewline();
-        ncPrint("  Sample data module contents: ");
-        ncPrint((char *)sampleDataModuleAddress);
-        ncNewline();
+        initScheduler();
+        initTestProcesses();
+        // ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
+        // ncNewline();
+        // ncNewline();
 
-        ncPrint("[Finished]");
+        // ncPrint("  Sample data module at 0x");
+        // ncPrintHex((uint64_t)sampleDataModuleAddress);
+        // ncNewline();
+        // ncPrint("  Sample data module contents: ");
+        // ncPrint((char *)sampleDataModuleAddress);
+        // ncNewline();
+
+        // ncPrint("[Finished]");
+
+        while (1)
+                ;
 
         return 0;
+}
+
+int printA(int argc, char **argv)
+{
+        while (1) {
+                for (int i = 0; i < 100; i++) {
+                        ncPrint("A");
+                        putProcessToSleep(1);
+                }
+                ncClear();
+        }
+}
+
+int printB(int argc, char **argv)
+{
+        int i = 0;
+        while (i < 2) {
+                ncPrint("B");
+                putProcessToSleep(1);
+                i++;
+        }
+        ncPrint("Done");
+}
+
+void initTestProcesses()
+{
+        createAndAddProcess("Print A", printA, 0, NULL);
+        createAndAddProcess("Print B", printB, 0, NULL);
 }

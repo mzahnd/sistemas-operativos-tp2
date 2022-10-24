@@ -63,8 +63,8 @@ uint64_t schedule(uint64_t rsp)
                         node nodeToKill = nextNode;
                         nextNode = nextNode->next;
                         next = nextNode->pcb;
-                        removeFromQueue(queue, nodeToKill->pcb->pid);
-                        freeProcess(nodeToKill->pcb);
+                        removeFromQueue(queue, nodeToKill->pcb->pid); // Remove makes the free of the process
+                        
                         totalReady--;
                         continue;
                 }

@@ -30,7 +30,7 @@ void initScheduler()
 {
         scheduler_initialized = 1;
         queue = newCircularQueue();
-        createAndAddProcess("HLT", haltProcess, 0, NULL);
+        createAndAddProcess("___HLT___", haltProcess, 0, NULL);
         totalReady--; // Halt process should not count as ready for the scheduler
 }
 
@@ -50,7 +50,7 @@ uint64_t schedule(uint64_t rsp)
         //Guardo el rsp en current
         current->rsp = (reg_t)rsp;
 
-        if (current->priority > currentProcessCycle && current->status != KILLED) {
+        if (current->priority > currentProcessCycle && current->status == READY) {
                 currentProcessCycle++;
                 return (uint64_t)current->rsp;
         }
@@ -198,6 +198,25 @@ void unlockProcessByPID(uint64_t pid)
                         return;
                 }
                 current = current->next;
+        }
+}
+
+void getSchedulerInfo(schInfo_t * infoBlock) {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return;
+        }
+        
+        infoBlock->totalReady = totalReady;
+        infoBlock->totalProcesses = queue->size;
+        node infoNode = queue->first;
+        for (int i = 0; i < MAX_PROCESSES_INFO && i < queue->size; i++, infoNode=infoNode->next) {
+                processInfo_t * processInfo = &(infoBlock->processes[i]);
+                process p = infoNode->pcb;
+                processInfo->name = p->name;
+                processInfo->pid = p->pid;
+                processInfo->ppid = p->pid;
+                processInfo->priority = p->priority;
+                processInfo->status = p->status;
         }
 }
 

@@ -15,6 +15,7 @@ GLOBAL mallocSyscall
 GLOBAL callocSyscall
 GLOBAL freeSyscall
 GLOBAL createProcessSyscall
+GLOBAL getSchedulerInfoSyscall
 
 section .text
 
@@ -207,6 +208,17 @@ createProcessSyscall:
     mov rbp, rsp
 
     mov rax, 20 ;ID createProcess
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+getSchedulerInfoSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 21 ;ID getSchedulerInfo
     int 80h
 
     mov rsp, rbp

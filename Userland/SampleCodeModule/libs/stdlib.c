@@ -1,6 +1,7 @@
 #ifndef STD_LIB_C
 #define STD_LIB_C value
 #include <stdlib.h>
+#include <syscalls_asm.h>
 
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);
@@ -150,6 +151,12 @@ void reverseStr(char str[])
                 str[i] = str[n - i - 1];
                 str[n - i - 1] = aux;
         }
+}
+
+void* malloc(unsigned int size) {
+        void * result;
+        mallocSyscall(size, &result); 
+        return result;
 }
 
 #endif

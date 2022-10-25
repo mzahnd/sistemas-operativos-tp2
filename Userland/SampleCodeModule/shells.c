@@ -39,18 +39,22 @@ static int activeShell = 0;
 void createTestProcess(char args[MAX_ARGS][MAX_ARG_LEN]) {
         createProcess("test", testProcess, 0, 0);
 }
+
+void testSchInfo(char args[MAX_ARGS][MAX_ARG_LEN]) {
+        schedulerInfo(0, NULL);
+}
 // -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 
 char commandsNames[][MAX_ARG_LEN] = { "datetime", "help",    "inforeg",
                                       "printmem", "divzero", "invalidopcode",
-                                      "clear",    "echo",    "windows", "testProcess" };
+                                      "clear",    "echo",    "windows", "testProcess", "schInfo"};
 void (*run[])(char args[MAX_ARGS][MAX_ARG_LEN]) = {
         dateTime,      help,  infoReg, printmem, divzero,
-        invalidopcode, clear, echo,    windows, createTestProcess
+        invalidopcode, clear, echo,    windows, createTestProcess, testSchInfo
 };
-static int totalCommands = 10;
+static int totalCommands = 11;
 
 void init_shell(uint64_t errCode)
 {

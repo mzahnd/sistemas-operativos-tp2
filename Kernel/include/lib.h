@@ -13,6 +13,10 @@
 
 #include <stdint.h>
 
+#ifndef NULL
+#define NULL ((void *)0)
+#endif
+
 // void *sosbrk(uint64_t size);
 void *somemset(void *dest, int32_t c, uint64_t n);
 void *somemcpy(void *dest, const void *src, uint64_t n);

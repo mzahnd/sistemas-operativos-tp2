@@ -214,7 +214,7 @@ void getSchedulerInfo(schInfo_t * infoBlock) {
                 process p = infoNode->pcb;
                 processInfo->name = p->name;
                 processInfo->pid = p->pid;
-                processInfo->ppid = p->pid;
+                processInfo->ppid = p->ppid;
                 processInfo->priority = p->priority;
                 processInfo->status = p->status;
         }

@@ -16,6 +16,7 @@ node currentNode = NULL;
 static int scheduler_initialized = 0;
 static unsigned int totalReady = 0;
 static unsigned int maxPID = 100;
+static unsigned int currentProcessCycle = 0;
 void putProcessToSleep(unsigned int seconds);
 
 int haltProcess(int argc, char **argv)
@@ -49,6 +50,11 @@ uint64_t schedule(uint64_t rsp)
         //Guardo el rsp en current
         current->rsp = (reg_t)rsp;
 
+        if (current->priority > currentProcessCycle && current->status != KILLED) {
+                currentProcessCycle++;
+                return (uint64_t)current->rsp;
+        }
+
         //Cambio al siguiente;
         node nextNode = currentNode->next;
         process next = nextNode->pcb;
@@ -56,8 +62,8 @@ uint64_t schedule(uint64_t rsp)
                (next->pid == HALT_PROCESS_PID && totalReady > 0)) {
                 if (nextNode == currentNode &&
                     currentNode->pcb->status != KILLED) {
-                        //Means that the queue was completely walked and only one process is active
-                        return (uint64_t)current->rsp;
+                        //Means that the queue was completely checked and only one process is active
+                        break;
                 }
 
                 if (next->status == KILLED) {
@@ -90,6 +96,7 @@ uint64_t schedule(uint64_t rsp)
 
         //Retorno el RSP de mi current
         currentNode = nextNode;
+        currentProcessCycle = 0;
         return (uint64_t)next->rsp;
 }
 

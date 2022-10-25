@@ -19,6 +19,7 @@ typedef struct process_t {
         reg_t rbp;
         void *stackPointer;
         uint8_t status;
+        uint8_t priority; 
         uint64_t sleepingCyclesLeft;
 } process_t;
 

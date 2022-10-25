@@ -33,7 +33,8 @@ process createProcess(char *name, uint64_t pid, uint64_t ppid,
                           1); //rbp + size of stackFrame
         p->status = READY;
         p->sleepingCyclesLeft = 0;
-
+        // Priority goes from 1 to 20. It indicates the total quantums it executes before switching to the next process
+        p->priority = 1; 
         initStack(p->rbp, p->rsp, mainF, argc, argv, &(p->status));
 
         return p;

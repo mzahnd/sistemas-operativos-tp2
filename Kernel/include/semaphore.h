@@ -11,18 +11,28 @@
 #ifndef SEMAPHORE_H
 #define SEMAPHORE_H
 
+#include <stdatomic.h> /* atomic_* */
 #include <stdint.h> /* int64_t */
 
-#define SOSEM_NAME_MAX ((2 << 7) - 2)
+/*
+ * Maximum value a semaphore can take.
+ */
+#define MAX_VALUE (~((unsigned int)0))
 
 typedef struct SOSEM {
-        int64_t value;
-        char name[SOSEM_NAME_MAX + 2];
+        atomic_uint value;
+        atomic_flag lock;
+
+        atomic_uint _n_waiting;
 } sosem_t;
 
-int sosem_close(sosem_t *sem);
-sosem_t *sosem_open(const char *name, uint64_t initial_value);
+// Create a semaphore starting with initial_value.
+int sosem_init(sosem_t *sem, unsigned int initial_value);
+int sosem_destroy(sosem_t *sem);
+int sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval);
 int sosem_post(sosem_t *sem);
 int sosem_wait(sosem_t *sem);
+
+// sosem_t *sosem_open(const char *name, uint64_t initial_value);
 
 #endif /* SEMAPHORE_H */

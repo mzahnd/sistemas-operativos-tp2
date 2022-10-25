@@ -14,12 +14,16 @@ INCLUDE		:= ./include
 
 SRCS_TEST	:= $(wildcard *.c)
 OBJS_TEST	:= $(SRCS_TEST:.c=.o)
-SRCS_KERNEL	:= $(wildcard Kernel/*.c) $(wildcard Kernel/mem/*.c)
-OBJS_KERNEL	:= $(SRCS_KERNEL:.c=.o) \
-			   $(wildcard ../Kernel/lib.o) $(wildcard ../Kernel/semaphore.o) \
-			   $(wildcard ../Kernel/mem/*.o)
 
-ALL_OBJS	:= $(OBJS_KERNEL) $(OBJS_TEST)
+SRCS_TEST_KERNEL	:= $(wildcard Kernel/lib.c) $(wildcard Kernel/mem/*.c) \
+					   $(wildcard Kernel/semaphore.c)
+OBJS_TEST_KERNEL	:= $(SRCS_TEST_KERNEL:.c=.o)
+
+OBJS_KERNEL	:=	$(wildcard ../Kernel/lib.o) \
+				$(wildcard ../Kernel/mem/*.o) \
+				$(wildcard ../Kernel/semaphore.o)
+
+ALL_OBJS	:= $(OBJS_TEST_KERNEL) $(OBJS_TEST) $(OBJS_KERNEL)
 
 CCSTD	:= gnu11
 

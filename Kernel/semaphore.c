@@ -9,26 +9,80 @@
  *                    Zahnd, M. E.
  */
 #include "lib.h"
+
 #include "semaphore.h"
 
 /* ------------------------------ */
 
-sosem_t *sosem_open(const char *name, uint64_t initial_value)
+#define acquire(lock) while (atomic_flag_test_and_set(lock))
+#define release(lock) atomic_flag_clear(lock)
+
+/* ------------------------------ */
+
+int sosem_init(sosem_t *sem, unsigned int initial_value)
 {
-        return NULL;
+        if (sem == NULL)
+                return -1;
+
+        atomic_store(&sem->value, initial_value);
+        atomic_flag_clear(&sem->lock);
+        atomic_store(&sem->_n_waiting, 0);
+
+        return 0;
 }
 
-int sosem_close(sosem_t *sem)
+/* ------------------------------ */
+
+int sosem_destroy(sosem_t *sem)
 {
-        return -1;
+        if (sem == NULL)
+                return -1;
+
+        atomic_store(&sem->value, MAX_VALUE);
+        return 0;
 }
+
+/* ------------------------------ */
 
 int sosem_post(sosem_t *sem)
 {
-        return -1;
+        if (sem == NULL)
+                return -1;
+
+        return atomic_fetch_add(&sem->value, 1);
 }
+
+/* ------------------------------ */
 
 int sosem_wait(sosem_t *sem)
 {
-        return -1;
+        if (sem == NULL)
+                return -1;
+
+        acquire(&(sem->lock));
+        atomic_fetch_add(&sem->_n_waiting, 1);
+
+        while (atomic_load(&sem->value) == 0)
+                ;
+        atomic_fetch_sub(&sem->value, 1);
+
+        atomic_fetch_sub(&sem->_n_waiting, 1);
+        release(&(sem->lock));
+
+        return 0;
+}
+
+/* ------------------------------ */
+
+int sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval)
+{
+        if (sem == NULL || sval == NULL)
+                return -1;
+
+        if (atomic_load(&sem->_n_waiting) > 0)
+                *sval = 0;
+        else
+                *sval = atomic_load(&sem->value);
+
+        return 0;
 }

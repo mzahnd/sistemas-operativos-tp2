@@ -115,7 +115,7 @@ rtc_poll:
 	out 0xA1, al
 
 	; Configure graphics if requested
-	cmp byte [cfg_vesa], 0		; Check if VESA should be enabled
+	cmp byte [cfg_vesa], 1		; Check if VESA should be enabled
 	jne VBEdone			; If not then skip VESA init
 
 	mov edi, VBEModeInfoBlock	; VBE data will be stored at this address

@@ -10,10 +10,10 @@
 #include <utils.h>
 
 static void mainFunctionWrapper(int (*mainF)(int, char **), int argc,
-                                char **agrv, uint64_t *processStatus);
+                                char **agrv, uint8_t *processStatus);
 static void initStack(reg_t rbp, reg_t rsp,
                       int (*processMainFunction)(int, char **), int argc,
-                      char **argv, uint64_t *processStatus);
+                      char **argv, uint8_t *processStatus);
 
 process createProcess(char *name, uint64_t pid, uint64_t ppid,
                       int (*mainF)(int, char **), int argc, char **argv)
@@ -33,7 +33,8 @@ process createProcess(char *name, uint64_t pid, uint64_t ppid,
                           1); //rbp + size of stackFrame
         p->status = READY;
         p->sleepingCyclesLeft = 0;
-
+        // Priority goes from 1 to 20. It indicates the total quantums it executes before switching to the next process
+        p->priority = 1; 
         initStack(p->rbp, p->rsp, mainF, argc, argv, &(p->status));
 
         return p;
@@ -41,7 +42,7 @@ process createProcess(char *name, uint64_t pid, uint64_t ppid,
 
 static void initStack(reg_t rbp, reg_t rsp,
                       int (*processMainFunction)(int, char **), int argc,
-                      char **argv, uint64_t *processStatus)
+                      char **argv, uint8_t *processStatus)
 {
         registerStruct *stack_frame = (registerStruct *)rsp;
         stack_frame->gs = 0x001;
@@ -71,7 +72,7 @@ static void initStack(reg_t rbp, reg_t rsp,
 }
 
 static void mainFunctionWrapper(int (*mainF)(int, char **), int argc,
-                                char **agrv, uint64_t *processStatus)
+                                char **agrv, uint8_t *processStatus)
 {
         int result = mainF(argc, agrv);
         *processStatus = KILLED;

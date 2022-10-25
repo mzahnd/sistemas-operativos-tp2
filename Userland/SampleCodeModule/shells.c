@@ -11,6 +11,8 @@
 #include <timer.h>
 #include <syscalls_asm.h>
 #include <clock.h>
+#include <processes.h>
+#include <processManagement.h>
 
 #define TOTAL_LINES 63
 #define MAX_LINE_LENGTH 128
@@ -30,14 +32,22 @@ static int currentLine[] = { 0, 0 };
 static int lineCursor[] = { 0, 0 };
 static int activeShell = 0;
 
+// TODO: Delete ------------------------------------------------------------------------------------------------------------------------------------------------------
+void createTestProcess(char args[MAX_ARGS][MAX_ARG_LEN]) {
+        createProcess("test", testProcess, 0, 0);
+}
+// -------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
 char commandsNames[][MAX_ARG_LEN] = { "datetime", "help",    "inforeg",
                                       "printmem", "divzero", "invalidopcode",
-                                      "clear",    "echo",    "windows" };
+                                      "clear",    "echo",    "windows", "testProcess" };
 void (*run[])(char args[MAX_ARGS][MAX_ARG_LEN]) = {
         dateTime,      help,  infoReg, printmem, divzero,
-        invalidopcode, clear, echo,    windows
+        invalidopcode, clear, echo,    windows, createTestProcess
 };
-static int totalCommands = 9;
+static int totalCommands = 10;
 
 void init_shell(uint64_t errCode)
 {

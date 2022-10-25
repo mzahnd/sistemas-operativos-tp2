@@ -9,9 +9,14 @@
 #include <font.h>
 #include <IO_driver.h>
 #include <exceptions.h>
+#include <scheduler/scheduler.h>
+#include <scheduler/process.h>
+#include <mem/memory.h>
+#include <utils.h>
 
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
+void syscallCreateProcess(registerStruct *reg) ;
 
 void syscallHandler(registerStruct *registers)
 {
@@ -120,6 +125,15 @@ void syscallHandler(registerStruct *registers)
                 //rdi -> indice del metodo a eliminar
                 deleteTickMethod(registers->rdi);
                 break;
+
+
+        // From 20 -> Process management syscalls:
+        case 20: //Create Process
+                //rdi -> char *: Nombre del proceso
+                //rsi -> int (*)(int, char**): Puntero a la funcion principal del procesp
+                //rdx -> int: argc
+                //rcx -> char**: argv
+                syscallCreateProcess(registers);
         }
 }
 
@@ -159,6 +173,10 @@ void writeStr(registerStruct *registers)
                 xOffset += CHAR_WIDTH * registers->r10;
         }
         //drawChar(0, 0, 'A',1, 0xFFFFFF, 0, 0);
+}
+
+void syscallCreateProcess(registerStruct *reg) {
+        createAndAddProcess((char *)reg->rdi,(int (*)(int, char**))reg->rsi, (int)reg->rdx, (char **)reg->rcx);
 }
 
 #endif

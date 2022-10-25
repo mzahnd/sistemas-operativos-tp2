@@ -13,6 +13,7 @@
 #include <scheduler/process.h>
 #include <mem/memory.h>
 #include <utils.h>
+#include <mem/sys_memory.h> /* sys_somalloc(); sys_socalloc(); sys_sofree() */
 
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
@@ -124,6 +125,25 @@ void syscallHandler(registerStruct *registers)
         case 15:
                 //rdi -> indice del metodo a eliminar
                 deleteTickMethod(registers->rdi);
+                break;
+
+        case 16: /* somalloc */
+                // rdi -> tamaño de memoria solicitado
+                // rsi -> result
+                sys_somalloc((size_t)registers->rdi, (void **)registers->rsi);
+                break;
+
+        case 17: /* socalloc */
+                // rdi -> cantidad de bloques solicitados
+                // rsi -> tamaño de cada bloque
+                // rdx -> result
+                sys_socalloc((size_t)registers->rdi, (size_t)registers->rsi,
+                             (void **)registers->rdx);
+                break;
+
+        case 18: /* sofree */
+                // rdi -> puntero al bloque a liberar
+                sys_sofree((void *)registers->rdi);
                 break;
 
 

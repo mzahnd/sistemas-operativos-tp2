@@ -1,6 +1,7 @@
 #ifndef SYSCALLS_ASM_H
 #define SYSCALLS_ASM_H
 
+#include <stddef.h> /* size_t */
 #include <stdint.h>
 
 void drawStringSysCall(char *buff, uint64_t size, uint64_t x, uint64_t y,
@@ -19,6 +20,9 @@ void getMemSyscall(uint64_t, uint64_t *, uint8_t);
 void readErrorSyscall(uint64_t *err);
 void setTimerFunctionSyscall(int index, int tickInterval, void (*)());
 void deleteTimerFunctionSyscall(int index);
+void mallocSyscall(size_t size, void **result);
+void callocSyscall(size_t nmemb, size_t size, void **result);
+void freeSyscall(void *ptr);
 void createProcessSyscall(char * name, int (*mainFunction)(int, char**), int argc, char** argv);
 
 #endif

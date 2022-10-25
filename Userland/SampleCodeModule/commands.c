@@ -83,6 +83,8 @@ void help(char args[MAX_ARGS][MAX_ARG_LEN])
         printf("\t* divzero - forces a division by zero\n");
         printf("\t* invalidopcode - forces an invalid OP code\n");
         printf("\t* windows - open a four window application\n");
+        printf("\t* twomallocs - Allocate two blocks of 1024 bytes each. \n");
+        printf("\t* twofrees [ADDR1] [ADDR2] - Free blocks allocated by twomallocs \n");
 }
 
 void clear(char args[MAX_ARGS][MAX_ARG_LEN])
@@ -113,4 +115,51 @@ void windows(char args[MAX_ARGS][MAX_ARG_LEN])
 {
         init_apps();
         putChar('\n');
+}
+
+void twomallocs(char args[MAX_ARGS][MAX_ARG_LEN])
+{
+        void *result = 0;
+
+        putChar('\n');
+        mallocSyscall(1024, &result);
+        ((char *)result)[0] = 'h';
+        ((char *)result)[1] = 'o';
+        ((char *)result)[2] = 'l';
+        ((char *)result)[3] = 'a';
+        printf("First malloc: %X\n ", result);
+
+        mallocSyscall(1024, &result);
+        ((char *)result)[0] = 'c';
+        ((char *)result)[1] = 'h';
+        ((char *)result)[2] = 'a';
+        ((char *)result)[3] = 'u';
+        printf("Second malloc: %X\n ", result);
+
+        printf("Written 'hola' in first malloc; 'chau' in second\n", result);
+}
+
+void twofrees(char args[MAX_ARGS][MAX_ARG_LEN])
+{
+        void *addr1 = NULL;
+        void *addr2 = NULL;
+        if (args[1][0] == '0' && args[1][1] == 'x') {
+                // Dual cast to avoid warning
+                addr1 = (void *)(uint64_t)atohex(&args[1][2]);
+        } else {
+                addr1 = (void *)(uint64_t)atohex(&args[1][0]);
+        }
+
+        if (args[2][0] == '0' && args[2][1] == 'x') {
+                // Dual cast to avoid warning
+                addr2 = (void *)(uint64_t)atohex(&args[2][2]);
+        } else {
+                addr2 = (void *)(uint64_t)atohex(&args[2][0]);
+        }
+
+        putChar('\n');
+        freeSyscall(addr1);
+        printf("First malloc freed\n");
+        freeSyscall(addr2);
+        printf("Second malloc freed\n");
 }

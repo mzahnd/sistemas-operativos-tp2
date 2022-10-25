@@ -12,6 +12,7 @@
 #include <idtLoader.h>
 #include <scheduler/scheduler.h>
 #include <mem/memory.h>
+#include <semaphore.h>
 
 extern uint8_t text;
 extern uint8_t rodata;
@@ -28,6 +29,10 @@ static void *const sampleDataModuleAddress = (void *)0x500000;
 typedef int (*EntryPoint)();
 
 void initTestProcesses();
+
+int semA(int argc, char **argv);
+int semB(int argc, char **argv);
+void initTestSem();
 
 void clearBSS(void *bssAddress, uint64_t bssSize)
 {
@@ -109,7 +114,8 @@ int main()
         saveInitialConditions(sampleCodeModuleAddress);
 
         initScheduler();
-        initTestProcesses();
+        /* initTestProcesses(); */
+        initTestSem();
         // ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
         // ncNewline();
         // ncNewline();
@@ -155,4 +161,80 @@ void initTestProcesses()
 {
         createAndAddProcess("Print A", printA, 0, NULL);
         createAndAddProcess("Print B", printB, 0, NULL);
+}
+
+static const uint64_t dummy = 0x0FFFFFFF;
+static sosem_t glob_sem;
+
+int semA(int argc, char **argv)
+{
+        ncPrint("[semA] Hi!");
+        ncNewline();
+        ncPrint("[semA] About to wait");
+        ncNewline();
+
+        sosem_wait(&glob_sem);
+
+        ncPrint("[semA] Critical section");
+        ncNewline();
+
+        for (uint64_t i = 0; i < dummy;) {
+                i++;
+        }
+
+        ncPrint("[semA] About to exit critical section");
+        ncNewline();
+
+        sosem_post(&glob_sem);
+        ncPrint("[semA] Exited critical section");
+        ncNewline();
+        return 0;
+}
+
+int semB(int argc, char **argv)
+{
+        ncPrint("[semB] Hi!");
+        ncNewline();
+
+        for (uint64_t i = 0; i < dummy;) {
+                i++;
+        }
+
+        ncPrint("[semB] About to post");
+        ncNewline();
+        sosem_post(&glob_sem);
+        ncPrint("[semB] Posted!");
+        ncNewline();
+
+        for (uint64_t i = 0; i < dummy / 4;) {
+                i++;
+        }
+
+        ncPrint("[semB] About to wait");
+        ncNewline();
+        sosem_wait(&glob_sem);
+        ncPrint("[semB] Critical section");
+        ncNewline();
+
+        for (uint64_t i = 0; i < dummy;) {
+                i++;
+        }
+        ncPrint("[semB] About to exit critical section");
+        ncNewline();
+
+        sosem_post(&glob_sem);
+        ncPrint("[semB] Exited critical section");
+        ncNewline();
+        return 0;
+}
+
+void initTestSem()
+{
+        int ret = sosem_init(&glob_sem, 0);
+        ncPrint("sosem_init() = ");
+        ncPrintDec(ret);
+        ncNewline();
+
+        createAndAddProcess("semA", semA, 0, NULL);
+        createAndAddProcess("semB", semB, 0, NULL);
 }

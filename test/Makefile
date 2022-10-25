@@ -16,7 +16,8 @@ SRCS_TEST	:= $(wildcard *.c)
 OBJS_TEST	:= $(SRCS_TEST:.c=.o)
 SRCS_KERNEL	:= $(wildcard Kernel/*.c) $(wildcard Kernel/mem/*.c)
 OBJS_KERNEL	:= $(SRCS_KERNEL:.c=.o) \
-			   $(wildcard ../Kernel/lib.o) $(wildcard ../Kernel/mem/*.o)
+			   $(wildcard ../Kernel/lib.o) $(wildcard ../Kernel/semaphore.o) \
+			   $(wildcard ../Kernel/mem/*.o)
 
 ALL_OBJS	:= $(OBJS_KERNEL) $(OBJS_TEST)
 

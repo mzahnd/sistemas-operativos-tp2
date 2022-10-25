@@ -72,8 +72,10 @@ void readKeyboard(char *buff, uint64_t size, uint64_t *count)
 {
         int i = 0;
         while (endIndex <= startIndex) {
+                _sti();
                 _hlt();
         }
+        _cli();
         for (i = 0; i < (endIndex - startIndex) && i < size; i++) {
                 buff[i] = BUFFER[(startIndex++) % BUFFER_SIZE];
         }

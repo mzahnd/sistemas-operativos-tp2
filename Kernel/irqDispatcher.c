@@ -25,9 +25,9 @@ void irqDispatcher(uint64_t irq, uint64_t *registers)
                 _sendEOI();
                 break;
         case 80:
-                _sti();
-                _sendEOI();
+                //_sti();
                 int_80h((registerStruct *)registers);
+                _sendEOI();
                 break;
         }
 }

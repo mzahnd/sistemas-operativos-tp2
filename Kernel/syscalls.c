@@ -16,6 +16,7 @@
 
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
+void syscallCreateProcess(registerStruct *reg) ;
 
 void syscallHandler(registerStruct *registers)
 {

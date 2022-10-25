@@ -10,10 +10,10 @@
 #include <utils.h>
 
 static void mainFunctionWrapper(int (*mainF)(int, char **), int argc,
-                                char **agrv, uint64_t *processStatus);
+                                char **agrv, uint8_t *processStatus);
 static void initStack(reg_t rbp, reg_t rsp,
                       int (*processMainFunction)(int, char **), int argc,
-                      char **argv, uint64_t *processStatus);
+                      char **argv, uint8_t *processStatus);
 
 process createProcess(char *name, uint64_t pid, uint64_t ppid,
                       int (*mainF)(int, char **), int argc, char **argv)
@@ -41,7 +41,7 @@ process createProcess(char *name, uint64_t pid, uint64_t ppid,
 
 static void initStack(reg_t rbp, reg_t rsp,
                       int (*processMainFunction)(int, char **), int argc,
-                      char **argv, uint64_t *processStatus)
+                      char **argv, uint8_t *processStatus)
 {
         registerStruct *stack_frame = (registerStruct *)rsp;
         stack_frame->gs = 0x001;
@@ -71,7 +71,7 @@ static void initStack(reg_t rbp, reg_t rsp,
 }
 
 static void mainFunctionWrapper(int (*mainF)(int, char **), int argc,
-                                char **agrv, uint64_t *processStatus)
+                                char **agrv, uint8_t *processStatus)
 {
         int result = mainF(argc, agrv);
         *processStatus = KILLED;

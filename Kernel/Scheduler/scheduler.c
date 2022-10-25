@@ -3,6 +3,7 @@
 
 #include <scheduler/process.h>
 #include <scheduler/circularQueue.h>
+#include <scheduler/scheduler.h>
 #include <mem/memory.h>
 #include <naiveConsole.h>
 #include <interrupts.h>
@@ -40,13 +41,13 @@ uint64_t schedule(uint64_t rsp)
 
         if (!currentNode) {
                 currentNode = queue->first;
-                return currentNode->pcb->rsp;
+                return (uint64_t)currentNode->pcb->rsp;
         }
 
         process current = currentNode->pcb;
 
         //Guardo el rsp en current
-        current->rsp = rsp;
+        current->rsp = (reg_t)rsp;
 
         //Cambio al siguiente;
         node nextNode = currentNode->next;
@@ -56,7 +57,7 @@ uint64_t schedule(uint64_t rsp)
                 if (nextNode == currentNode &&
                     currentNode->pcb->status != KILLED) {
                         //Means that the queue was completely walked and only one process is active
-                        return current->rsp;
+                        return (uint64_t)current->rsp;
                 }
 
                 if (next->status == KILLED) {
@@ -89,7 +90,7 @@ uint64_t schedule(uint64_t rsp)
 
         //Retorno el RSP de mi current
         currentNode = nextNode;
-        return next->rsp;
+        return (uint64_t)next->rsp;
 }
 
 void addProcess(process p)
@@ -172,7 +173,7 @@ void unlockCurrentProcess()
 
 void unlockProcessByPID(uint64_t pid)
 {
-        if (!scheduler_initialized || queue == NULL || queue->size == NULL) {
+        if (!scheduler_initialized || queue == NULL || queue->size == 0) {
                 return;
         }
         int init = 0;

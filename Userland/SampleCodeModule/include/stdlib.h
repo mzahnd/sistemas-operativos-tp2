@@ -1,6 +1,8 @@
 #ifndef STDLIB_H
 #define STDLIB_H
 
+#define NULL 0
+
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);
 int strlen(char *str);

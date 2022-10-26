@@ -34,7 +34,7 @@ CCFLAGS	:=	-fdiagnostics-color=auto --std=$(CCSTD) -Wall \
 			-fno-common -D_POSIX_C_SOURCE=200809L -DTESTING
 
 LDFLAGS	:=	-g --std=$(CCSTD) -Wall -z max-page-size=0x1000 \
-			-D_POSIX_C_SOURCE=200809L -lm
+			-D_POSIX_C_SOURCE=200809L -lm -lpthread
 
 .PHONY: all clean
 

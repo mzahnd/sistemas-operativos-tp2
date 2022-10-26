@@ -3,6 +3,7 @@
 #include <CuTest.h>
 #include "Kernel/lib.h"
 #include "Kernel/mem/memory.h"
+#include "Kernel/semaphore.h"
 
 void RunAllTests(void)
 {
@@ -11,6 +12,7 @@ void RunAllTests(void)
 
         CuSuiteAddSuite(suite, test_get_lib_suite());
         CuSuiteAddSuite(suite, test_get_memory_suite());
+        CuSuiteAddSuite(suite, test_get_semaphore_suite());
 
         CuSuiteRun(suite);
 

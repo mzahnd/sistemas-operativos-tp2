@@ -8,21 +8,11 @@
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
  */
-#ifndef LIB_H
-#define LIB_H
+#ifndef TEST_SEMAPHORE_H
+#define TEST_SEMAPHORE_H
 
-#include <stdint.h>
+#include <CuTest.h>
 
-#ifndef NULL
-#define NULL ((void *)0)
-#endif
+CuSuite *test_get_semaphore_suite(void);
 
-// void *sosbrk(uint64_t size);
-void *somemset(void *dest, int32_t c, uint64_t n);
-void *somemcpy(void *dest, const void *src, uint64_t n);
-
-char *cpuVendor(char *result);
-
-uint8_t RTC(uint8_t mode);
-
-#endif /* LIB_H */
+#endif /* TEST_SEMAPHORE_H */

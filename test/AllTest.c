@@ -13,7 +13,9 @@ void RunAllTests(void)
         CuSuiteAddSuite(suite, test_get_lib_suite());
         CuSuiteAddSuite(suite, test_get_memory_suite());
         CuSuiteAddSuite(suite, test_get_semaphore_suite());
+        printf("[INFO] All suites loaded.\n");
 
+        printf("[INFO] Running tests...\n");
         CuSuiteRun(suite);
 
         CuSuiteSummary(suite, output);

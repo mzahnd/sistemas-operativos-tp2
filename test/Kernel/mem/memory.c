@@ -57,7 +57,6 @@ static const size_t memblock_size =
 
 CuSuite *test_get_memory_suite(void)
 {
-        printf("[INFO] Running memory suite.\n");
         CuSuite *const suite = CuSuiteNew();
 
         printf("[INFO] MEM_HEAP_SIZE: %ld\n", MEM_HEAP_SIZE);
@@ -86,7 +85,7 @@ CuSuite *test_get_memory_suite(void)
         SUITE_ADD_TEST(suite, test_sofree_left_join_middle);
         SUITE_ADD_TEST(suite, test_sofree_free_between_blocks);
 
-        printf("[INFO] Done memory suite.\n");
+        printf("[INFO] Loaded memory suite.\n");
         return suite;
 }
 

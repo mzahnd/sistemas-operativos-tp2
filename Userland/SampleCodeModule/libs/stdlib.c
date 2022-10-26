@@ -158,4 +158,8 @@ void* malloc(unsigned int size) {
         return result;
 }
 
+void free(void* ptr) {
+        freeSyscall(ptr);
+}
+
 #endif

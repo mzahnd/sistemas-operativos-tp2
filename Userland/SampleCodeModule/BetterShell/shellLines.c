@@ -29,7 +29,7 @@ void freeShellLines(shellLinesQueue lines) {
     free(lines);
 }
 
-void addLine(shellLinesQueue lines, char * str) {
+void addShellLine(shellLinesQueue lines, char * str) {
     unsigned int len = strlen(str);
     char * line = malloc((len + 1) * sizeof(char));
     strcpy(line, str);
@@ -55,6 +55,7 @@ void addLine(shellLinesQueue lines, char * str) {
 
 
 void displayLines(shellLinesQueue lines) {
+    // Draw Background
     
 }
 

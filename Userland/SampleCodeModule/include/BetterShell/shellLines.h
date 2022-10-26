@@ -19,7 +19,7 @@ typedef shellLinesQueue_t* shellLinesQueue;
 
 shellLinesQueue newShellLines(unsigned int maxLines);
 void freeShellLines(shellLinesQueue lines);
-void addLine(shellLinesQueue lines, char * str);
+void addShellLine(shellLinesQueue lines, char * str);
 
 
 #endif

@@ -11,6 +11,7 @@
 #ifndef LIB_H
 #define LIB_H
 
+#include <stddef.h> /* size_t */
 #include <stdint.h>
 
 #ifndef NULL
@@ -20,6 +21,15 @@
 // void *sosbrk(uint64_t size);
 void *somemset(void *dest, int32_t c, uint64_t n);
 void *somemcpy(void *dest, const void *src, uint64_t n);
+
+/**
+ * djb2 string hashing algorithm
+ *
+ * Source: http://www.cse.yorku.ca/~oz/hash.html
+ */
+uint64_t djb2 (const unsigned char* str);
+
+size_t strnlen(const char *s, size_t maxlen);
 
 char *cpuVendor(char *result);
 

@@ -31,9 +31,9 @@ CCFLAGS	:=	-fdiagnostics-color=auto --std=$(CCSTD) -Wall \
 			--pedantic -g -fno-exceptions -fno-asynchronous-unwind-tables \
 			-msse -msse2 -msse3 -msse4 \
 			-mno-red-zone -ffreestanding -Wno-int-to-pointer-cast \
-			-fno-common -D_POSIX_C_SOURCE=200809L -DTESTING
+			-fno-common -mcmodel=medium -D_POSIX_C_SOURCE=200809L -DTESTING
 
-LDFLAGS	:=	-g --std=$(CCSTD) -Wall -z max-page-size=0x1000 \
+LDFLAGS	:=	-g --std=$(CCSTD) -Wall -z max-page-size=0x1000 -mcmodel=large \
 			-D_POSIX_C_SOURCE=200809L -lm -lpthread
 
 .PHONY: all clean

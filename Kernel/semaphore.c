@@ -17,13 +17,69 @@
  * https://en.cppreference.com/w/c/atomic
  */
 #include "lib.h"
+#include "mem/memory.h"
 
 #include "semaphore.h"
 
 /* ------------------------------ */
 
+#define SEM_INITIAL_CHAR '$'
+
 #define acquire(lock) while (atomic_flag_test_and_set(lock))
 #define release(lock) atomic_flag_clear(lock)
+
+/* ------------------------------ */
+
+typedef struct {
+        uint64_t k; // hash
+        sosem_t *v; // semaphore
+} sosem_kv_t;
+
+static sosem_kv_t sosem_names_table[SEM_MAX_NAMED] = {};
+
+/* ------------------------------ */
+
+static int get_semaphore_index_from_table(const char *name);
+static int add_semaphore_to_table(sosem_t **sem);
+static int remove_semaphore_from_table(unsigned int index);
+static int create_named_semaphore(const char *name, unsigned int initial_value,
+                                  sosem_t **sem);
+
+/* ------------------------------ */
+
+sosem_t *sosem_open(const char *name, unsigned int initial_value)
+{
+        sosem_t *sem = NULL;
+
+        int index = get_semaphore_index_from_table(name);
+        if (index == -1) {
+                create_named_semaphore(name, initial_value, &sem);
+                add_semaphore_to_table(&sem);
+        } else {
+                sem = sosem_names_table[index].v;
+        }
+
+        return sem;
+}
+
+/* ------------------------------ */
+
+int sosem_close(sosem_t *sem)
+{
+        if (sem == NULL)
+                return -1;
+
+        int idx = get_semaphore_index_from_table(sem->name);
+
+        if (idx == -1)
+                return 0;
+
+        // Free all waiting processes (if any)
+        if (sosem_names_table[idx].v)
+                atomic_store(&(sosem_names_table[idx].v->value), SEM_MAX_VALUE);
+
+        return remove_semaphore_from_table(idx);
+}
 
 /* ------------------------------ */
 
@@ -47,7 +103,7 @@ int sosem_destroy(sosem_t *sem)
                 return -1;
 
         // Free all waiting processes (if any)
-        atomic_store(&sem->value, MAX_VALUE);
+        atomic_store(&sem->value, SEM_MAX_VALUE);
         return 0;
 }
 
@@ -94,6 +150,91 @@ int sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval)
                 *sval = 0;
         else
                 *sval = atomic_load(&sem->value);
+
+        return 0;
+}
+
+/* ------------------------------ */
+
+static int get_semaphore_index_from_table(const char *name)
+{
+        if (name == NULL)
+                return -1;
+
+        uint64_t hash = djb2((unsigned char *)name);
+        int idx = 0;
+
+        for (int i = 0; i < SEM_MAX_NAMED; i++) {
+                idx = i + hash % SEM_MAX_NAMED;
+
+                if (sosem_names_table[idx].k == hash)
+                        break;
+                else
+                        idx = -1;
+        }
+
+        return idx;
+}
+
+/* ------------------------------ */
+
+static int add_semaphore_to_table(sosem_t **sem)
+{
+        if (sem == NULL)
+                return -1;
+
+        uint64_t hash = djb2((unsigned char *)(*sem)->name);
+        int idx = 0;
+
+        for (int i = 0; i < SEM_MAX_NAMED; i++) {
+                idx = i + hash % SEM_MAX_NAMED;
+
+                if (sosem_names_table[idx].k == 0) {
+                        sosem_names_table[idx].k = hash;
+                        sosem_names_table[idx].v = *sem;
+
+                        break;
+                } else {
+                        idx = -1;
+                }
+        }
+
+        return idx >= 0;
+}
+
+/* ------------------------------ */
+
+static int remove_semaphore_from_table(unsigned int index)
+{
+        if (index > SEM_MAX_NAMED)
+                return -1;
+
+        sosem_names_table[index].k = 0;
+        sofree(sosem_names_table[index].v);
+        sosem_names_table[index].v = NULL;
+
+        return 0;
+}
+
+/* ------------------------------ */
+
+static int create_named_semaphore(const char *name, unsigned int initial_value,
+                                  sosem_t **sem)
+{
+        if (name == NULL || sem == NULL)
+                return -1;
+
+        *sem = somalloc(sizeof(sosem_t));
+        if (*sem == NULL)
+                return -1;
+
+        size_t len = strnlen(name, SEM_MAX_NAME_LEN);
+        somemcpy(&(*sem)->name, name, len);
+        (*sem)->name[len] = '\0';
+
+        atomic_store(&(*sem)->value, initial_value);
+        atomic_flag_clear(&(*sem)->lock);
+        atomic_store(&(*sem)->_n_waiting, 0);
 
         return 0;
 }

@@ -148,12 +148,17 @@ void syscallHandler(registerStruct *registers)
 
 
         // From 20 -> Process management syscalls:
-        case 20: //Create Process
+        case 20: // Create Process
                 //rdi -> char *: Nombre del proceso
                 //rsi -> int (*)(int, char**): Puntero a la funcion principal del procesp
                 //rdx -> int: argc
                 //rcx -> char**: argv
                 syscallCreateProcess(registers);
+                break;
+        
+        case 21: // Get Scheduler Info
+                // rdi -> schInfo_t*: pointer to struct
+                getSchedulerInfo((schInfo_t *)registers->rdi);
 
         case 30:
                 // rdi -> id
@@ -190,6 +195,7 @@ void syscallHandler(registerStruct *registers)
                 return 1;
                 // break;
         }
+
 }
 
 void getDateInfo(uint8_t mode, uint8_t *target)

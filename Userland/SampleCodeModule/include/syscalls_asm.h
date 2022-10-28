@@ -3,6 +3,7 @@
 
 #include <stddef.h> /* size_t */
 #include <stdint.h>
+#include <syscalls_definitions.h>
 
 void drawStringSysCall(char *buff, uint64_t size, uint64_t x, uint64_t y,
                        uint64_t fontColor, uint64_t backgroundColor,
@@ -24,5 +25,6 @@ void mallocSyscall(size_t size, void **result);
 void callocSyscall(size_t nmemb, size_t size, void **result);
 void freeSyscall(void *ptr);
 void createProcessSyscall(char * name, int (*mainFunction)(int, char**), int argc, char** argv);
+void getSchedulerInfoSyscall(schInfo_t *);
 
 #endif

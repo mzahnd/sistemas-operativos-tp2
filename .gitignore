@@ -475,3 +475,4 @@ output.txt
 # clangd
 compile_commands.json
 .gdb_history
+temp.txt

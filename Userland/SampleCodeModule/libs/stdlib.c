@@ -1,10 +1,10 @@
 #ifndef STD_LIB_C
 #define STD_LIB_C value
 #include <stdlib.h>
+#include <syscalls_asm.h>
 
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);
-int strlen(char *str);
 int strcmp(char *str1, char *str2);
 int intToBase(unsigned long long num, int base, char *buffer);
 int iabs(int num);
@@ -99,13 +99,6 @@ int intToString(unsigned long long num, char *buffer)
         return intToBase(num, 10, buffer);
 }
 
-int strlen(char *str)
-{
-        int i = 0;
-        for (i = 0; *(str + i); i++) {}
-        return i;
-}
-
 int strcmp(char *str1, char *str2)
 {
         int i = 0;
@@ -116,14 +109,6 @@ int strcmp(char *str1, char *str2)
                 i++;
         }
         return str1[i] - str2[i];
-}
-
-char *strcpy(char *dest, char *src)
-{
-        for (int i = 0; src[i] != 0; i++) {
-                dest[i] = src[i];
-        }
-        return dest;
 }
 
 int round(double number)
@@ -142,14 +127,14 @@ int isalpha(char ch)
         return 0;
 }
 
-void reverseStr(char str[])
-{
-        int n = strlen(str);
-        for (int i = 0; i < n / 2; i++) {
-                char aux = str[i];
-                str[i] = str[n - i - 1];
-                str[n - i - 1] = aux;
-        }
+void* malloc(unsigned int size) {
+        void * result;
+        mallocSyscall(size, &result); 
+        return result;
+}
+
+void free(void* ptr) {
+        freeSyscall(ptr);
 }
 
 #endif

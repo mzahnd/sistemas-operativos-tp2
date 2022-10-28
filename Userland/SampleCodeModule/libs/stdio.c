@@ -7,9 +7,12 @@
 #include <stdlib.h>
 #include <syscalls_asm.h>
 #include <stdGraphics.h>
+#include <stringUtils.h>
 
 #define PRINTF_BUFFER_SIZE 128
 #define STD_BUFFER_SIZE 256
+
+#define INLINE_SPACING 16
 
 char std_in[STD_BUFFER_SIZE] = { 0 };
 char std_out[STD_BUFFER_SIZE] = { 0 };
@@ -66,6 +69,10 @@ void printf(char *fmt, ...)
                                 strcpy(&buffer[j], tmp);
                                 j += strlen(tmp);
                                 break;
+                        }
+                } else if (fmt[i] == '\t') {
+                        while (j % INLINE_SPACING != 0) {
+                                buffer[j++] = ' ';
                         }
                 } else {
                         buffer[j++] = fmt[i];

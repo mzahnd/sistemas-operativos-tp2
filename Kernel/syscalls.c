@@ -154,6 +154,41 @@ void syscallHandler(registerStruct *registers)
                 //rdx -> int: argc
                 //rcx -> char**: argv
                 syscallCreateProcess(registers);
+
+        case 30:
+                // rdi -> id
+                // rsi -> initValue
+                // rdx -> *toReturn
+                sosem_open((uint32_t) registers->rdi, (uint32_t) registers->rsi, (int*) registers->rdx);
+                return 1;
+                // break;
+
+        case 31:
+                // rdi -> id
+                // rsi -> *toReturn
+                sosem_wait((uint32_t) registers->rdi, (int*) registers->rsi);
+                return 1;
+                // break;
+
+        case 32:
+                // rdi -> id
+                // rsi -> *toReturn
+                sosem_post((uint32_t) registers->rdi, (int*) registers->rsi);
+                return 1;
+                // break;
+
+        case 33:
+                // rdi -> id
+                // rsi -> *toReturn
+                sosem_close((uint32_t) registers->rdi, (int*) registers->rsi);
+                return 1;
+                // break;
+
+        // case 34:
+        //         // rdi -> buffer
+        //         printSemaphore((char *) registers->rdi);
+        //         return 1;
+        //         // break;
         }
 }
 

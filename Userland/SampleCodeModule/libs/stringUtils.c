@@ -11,7 +11,7 @@ unsigned int strlen(char *str)
     return i;
 }
 
-void strcat(char* destination, const char* source) {
+char* strcat(char* destination, const char* source) {
 
      // make `ptr` point to the end of the destination string
     char* ptr = destination + strlen(destination);
@@ -43,6 +43,16 @@ char* strcpy(char* destination, const char* source)
  
     *destination = '\0';
     return ptr;
+}
+
+void reverseStr(char str[])
+{
+        int n = strlen(str);
+        for (int i = 0; i < n / 2; i++) {
+                char aux = str[i];
+                str[i] = str[n - i - 1];
+                str[n - i - 1] = aux;
+        }
 }
 
 #endif

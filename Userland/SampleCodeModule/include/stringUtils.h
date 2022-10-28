@@ -2,6 +2,7 @@
 #define STRING_UTILS_H
 
 unsigned int strlen(char *);
-void strcat(char* destination, const char* source);
+char* strcat(char* destination, const char* source);
 char* strcpy(char* destination, const char* source);
+void reverseStr(char str[]);
 #endif

@@ -127,16 +127,6 @@ int isalpha(char ch)
         return 0;
 }
 
-void reverseStr(char str[])
-{
-        int n = strlen(str);
-        for (int i = 0; i < n / 2; i++) {
-                char aux = str[i];
-                str[i] = str[n - i - 1];
-                str[n - i - 1] = aux;
-        }
-}
-
 void* malloc(unsigned int size) {
         void * result;
         mallocSyscall(size, &result); 

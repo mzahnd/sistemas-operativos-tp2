@@ -4,11 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-static int getSpaces() {
-
-} 
-
 int schedulerInfo(int argc, char** argv) {
     schInfo_t info;
     getSchedulerInfoSyscall(&info);
@@ -25,5 +20,7 @@ int schedulerInfo(int argc, char** argv) {
         }
         printf("%s\t%d\t%d\t%s\n", info.processes[i].name, info.processes[i].pid, info.processes[i].ppid, status);
     }
+
+    return 0;
     
 }

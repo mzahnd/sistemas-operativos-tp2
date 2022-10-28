@@ -18,6 +18,7 @@
  */
 #include "lib.h"
 #include "include/semaphore.h"
+// #include <stdlib.h>
 
 #include "include/pipes.h"
 #define MAX_READ 50
@@ -25,20 +26,17 @@
 /* ------------------------------ */
 Pipe pipes[MAX_PIPES];
 int openedPipes = 0;
+int index = 500;
 /* ------------------------------ */
 
 
 static void createPipe(int id) {
 
     Pipe *pipe = &pipes[id];
+//     pipe->pipeBuffer = malloc(sizeof(char) * PIPE_BUFFER_SIZE);
     pipe->id = id;
-
-    sosem_t *sem = sosem_open("nextSemaphore", 0);
-
-    int nextSemaphore = get_semaphore_index_from_table("nextSemaphore");
-
-    pipe -> readSem = nextSemaphore++;
-    pipe -> writeSem = nextSemaphore++;
+    pipe -> readSem.index = index++;
+    pipe -> writeSem.index = index++;
 
 }
 
@@ -61,14 +59,15 @@ int sopipe(int fildes[PIPE_N_FD]) {
         if(pipes[i].processCount == 0) {
             createPipe(i);
             pipes[i].processCount++;
-            fildes[0] = pipes[i].fdIn;
-            fildes[1] = pipes[i].fdOut;
+            pipes[i].fdIn = fildes[0];
+            pipes[i].fdOut = fildes[1];
             pipes[i].readIndex = 0;
             pipes[i].writeIndex = 0;
             openedPipes++;
             return 1;
         }
     }
+    return -1;
 }
 
 ssize_t soread(int fd, char *buf, size_t count) {
@@ -79,7 +78,7 @@ ssize_t soread(int fd, char *buf, size_t count) {
 
     Pipe auxPipe = pipes[index];
 
-    sosem_wait(auxPipe.readSem);
+    sosem_wait(&auxPipe.readSem);
    
     int i;
     for (i = 0; auxPipe.readIndex != auxPipe.writeIndex && i < count; i++) {
@@ -88,7 +87,7 @@ ssize_t soread(int fd, char *buf, size_t count) {
         auxPipe.readIndex = (auxPipe.readIndex + 1) % PIPE_BUFFER_SIZE;
     }
 
-    sosem_post(auxPipe.writeSem);
+    sosem_post(&auxPipe.writeSem);
 
     buf[i] = 0;
     return i;
@@ -102,7 +101,7 @@ ssize_t sowrite(int fd, const char *buf, size_t count) {
 
     Pipe auxPipe = pipes[index];
 
-    sosem_wait(auxPipe.writeSem);
+    sosem_wait(&auxPipe.writeSem);
 
     int i;
     for (i = 0; i < count; i++) {
@@ -110,7 +109,7 @@ ssize_t sowrite(int fd, const char *buf, size_t count) {
         auxPipe.writeIndex = (auxPipe.writeIndex + 1) % PIPE_BUFFER_SIZE;
     }
 
-    sosem_post(auxPipe.readSem);
+    sosem_post(&auxPipe.readSem);
 
     
     return i;
@@ -121,8 +120,10 @@ int soclose(int fd) {
 
     Pipe auxPipe = pipes[index];
 
-    sosem_close(auxPipe.readSem);
-    sosem_close(auxPipe.writeSem);
+    sosem_close(&auxPipe.readSem);
+    sosem_close(&auxPipe.writeSem);
+
+    pipes[index].processCount = 0;
 
     return 1;
     

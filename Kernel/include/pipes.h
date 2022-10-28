@@ -13,6 +13,7 @@
 
 #include <sys/types.h> /* ssize_t */
 #include <stdint.h>
+#include "semaphore.h"
 
 #define PIPE_BUFFER_SIZE 4096
 #define MAX_PIPES 10
@@ -24,9 +25,9 @@ typedef struct Pipe{
     char *pipeBuffer;
     int readIndex;
     int writeIndex;
-    int processCount;               //Amount of processes using the pipe
-	uint32_t readSem;               //Semaphore for pipe read (non binary)
-	uint32_t writeSem;              //Semaphore for pipe write (non binary)
+    int processCount;       
+	sosem_t readSem;          
+	sosem_t writeSem;         
     unsigned int fdIn;
     unsigned int fdOut;
 }Pipe;

@@ -32,6 +32,7 @@ typedef struct SOSEM {
         atomic_uint value;
         atomic_flag lock;
         atomic_uint _n_waiting;
+        int index;
 } sosem_t;
 
 // Create a named semaphore starting with initial_value.

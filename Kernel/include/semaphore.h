@@ -31,12 +31,12 @@ typedef struct SOSEM {
 
         atomic_uint value;
         atomic_flag lock;
-
         atomic_uint _n_waiting;
 } sosem_t;
 
 // Create a named semaphore starting with initial_value.
 sosem_t *sosem_open(const char *name, unsigned int initial_value);
+int get_semaphore_index_from_table(const char *name);
 // Close a named semaphore
 int sosem_close(sosem_t *sem);
 // Create an unnamed semaphore starting with initial_value.

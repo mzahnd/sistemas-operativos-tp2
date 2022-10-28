@@ -39,7 +39,7 @@ static sosem_kv_t sosem_names_table[SEM_MAX_NAMED] = {};
 
 /* ------------------------------ */
 
-static int get_semaphore_index_from_table(const char *name);
+// static int get_semaphore_index_from_table(const char *name);
 static int add_semaphore_to_table(sosem_t **sem);
 static int remove_semaphore_from_table(unsigned int index);
 static int create_named_semaphore(const char *name, unsigned int initial_value,
@@ -156,7 +156,7 @@ int sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval)
 
 /* ------------------------------ */
 
-static int get_semaphore_index_from_table(const char *name)
+int get_semaphore_index_from_table(const char *name)
 {
         if (name == NULL)
                 return -1;

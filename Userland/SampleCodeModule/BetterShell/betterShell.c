@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdGraphics.h>
+#include <stringUtils.h>
 #include <colors.h>
 #include <BetterShell/betterShell.h>
 #include <BetterShell/shellLines.h>
@@ -16,16 +17,20 @@ static void deleteLastChar(char* commandLine, int* index);
 static void undrawLastChar(char* commandLine, int index);
 static void drawLastChar(char* commandLine, int index);
 static void clearCommandLine(char* commandLine, unsigned int* index);
+static void processCommand(char* command);
+
+void printOnShell(char* str, int dim);
+
+static shellLinesQueue lines;
 
 int runShell(int argc, char** argv) {
     
     unsigned int commandLineIndex = 0;
     char * commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
 
-    shellLinesQueue lines = newShellLines(5);
-    addShellLine(lines, "Hola");
-    addShellLine(lines, "ASDASDDAS");
-    addShellLine(lines, "Esto es un test xD");
+    lines = newShellLines(64);
+
+    setConsoleUpdateFunction(printOnShell);
 
 
     if (commandLine == NULL) {
@@ -35,6 +40,12 @@ int runShell(int argc, char** argv) {
     for (int i = 0; i <= MAX_COMMAND_LENGTH; i++) {
         commandLine[i] = '\0';
     }
+
+    // printf("Hola\n");
+    // printf("Otra Linea\n");
+    printf("Line 1\nLine 2 ");
+    printf("ASDASD = ");
+    printf("%X.\n", 0x11234);
 
 
     displayCommandLine(commandLine, commandLineIndex);
@@ -55,10 +66,18 @@ static void writeToCommandLine(char ch, char* commandLine, unsigned int* index, 
         deleteLastChar(commandLine, index);
         undrawLastChar(commandLine, *index);
     } else if (ch == '\n') {
+        commandLine[*index] = ch;
+        (*index)++;
         addShellLine(lines, commandLine);
         displayLines(lines);
+
+        //Process Command
+        processCommand(commandLine);
+
         clearCommandLine(commandLine, index);
         displayCommandLine(commandLine, *index);
+
+
     } else if (*index < (MAX_COMMAND_LENGTH - 1) && ch >= 0) {
         commandLine[*index] = ch;
         (*index)++;
@@ -92,6 +111,34 @@ static void clearCommandLine(char* commandLine, unsigned int* index) {
     }
     *index = 0;
 
+}
+
+static void processCommand(char* command) {
+    //strchr("ASDASF", 'F');
+}
+
+void printOnShell(char* str, int dim) {
+    if (lines == NULL) {
+        return;
+    }
+    char buffer[MAX_COMMAND_LENGTH] = {0};
+    for (int i = 0, k = 0; i < dim && i < MAX_COMMAND_LENGTH; i++, k++) {
+
+        buffer[k] = str[i];
+        if (str[i] == '\n' || i == (dim-1) || i == (MAX_COMMAND_LENGTH-1)) {
+            char lastLineChar = lines->last ? lines->last->line[strlen(lines->last->line)-1] : 'x';
+            if (!lines->last || lastLineChar == '\n') {
+                addShellLine(lines, buffer);
+            } else {
+                addToLastLine(lines, buffer);
+            }
+            for (int j = 0; j <= i; j++) {
+                buffer[j] = 0;
+            }
+            k=-1;
+        }
+    }
+    addToLastLine(lines, buffer);
 }
 
 

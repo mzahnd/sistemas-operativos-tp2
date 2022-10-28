@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdGraphics.h>
 #include <colors.h>
+#include <stringUtils.h>
 
 static void freeNextNodeRec(shellLineNode node);
 static void freeNode(shellLineNode node);
@@ -79,6 +80,19 @@ void displayLines(shellLinesQueue lines) {
     
 }
 
+void addToLastLine(shellLinesQueue lines, char* str) {
+    if (lines == NULL || lines->last == NULL || str == NULL || strlen(str) == 0) {
+        return;
+    }
+
+    char* lastString = lines->last->line;
+    unsigned int lastStringLen = strlen(lastString);
+    char* destination = malloc((lastStringLen + strlen(str) + 1) * sizeof(char));
+    strcpy(destination, lastString);
+    strcpy((destination+lastStringLen), str);
+    free(lines->last->line);
+    lines->last->line = destination;
+} 
 static void freeNextNodeRec(shellLineNode node) {
     if (node == NULL) {
         return;

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <syscalls_asm.h>
 #include <stdGraphics.h>
+#include <stringUtils.h>
 
 #define PRINTF_BUFFER_SIZE 128
 #define STD_BUFFER_SIZE 256

@@ -9,7 +9,6 @@
  *                    Zahnd, M. E.
  */
 
-#include <stddef.h> /* size_t */
 #include <stdint.h>
 
 #include "lib.h"
@@ -156,4 +155,31 @@ void *somemcpy(void *dest, const void *src, uint64_t len)
         }
 
         return dest;
+}
+
+uint64_t djb2(const unsigned char *str)
+{
+        uint64_t hash = 5381;
+
+        while (str && *str) {
+                hash = ((hash << 5) + hash) + *str; /* hash * 33 + c */
+                str++;
+        }
+
+        return hash;
+}
+
+size_t strnlen(const char *s, size_t maxlen)
+{
+        if (s == NULL)
+                return 0;
+
+        size_t n = 0;
+
+        while (n < maxlen && *s) {
+                s++;
+                n++;
+        }
+
+        return n;
 }

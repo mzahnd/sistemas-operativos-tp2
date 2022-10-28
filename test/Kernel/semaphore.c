@@ -23,6 +23,9 @@
 #define TEST_WAIT_WRITE_N_IN_BUFF 10
 #define TEST_WAIT_WRITES_BUFF_SIZE (TEST_WAIT_WRITE_N_IN_BUFF * 2 + 1)
 
+#define TEST_SEM_NAME "Louis Reasoner"
+#define TEST_SEM_NAME_LEN (14) // Same as strlen(TEST_SEM_NAME)
+
 #define MS_TO_US(n) ((unsigned int)(n)*1000)
 
 typedef struct {
@@ -41,6 +44,13 @@ void test_sosem_init_NULL_sem(CuTest *const ct);
 /* ---------- sosem_destroy ---------- */
 void test_sosem_destroy_sem(CuTest *const ct);
 void test_sosem_destroy_NULL(CuTest *const ct);
+/* ---------- sosem_open ---------- */
+void test_sosem_open_create_and_reopen(CuTest *const ct);
+void test_sosem_open_NULL_args(CuTest *const ct);
+void test_sosem_open_long_name(CuTest *const ct);
+/* ---------- sosem_close ---------- */
+void test_sosem_close_close_recreate(CuTest *const ct);
+void test_sosem_close_NULL_args(CuTest *const ct);
 /* ---------- sosem_post ---------- */
 void test_sosem_post_non_zero_initial_value(CuTest *const ct);
 void test_sosem_post_zero_initial_value(CuTest *const ct);
@@ -66,6 +76,12 @@ CuSuite *test_get_semaphore_suite(void)
         /* sosem_destroy */
         SUITE_ADD_TEST(suite, test_sosem_destroy_sem);
         SUITE_ADD_TEST(suite, test_sosem_destroy_NULL);
+        /* sosem_open */
+        SUITE_ADD_TEST(suite, test_sosem_open_create_and_reopen);
+        SUITE_ADD_TEST(suite, test_sosem_open_NULL_args);
+        SUITE_ADD_TEST(suite, test_sosem_open_long_name);
+        /* sosem_close */
+        SUITE_ADD_TEST(suite, test_sosem_close_close_recreate);
         /* sosem_wait */
         SUITE_ADD_TEST(suite, test_sosem_wait_two_threads);
         SUITE_ADD_TEST(suite, test_sosem_wait_NULL_args);
@@ -131,6 +147,112 @@ void test_sosem_destroy_sem(CuTest *const ct)
 void test_sosem_destroy_NULL(CuTest *const ct)
 {
         int ret = sosem_destroy(NULL);
+        CuAssertIntEquals(ct, -1, ret);
+}
+
+/* ---------- sosem_open ---------- */
+void test_sosem_open_create_and_reopen(CuTest *const ct)
+{
+        const int initial_value = 6;
+        int ret = 0;
+        char ok_name[1 + SEM_MAX_NAME_LEN] = { 0 };
+        sosem_t *sem_1 = NULL;
+        sosem_t *sem_2 = NULL;
+
+        memcpy(&ok_name[0], TEST_SEM_NAME, 1 + TEST_SEM_NAME_LEN);
+
+        sem_1 = sosem_open(TEST_SEM_NAME, initial_value);
+        CuAssertPtrNotNull(ct, sem_1);
+
+        // Name
+        ret = memcmp(ok_name, sem_1->name, 1 + TEST_SEM_NAME_LEN);
+        CuAssertIntEquals(ct, 0, ret);
+
+        // Value
+        CuAssertIntEquals(ct, initial_value, sem_1->value);
+
+        sem_2 = sosem_open(TEST_SEM_NAME, initial_value + 2);
+        CuAssertPtrNotNull(ct, sem_2);
+
+        // Same semaphore
+        CuAssertPtrEquals(ct, sem_1, sem_2);
+
+        // Name
+        ret = memcmp(ok_name, sem_2->name, 1 + TEST_SEM_NAME_LEN);
+        CuAssertIntEquals(ct, 0, ret);
+
+        // Value
+        CuAssertIntEquals(ct, initial_value, sem_2->value);
+
+        sosem_close(sem_1);
+        sosem_close(sem_2);
+}
+
+void test_sosem_open_NULL_args(CuTest *const ct)
+{
+        const int initial_value = 0;
+        sosem_t *sem = NULL;
+
+        sem = sosem_open(NULL, initial_value);
+        CuAssertPtrEquals(ct, NULL, sem);
+}
+
+void test_sosem_open_long_name(CuTest *const ct)
+{
+        const int initial_value = 8;
+        int ret = 0;
+        char ok_name[1 + SEM_MAX_NAME_LEN] = { 0 };
+        sosem_t *sem = NULL;
+
+        memset(&ok_name[0], TEST_SEM_NAME[0], SEM_MAX_NAME_LEN);
+
+        sem = sosem_open(&ok_name[0], initial_value);
+        CuAssertPtrNotNull(ct, sem);
+
+        CuAssertStrEquals(ct, ok_name, sem->name);
+        CuAssertIntEquals(ct, initial_value, sem->value);
+
+        ret = sosem_close(sem);
+        CuAssertIntEquals(ct, 0, ret);
+}
+
+/* ---------- sosem_close ---------- */
+void test_sosem_close_close_recreate(CuTest *const ct)
+{
+        const int initial_value_1 = 3;
+        const int initial_value_2 = initial_value_1 + 2;
+        int ret = 0;
+        char ok_name[1 + SEM_MAX_NAME_LEN] = { 0 };
+        sosem_t *sem = NULL;
+
+        memcpy(&ok_name[0], TEST_SEM_NAME, 1 + TEST_SEM_NAME_LEN);
+
+        // First time: create and close
+        sem = sosem_open(TEST_SEM_NAME, initial_value_1);
+        CuAssertPtrNotNull(ct, sem);
+
+        CuAssertStrEquals(ct, ok_name, sem->name);
+        CuAssertIntEquals(ct, initial_value_1, sem->value);
+
+        ret = sosem_close(sem);
+        CuAssertIntEquals(ct, 0, ret);
+
+        // Second time: create again with a new initial value (same name)
+        sem = sosem_open(TEST_SEM_NAME, initial_value_2);
+        CuAssertPtrNotNull(ct, sem);
+
+        CuAssertStrEquals(ct, ok_name, sem->name);
+        CuAssertIntEquals(ct, initial_value_2, sem->value);
+
+        ret = sosem_close(sem);
+        CuAssertIntEquals(ct, 0, ret);
+}
+
+void test_sosem_close_NULL_args(CuTest *const ct)
+{
+        int ret = 0;
+
+        ret = sosem_close(NULL);
         CuAssertIntEquals(ct, -1, ret);
 }
 

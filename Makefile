@@ -14,7 +14,7 @@ image: kernel bootloader userland
 	cd Image; make all
 
 test:
-	cd Kernel; make clean; make EXTRA_CFLAGS="-DTESTING" all
+	cd Kernel; make clean; make EXTRA_CFLAGS="-DTESTING -mcmodel=medium" all
 	cd test; make all
 
 clean:

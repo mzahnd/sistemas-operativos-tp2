@@ -16,21 +16,9 @@
 #include "semaphore.h"
 
 #define PIPE_BUFFER_SIZE 4096
-#define MAX_PIPES 10
+#define MAX_PIPES 32
 
 enum pipe_fd { PIPE_FD_READ = 0, PIPE_FD_WRITE, PIPE_N_FD };
-
-typedef struct Pipe{
-	int id;
-    char *pipeBuffer;
-    int readIndex;
-    int writeIndex;
-    int processCount;       
-	sosem_t readSem;          
-	sosem_t writeSem;         
-    unsigned int fdIn;
-    unsigned int fdOut;
-}Pipe;
 
 int sopipe(int fildes[PIPE_N_FD]);
 ssize_t soread(int fd, char *buf, size_t count);

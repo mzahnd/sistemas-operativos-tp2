@@ -17,114 +17,245 @@
  * https://en.cppreference.com/w/c/atomic
  */
 #include "lib.h"
-#include "include/semaphore.h"
-// #include <stdlib.h>
+#include "semaphore.h"
 
-#include "include/pipes.h"
-#define MAX_READ 50
+#include "pipes.h"
 
 /* ------------------------------ */
-Pipe pipes[MAX_PIPES];
-int openedPipes = 0;
-int index = 500;
+
+#define FIRST_FD 3 // 0 = stdin; 1 = stdout; 2 = stderr
+
+#define NOT_ASSIGNED 0
+#define ASSIGNED 1
+
 /* ------------------------------ */
 
+typedef struct {
+        sosem_t sem;
+        int index;
+} pipe_flow_t;
 
-static void createPipe(int id) {
+typedef struct {
+        int active;
 
-    Pipe *pipe = &pipes[id];
-//     pipe->pipeBuffer = malloc(sizeof(char) * PIPE_BUFFER_SIZE);
-    pipe->id = id;
-    pipe -> readSem.index = index++;
-    pipe -> writeSem.index = index++;
+        char buffer[PIPE_BUFFER_SIZE];
 
-}
+        int fd[PIPE_N_FD];
+        pipe_flow_t read;
+        pipe_flow_t write;
+} pipe_t;
 
-static int searchPipe(int fd) {
-    for (int i = 0; i < MAX_PIPES; i++) {
-        if (pipes[i].fdIn == fd || pipes[i].fdOut == fd) {
-            return i;
+/* ------------------------------ */
+
+static int assigned_fd[MAX_PIPES * 2] = {}; // List of assigned file descriptors
+static pipe_t pipes[MAX_PIPES] = {};
+static int pipes_open = 0;
+
+/* ------------------------------ */
+
+static inline void createPipe(int index);
+static int get_pipe_index(int fd);
+static inline int get_fd_status(int fd);
+static inline void store_fd_pair(int fd[PIPE_N_FD]);
+static inline void dup_fd_pair(int dest[PIPE_N_FD], int src[PIPE_N_FD]);
+static inline void remove_fd(int fd);
+static int is_valid_fd(int fd);
+
+/* ------------------------------ */
+
+int sopipe(int fildes[PIPE_N_FD])
+{
+        if (pipes_open == MAX_PIPES) {
+                return -1;
         }
-    }
-    return -1;
-}
 
+        for (int i = 0; i < MAX_PIPES; i++) {
+                if (pipes[i].active == 0) {
+                        createPipe(i);
+                        store_fd_pair(pipes[i].fd);
+                        dup_fd_pair(fildes, pipes[i].fd);
 
-int sopipe(int fildes[PIPE_N_FD]) {
-    if (openedPipes == MAX_PIPES - 1) {
+                        pipes_open++;
+                        return 0;
+                }
+        }
+
         return -1;
-    }
+}
 
-    for(int i = 0; i < MAX_PIPES; i++) {
-        if(pipes[i].processCount == 0) {
-            createPipe(i);
-            pipes[i].processCount++;
-            pipes[i].fdIn = fildes[0];
-            pipes[i].fdOut = fildes[1];
-            pipes[i].readIndex = 0;
-            pipes[i].writeIndex = 0;
-            openedPipes++;
-            return 1;
+/* ------------------------------ */
+
+ssize_t soread(int fd, char *buf, size_t count)
+{
+        if (count == 0 || buf == NULL || is_valid_fd(fd) == -1 ||
+            assigned_fd[fd - FIRST_FD] == NOT_ASSIGNED)
+                return 0;
+
+        int index = get_pipe_index(fd);
+        if (index == -1 || pipes[index].fd[PIPE_FD_WRITE] == fd) {
+                return 0;
         }
-    }
-    return -1;
+
+        ssize_t n = 0;
+
+        sosem_wait(&pipes[index].read.sem);
+
+        int read_idx = pipes[index].read.index; // Alias for readabilty
+
+        do {
+                buf[n] = pipes[index].buffer[read_idx];
+                pipes[index].buffer[read_idx] = 0;
+                read_idx = (read_idx + 1) % PIPE_BUFFER_SIZE;
+
+                n++;
+        } while (read_idx != pipes[index].write.index && n - 1 < count);
+
+        pipes[index].read.index = read_idx; // Update. Downside of the alias (:
+
+        sosem_post(&pipes[index].write.sem);
+
+        return n;
 }
 
-ssize_t soread(int fd, char *buf, size_t count) {
-    int index = searchPipe(fd);
-    if (index == -1 || pipes[index].fdOut == fd || count <= 0) {
+/* ------------------------------ */
+
+ssize_t sowrite(int fd, const char *buf, size_t count)
+{
+        if (count == 0 || buf == NULL || is_valid_fd(fd) == -1 ||
+            assigned_fd[fd - FIRST_FD] == NOT_ASSIGNED)
+                return 0;
+
+        int index = get_pipe_index(fd);
+        if (index == -1 || pipes[index].fd[PIPE_FD_READ] == fd) {
+                return 0;
+        }
+
+        ssize_t n = 0;
+
+        sosem_wait(&pipes[index].write.sem);
+
+        for (n = 0; n < count && n < PIPE_BUFFER_SIZE; n++) {
+                int write_idx =
+                        pipes[index].write.index; // Alias for readabilty
+
+                pipes[index].buffer[write_idx] = buf[n];
+                pipes[index].write.index = (write_idx + 1) % PIPE_BUFFER_SIZE;
+        }
+
+        sosem_post(&pipes[index].read.sem);
+
+        return n;
+}
+
+/* ------------------------------ */
+
+int soclose(int fd)
+{
+        if (fd < FIRST_FD || fd > FIRST_FD + MAX_PIPES * 2)
+                return -1;
+
+        // Set fd as NOT_ASSIGNED
+        remove_fd(fd);
+
+        // Check if it's the last open fd from a pipe and close the pipe
+        int index = get_pipe_index(fd);
+
+        if (get_fd_status(pipes[index].fd[PIPE_FD_READ]) == NOT_ASSIGNED &&
+            get_fd_status(pipes[index].fd[PIPE_FD_WRITE]) == NOT_ASSIGNED) {
+                pipes[index].active = 0;
+                pipes[index].buffer[0] = '\0';
+
+                sosem_destroy(&pipes[index].read.sem);
+                sosem_destroy(&pipes[index].write.sem);
+        }
+
         return 0;
-    }
-
-    Pipe auxPipe = pipes[index];
-
-    sosem_wait(&auxPipe.readSem);
-   
-    int i;
-    for (i = 0; auxPipe.readIndex != auxPipe.writeIndex && i < count; i++) {
-        buf[i] = auxPipe.pipeBuffer[auxPipe.readIndex];
-        auxPipe.pipeBuffer[auxPipe.readIndex] = 0;
-        auxPipe.readIndex = (auxPipe.readIndex + 1) % PIPE_BUFFER_SIZE;
-    }
-
-    sosem_post(&auxPipe.writeSem);
-
-    buf[i] = 0;
-    return i;
 }
 
-ssize_t sowrite(int fd, const char *buf, size_t count) {
-    int index = searchPipe(fd);
-    if (index == -1 || pipes[index].fdIn == fd || count <= 0) {
+/* ------------------------------ */
+
+static inline void createPipe(int index)
+{
+        pipes[index].active = 1;
+        somemset(pipes[index].buffer, '\0', PIPE_BUFFER_SIZE);
+
+        pipes[index].read.index = 0;
+        pipes[index].write.index = 0;
+
+        sosem_init(&pipes[index].read.sem, 0);
+        // Initial value > 0 to allow writting
+        sosem_init(&pipes[index].write.sem, 1);
+}
+
+/* ------------------------------ */
+
+static int get_pipe_index(int fd)
+{
+        for (int i = 0; i < MAX_PIPES; i++) {
+                if (pipes[i].fd[PIPE_FD_READ] == fd ||
+                    pipes[i].fd[PIPE_FD_WRITE] == fd) {
+                        return i;
+                }
+        }
+
+        return -1;
+}
+
+/* ------------------------------ */
+
+static inline int get_fd_status(int fd)
+{
+        if (is_valid_fd(fd) == -1)
+                return -1;
+
+        return assigned_fd[fd - FIRST_FD];
+}
+
+/* ------------------------------ */
+
+static inline void store_fd_pair(int fd[PIPE_N_FD])
+{
+        fd[PIPE_FD_READ] = -1;
+        fd[PIPE_FD_WRITE] = -1;
+
+        int rw = PIPE_FD_READ;
+        for (int i = 0; i < MAX_PIPES * 2; i++) {
+                if (assigned_fd[i] == NOT_ASSIGNED) {
+                        fd[rw] = i + FIRST_FD;
+                        assigned_fd[i] = ASSIGNED;
+
+                        rw++;
+
+                        if (rw != PIPE_FD_READ && rw != PIPE_FD_WRITE)
+                                break;
+                }
+        }
+}
+
+/* ------------------------------ */
+
+static inline void dup_fd_pair(int dest[PIPE_N_FD], int src[PIPE_N_FD])
+{
+        dest[PIPE_FD_READ] = src[PIPE_FD_READ];
+        dest[PIPE_FD_WRITE] = src[PIPE_FD_WRITE];
+}
+
+/* ------------------------------ */
+
+static inline void remove_fd(int fd)
+{
+        if (is_valid_fd(fd) == -1)
+                return;
+
+        assigned_fd[fd - FIRST_FD] = NOT_ASSIGNED;
+}
+
+/* ------------------------------ */
+
+static int is_valid_fd(int fd)
+{
+        if (fd < FIRST_FD || fd > FIRST_FD + MAX_PIPES * 2)
+                return -1;
+
         return 0;
-    }
-
-    Pipe auxPipe = pipes[index];
-
-    sosem_wait(&auxPipe.writeSem);
-
-    int i;
-    for (i = 0; i < count; i++) {
-        auxPipe.pipeBuffer[auxPipe.writeIndex] = buf[i];
-        auxPipe.writeIndex = (auxPipe.writeIndex + 1) % PIPE_BUFFER_SIZE;
-    }
-
-    sosem_post(&auxPipe.readSem);
-
-    
-    return i;
-}
-
-int soclose(int fd) {
-    int index = searchPipe(fd);
-
-    Pipe auxPipe = pipes[index];
-
-    sosem_close(&auxPipe.readSem);
-    sosem_close(&auxPipe.writeSem);
-
-    pipes[index].processCount = 0;
-
-    return 1;
-    
 }

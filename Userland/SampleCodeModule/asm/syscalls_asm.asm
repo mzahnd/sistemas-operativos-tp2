@@ -15,6 +15,12 @@ GLOBAL mallocSyscall
 GLOBAL callocSyscall
 GLOBAL freeSyscall
 GLOBAL createProcessSyscall
+GLOBAL initSemaphoresSyscall
+GLOBAL openSemaphoreSyscall
+GLOBAL waitSemaphoreSyscall
+GLOBAL postSemaphoreSyscall
+GLOBAL closeSemaphoreSyscall
+GLOBAL semSyscall
 
 section .text
 
@@ -207,6 +213,61 @@ createProcessSyscall:
     mov rbp, rsp
 
     mov rax, 20 ;ID createProcess
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+openSemaphoreSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 30
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+waitSemaphoreSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 31
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+postSemaphoreSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 32
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+closeSemaphoreSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 33
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semSyscall: ;getValueSemaphore
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 34
     int 80h
 
     mov rsp, rbp

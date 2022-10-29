@@ -184,11 +184,11 @@ void syscallHandler(registerStruct *registers)
                 return 1;
                 // break;
 
-        // case 34:
-        //         // rdi -> buffer
-        //         printSemaphore((char *) registers->rdi);
-        //         return 1;
-        //         // break;
+        case 34:
+                // rdi -> buffer
+                sosem_getvalue((char *) registers->rdi, (int*) registers->rsi);
+                return 1;
+                // break;
         }
 }
 

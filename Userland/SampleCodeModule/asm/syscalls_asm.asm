@@ -176,7 +176,7 @@ mallocSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 16 ;sys_somalloc
+    mov rax, 16 ;ID sys_somalloc
     int 80h
 
     mov rsp, rbp
@@ -187,7 +187,7 @@ callocSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 17 ;sys_socalloc
+    mov rax, 17 ;ID sys_socalloc
     int 80h
 
     mov rsp, rbp
@@ -198,15 +198,12 @@ freeSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 18 ;sys_sofree
+    mov rax, 18 ;ID sys_sofree
     int 80h
 
     mov rsp, rbp
     pop rbp
     ret
-
-
-
 
 createProcessSyscall:
     push rbp
@@ -223,7 +220,7 @@ openSemaphoreSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 30
+    mov rax, 30 ;ID sys_sosem_open
     int 80h
 
     mov rsp, rbp
@@ -234,7 +231,7 @@ waitSemaphoreSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 31
+    mov rax, 31 ;ID sys_sosem_wait
     int 80h
 
     mov rsp, rbp
@@ -245,7 +242,7 @@ postSemaphoreSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 32
+    mov rax, 32 ;ID sys_sosem_post
     int 80h
 
     mov rsp, rbp
@@ -256,18 +253,40 @@ closeSemaphoreSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 33
+    mov rax, 33 ;ID sys_sosem_close
     int 80h
 
     mov rsp, rbp
     pop rbp
     ret
 
-semSyscall: ;getValueSemaphore
+semSyscall: 
     push rbp
     mov rbp, rsp
 
-    mov rax, 34
+    mov rax, 34 ;ID sys_sosem_getvalue
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+initSemaphoreSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 35 ;ID sys_sosem_init
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+destroySemaphoreSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 36 ;ID sys_sosem_destroy
     int 80h
 
     mov rsp, rbp

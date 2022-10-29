@@ -64,3 +64,10 @@ inline void sys_sosem_wait(sosem_t *sem, int *result)
 {
         *result = sosem_wait(sem);
 }
+
+/* ------------------------------ */
+
+inline void sys_sosem_getinformation(sosem_t *sem, sosem_info_t **result)
+{
+        *result = sosem_getinformation(sem);
+}

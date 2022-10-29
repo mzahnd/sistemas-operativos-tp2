@@ -21,6 +21,9 @@ GLOBAL waitSemaphoreSyscall
 GLOBAL postSemaphoreSyscall
 GLOBAL closeSemaphoreSyscall
 GLOBAL semSyscall
+GLOBAL initSemaphoreSyscall
+GLOBAL destroySemaphoreSyscall
+GLOBAL getSemaphoreInformationSyscall
 
 section .text
 
@@ -287,6 +290,17 @@ destroySemaphoreSyscall:
     mov rbp, rsp
 
     mov rax, 36 ;ID sys_sosem_destroy
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+getSemaphoreInformationSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 37 ;ID sys_sosem_getinformation
     int 80h
 
     mov rsp, rbp

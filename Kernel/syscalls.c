@@ -158,44 +158,44 @@ void syscallHandler(registerStruct *registers)
         case 30:
                 // rdi -> name
                 // rsi -> initial value
-                // rdx -> semaphore pointer (sosem_t*)
+                // rdx -> semaphore pointer (sosem_t **)
                 sys_sosem_open((const char *)registers->rdi,
                                (unsigned int)registers->rsi,
                                (sosem_t **)registers->rdx);
                 break;
 
         case 31:
-                // rdi -> semaphore pointer (sosem_t*)
-                // rsi -> result (int*)
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int *)
                 sys_sosem_wait((sosem_t *)registers->rdi,
                                (int *)registers->rsi);
                 break;
 
         case 32:
-                // rdi -> semaphore pointer (sosem_t*)
-                // rsi -> result (int*)
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int *)
                 sys_sosem_post((sosem_t *)registers->rdi,
                                (int *)registers->rsi);
                 break;
 
         case 33:
-                // rdi -> semaphore pointer (sosem_t*)
-                // rsi -> result (int*)
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int *)
                 sys_sosem_close((sosem_t *)registers->rdi,
                                 (int *)registers->rsi);
                 break;
 
         case 34:
-                // rdi -> semaphore pointer (sosem_t*)
-                // rsi -> semaphore's value storage (int*)
-                // rdx -> function result (int*)
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> semaphore's value storage (int *)
+                // rdx -> function result (int *)
                 sys_sosem_getvalue((sosem_t *)registers->rdi,
                                    (unsigned int *)registers->rsi,
                                    (int *)registers->rdx);
                 break;
 
         case 35:
-                // rdi -> semaphore pointer (sosem_t*)
+                // rdi -> semaphore pointer (sosem_t *)
                 // rsi -> initial value
                 // rdx -> result (int*)
                 sys_sosem_init((sosem_t *)registers->rdi,
@@ -204,10 +204,17 @@ void syscallHandler(registerStruct *registers)
                 break;
 
         case 36:
-                // rdi -> semaphore pointer (sosem_t*)
-                // rsx -> result (int*)
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int*)
                 sys_sosem_destroy((sosem_t *)registers->rdi,
                                   (int *)registers->rsi);
+                break;
+
+        case 37:
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (sosem_info_t **)
+                sys_sosem_getinformation((sosem_t *)registers->rdi,
+                                         (sosem_info_t **)registers->rsi);
                 break;
         }
 }

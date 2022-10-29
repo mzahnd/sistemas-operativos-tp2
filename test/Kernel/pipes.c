@@ -37,7 +37,6 @@ typedef struct {
 void test_sopipe_soclose_create_and_close(CuTest *const ct);
 /* ---------- sowrite & soread ---------- */
 void test_sowrite_soread_fill_buffer(CuTest *const ct);
-void test_sowrite_soread_overflow_buffer(CuTest *const ct);
 void test_sowrite_soread_small_writes(CuTest *const ct);
 void test_sowrite_soread_ipc_full_buff(CuTest *const ct);
 void *test_sowrite_soread_ipc_thread_reader(void *arg);
@@ -72,13 +71,13 @@ void test_sopipe_soclose_create_and_close(CuTest *const ct)
         // First file descriptor ever created: expects index 3
         // Remember: fd 0 "is" stdin, 1 stdout and 2 stderr
         CuAssertIntEquals(ct, 3, fd[PIPE_FD_READ]);
-        CuAssertIntEquals(ct, 3, fd[PIPE_FD_WRITE]);
+        CuAssertIntEquals(ct, 4, fd[PIPE_FD_WRITE]);
 
         ret = sopipe(fd2);
         CuAssertIntEquals(ct, 0, ret);
 
-        CuAssertIntEquals(ct, 4, fd[PIPE_FD_READ]);
-        CuAssertIntEquals(ct, 4, fd[PIPE_FD_WRITE]);
+        CuAssertIntEquals(ct, 5, fd2[PIPE_FD_READ]);
+        CuAssertIntEquals(ct, 6, fd2[PIPE_FD_WRITE]);
 
         // fd
         ret = soclose(fd[PIPE_FD_READ]);

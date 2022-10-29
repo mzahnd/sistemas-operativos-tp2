@@ -13,5 +13,6 @@ void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
 void lockCurrentProcess();
 void unlockCurrentProcess();
 void unlockProcessByPID(uint64_t pid);
+uint64_t getCurrentProcessPID();
 
 #endif

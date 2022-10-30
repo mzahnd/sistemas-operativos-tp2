@@ -25,7 +25,9 @@
 /**
  * Maximum number of named semaphores
  */
-#define SEM_MAX_NAMED (2 << 4) // 256
+#define SEM_MAX_NAMED (2 << 4) // 32
+
+#define SEM_MAX_WAITING (2 << 4) // 32
 
 // Information for Userland.
 typedef struct SOSEM_INFO {
@@ -34,9 +36,16 @@ typedef struct SOSEM_INFO {
 
         unsigned int value;
 
-        uint64_t *waiting_pid;
+        uint64_t waiting_pid[SEM_MAX_WAITING];
         size_t n_waiting;
 } sosem_info_t;
+
+// Circular queue with locked processes' PID
+typedef struct _SOSEM_PID {
+        unsigned int _n_waiting;
+        uint64_t _queue[SEM_MAX_WAITING];
+        unsigned int _index;
+} _sosem_pid_t;
 
 typedef struct SOSEM {
         char name[SEM_MAX_NAME_LEN + 1];
@@ -46,6 +55,8 @@ typedef struct SOSEM {
         atomic_uint _n_waiting;
 
         sosem_info_t userland;
+
+        _sosem_pid_t _processes;
 } sosem_t;
 
 // Create a named semaphore starting with initial_value.

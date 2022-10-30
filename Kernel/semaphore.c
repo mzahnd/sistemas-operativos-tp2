@@ -19,7 +19,9 @@
 #include "lib.h"
 #include "mem/memory.h"
 #ifndef TESTING
-#include "scheduler/scheduler.h" /* getCurrentProcessPID() */
+#include "scheduler/scheduler.h" /* getCurrentProcessPID(),
+                                    unlockProcessByPID(),
+                                    lockCurrentProcess() */
 #endif
 
 #include "semaphore.h"
@@ -47,10 +49,21 @@ static int add_semaphore_to_table(sosem_t **sem);
 static int remove_semaphore_from_table(unsigned int index);
 static int create_named_semaphore(const char *name, unsigned int initial_value,
                                   sosem_t **sem);
-static void userland_init(sosem_t *restrict sem, sosem_info_t *restrict info);
-static void userland_add_pid(sosem_t *restrict sem, uint64_t pid);
-static void userland_remove_pid(sosem_t *restrict sem, uint64_t pid);
-static void userland_destroy(sosem_t *restrict sem);
+static inline void userland_init(sosem_t *restrict sem,
+                                 sosem_info_t *restrict info);
+static inline void userland_destroy(sosem_t *restrict sem);
+static inline void userland_update(sosem_t *restrict sem);
+
+static inline void pid_queue_init(sosem_t *restrict sem);
+static inline int pid_queue_shift(sosem_t *restrict sem, uint64_t *pid);
+static inline int pid_queue_push(sosem_t *restrict sem, uint64_t pid);
+
+#ifdef TESTING
+// Replace Scheduler/scheduler.h functions with dummies
+static uint64_t getCurrentProcessPID();
+static void unlockProcessByPID(uint64_t pid);
+static void lockCurrentProcess(sosem_t *sem);
+#endif
 
 /* ------------------------------ */
 
@@ -79,15 +92,20 @@ int sosem_close(sosem_t *sem)
         int idx = get_semaphore_index_from_table(sem->name);
 
         if (idx == -1)
-                return 0;
+                return -1;
 
         // Free all waiting processes (if any)
-        if (sosem_names_table[idx].v)
-                atomic_store(&(sosem_names_table[idx].v->value), SEM_MAX_VALUE);
+        atomic_store(&sem->value, SEM_MAX_VALUE);
+
+        uint64_t pid = 0;
+        while (pid_queue_shift(sem, &pid) == 0) {
+                unlockProcessByPID(pid);
+        }
 
         userland_destroy(sem);
+        remove_semaphore_from_table(idx);
 
-        return remove_semaphore_from_table(idx);
+        return 0;
 }
 
 /* ------------------------------ */
@@ -104,6 +122,7 @@ int sosem_init(sosem_t *sem, unsigned int initial_value)
         atomic_store(&sem->_n_waiting, 0);
 
         userland_init(sem, &sem->userland);
+        pid_queue_init(sem);
 
         return 0;
 }
@@ -118,6 +137,11 @@ int sosem_destroy(sosem_t *sem)
         // Free all waiting processes (if any)
         atomic_store(&sem->value, SEM_MAX_VALUE);
 
+        uint64_t pid = 0;
+        while (pid_queue_shift(sem, &pid) == 0) {
+                unlockProcessByPID(pid);
+        }
+
         userland_destroy(sem);
 
         return 0;
@@ -130,7 +154,26 @@ int sosem_post(sosem_t *sem)
         if (sem == NULL)
                 return -1;
 
-        return atomic_fetch_add(&sem->value, 1);
+        int ret = 0;
+
+        // Acquiring the lock (sem->lock) can result in a deadlock if
+        // another process is in the middle of waiting. Fortunately,
+        // the "worst case sceneario" is a single process busy waiting
+        // if a context swich happens right after unlockProcessByPID().
+        // The scheduler will waste that quantum and eventualy perform the
+        // atomic_fetch_add and allow the locked process to go on.
+        uint64_t pid = 0;
+        if (pid_queue_shift(sem, &pid) == 0) {
+                unlockProcessByPID(pid);
+        }
+        ret = atomic_fetch_add(&sem->value, 1);
+
+        acquire(&(sem->lock));
+        // Userland
+        userland_update(sem);
+        release(&(sem->lock));
+
+        return ret;
 }
 
 /* ------------------------------ */
@@ -144,23 +187,26 @@ int sosem_wait(sosem_t *sem)
         // have any guarantees about them being executed atomically as a block
         // Plus we have to update the Userland info (which is not atomic)
         acquire(&(sem->lock));
-#ifndef TESTING
-        // Userland
-        userland_add_pid(sem, getCurrentProcessPID());
-#endif
 
         atomic_fetch_add(&sem->_n_waiting, 1);
 
-        while (atomic_load(&sem->value) == 0)
-                ;
-        atomic_fetch_sub(&sem->value, 1);
+        // Userland
+        if (atomic_load(&sem->value) == 0) {
+                pid_queue_push(sem, getCurrentProcessPID());
+                userland_update(sem);
+#ifdef TESTING
+                lockCurrentProcess(sem);
+#else
+                lockCurrentProcess();
+#endif
+        }
 
+        atomic_fetch_sub(&sem->value, 1);
         atomic_fetch_sub(&sem->_n_waiting, 1);
 
-#ifndef TESTING
         // Userland
-        userland_remove_pid(sem, getCurrentProcessPID());
-#endif
+        userland_update(sem);
+
         release(&(sem->lock));
 
         return 0;
@@ -274,82 +320,125 @@ static int create_named_semaphore(const char *name, unsigned int initial_value,
         atomic_store(&(*sem)->_n_waiting, 0);
 
         userland_init(*sem, &(*sem)->userland);
+        pid_queue_init(*sem);
 
         return 0;
 }
 
 /* ------------------------------ */
 
-static void userland_init(sosem_t *restrict sem, sosem_info_t *restrict info)
+static inline void userland_init(sosem_t *restrict sem,
+                                 sosem_info_t *restrict info)
 {
         info->name = &sem->name[0];
         info->len = strnlen(sem->name, SEM_MAX_NAME_LEN);
 
         info->value = atomic_load(&sem->value);
 
-        info->waiting_pid = NULL;
-        info->n_waiting = 0;
+        somemset(info->waiting_pid, 0, SEM_MAX_WAITING);
+        info->n_waiting = sem->_processes._n_waiting;
 }
 
 /* ------------------------------ */
 
-static void userland_add_pid(sosem_t *restrict sem, uint64_t pid)
-{
-        // TODO: Imeplement sorealloc()
-        uint64_t *n =
-                somalloc(sizeof(uint64_t) * (sem->userland.n_waiting + 1));
-        if (n == NULL)
-                return;
-
-        somemcpy(n, sem->userland.waiting_pid, sem->userland.n_waiting);
-        n[sem->userland.n_waiting] = pid;
-
-        sofree(sem->userland.waiting_pid);
-
-        sem->userland.n_waiting++;
-        sem->userland.waiting_pid = n;
-}
-
-/* ------------------------------ */
-
-static void userland_remove_pid(sosem_t *restrict sem, uint64_t pid)
-{
-        if (sem->userland.n_waiting == 0) {
-                return;
-        } else if (sem->userland.n_waiting == 1) {
-                sem->userland.waiting_pid[0] = 0;
-                sofree(sem->userland.waiting_pid);
-                sem->userland.n_waiting = 0;
-        } else {
-                uint64_t *n = somalloc(sizeof(uint64_t) *
-                                       (sem->userland.n_waiting - 1));
-                if (n == NULL)
-                        return;
-
-                for (size_t idx_n = 0, idx_wp = 0;
-                     idx_wp < sem->userland.n_waiting; idx_wp++) {
-                        if (sem->userland.waiting_pid[idx_wp] != pid) {
-                                n[idx_n] = sem->userland.waiting_pid[idx_wp];
-                                idx_n++;
-                        }
-                }
-
-                sofree(sem->userland.waiting_pid);
-
-                sem->userland.waiting_pid = n;
-                sem->userland.n_waiting--;
-        }
-}
-
-/* ------------------------------ */
-
-static void userland_destroy(sosem_t *restrict sem)
+static inline void userland_destroy(sosem_t *restrict sem)
 {
         sem->userland.name = NULL;
         sem->userland.len = 0;
 
         sem->userland.value = 0;
-
-        sofree(sem->userland.waiting_pid);
-        sem->userland.n_waiting = 0;
+        sem->userland.n_waiting = sem->_processes._n_waiting;
 }
+
+/* ------------------------------ */
+
+static inline void userland_update(sosem_t *restrict sem)
+{
+        sem->userland.value = atomic_load(&sem->value);
+        sem->userland.n_waiting = sem->_processes._n_waiting;
+
+        for (unsigned int i = 0; i < sem->_processes._n_waiting;
+             i = (i + 1) % SEM_MAX_WAITING) {
+                unsigned int queue_index =
+                        (i + sem->_processes._index) % SEM_MAX_WAITING;
+                sem->userland.waiting_pid[i] =
+                        sem->_processes._queue[queue_index];
+        }
+}
+
+/* ------------------------------ */
+
+static inline void pid_queue_init(sosem_t *restrict sem)
+{
+        if (sem == NULL)
+                return;
+
+        sem->_processes._n_waiting = 0;
+        sem->_processes._queue[0] = 0;
+        sem->_processes._index = 0;
+}
+
+/* ------------------------------ */
+
+static inline int pid_queue_shift(sosem_t *restrict sem, uint64_t *pid)
+{
+        if (sem == NULL || pid == NULL)
+                return -1;
+
+        if (sem->_processes._n_waiting == 0)
+                return -1;
+
+        *pid = sem->_processes._queue[sem->_processes._index];
+        sem->_processes._queue[sem->_processes._index] = 0;
+        sem->_processes._index = (sem->_processes._index + 1) % SEM_MAX_WAITING;
+        sem->_processes._n_waiting--;
+
+        return 0;
+}
+
+/* ------------------------------ */
+
+static inline int pid_queue_push(sosem_t *restrict sem, uint64_t pid)
+{
+        if (sem == NULL)
+                return -1;
+
+        if (sem->_processes._n_waiting == SEM_MAX_WAITING)
+                return -1;
+
+        unsigned int index =
+                (sem->_processes._index + sem->_processes._n_waiting) %
+                SEM_MAX_WAITING;
+        sem->_processes._queue[index] = pid;
+        sem->_processes._n_waiting++;
+
+        return 0;
+}
+
+#ifdef TESTING
+static const uint64_t pids[SEM_MAX_WAITING + 1] = {
+        14166, 43263, 17495, 62492, 54659, 40748, 30951, 41324, 4010,
+        35957, 38284, 36361, 16601, 41779, 6083,  50030, 9082,  51745,
+        26835, 2667,  47584, 44811, 41490, 15464, 29675, 26681, 23063,
+        38607, 65432, 64108, 40418, 6242,  5291
+};
+static unsigned int last_pid = 0;
+
+static uint64_t getCurrentProcessPID()
+{
+        uint64_t pid = pids[last_pid];
+        last_pid = (last_pid + 1) % (SEM_MAX_WAITING + 1);
+        return pid;
+}
+
+static void unlockProcessByPID(uint64_t pid)
+{
+        return;
+}
+
+static void lockCurrentProcess(sosem_t *sem)
+{
+        while (atomic_load(&sem->value) == 0)
+                ;
+}
+#endif

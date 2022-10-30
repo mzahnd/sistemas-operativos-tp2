@@ -5,6 +5,7 @@
 #include <scheduler/process.h>
 
 #define MAX_PROCESSES_INFO 32
+#define MAX_PROCESS_PRIORITY 10
 
 uint64_t schedule(uint64_t rsp);
 

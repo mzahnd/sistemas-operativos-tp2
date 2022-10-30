@@ -51,7 +51,7 @@ uint64_t schedule(uint64_t rsp)
         current->rsp = (reg_t)rsp;
 
         if (current->priority > currentProcessCycle &&
-            current->status != KILLED) {
+            current->status != KILLED && current->status != BLOCKED) {
                 currentProcessCycle++;
                 return (uint64_t)current->rsp;
         }
@@ -161,11 +161,12 @@ void lockCurrentProcess()
                 return;
         }
         process p = currentNode->pcb;
-        if (p == NULL || p->status == BLOCKED || p->status == KILLED) {
-                return;
+        if (p->status == READY) {
+                p->status = BLOCKED;
+                totalReady--;
         }
-        p->status = BLOCKED;
-        totalReady--;
+        currentProcessCycle = MAX_PROCESS_PRIORITY + 1; // To force the context Switch
+        _sti();
         forceTimerTick();
 }
 
@@ -190,7 +191,7 @@ void unlockProcessByPID(uint64_t pid)
         int init = 0;
         node current = queue->first;
         node first = current;
-        while (current != first && init) {
+        while (current != first || !init) {
                 init = 1;
                 process p = current->pcb;
                 if (p->pid == pid) {

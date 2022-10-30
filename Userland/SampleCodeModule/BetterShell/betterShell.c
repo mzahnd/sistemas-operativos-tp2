@@ -189,6 +189,7 @@ void printOnShell(char* str, int dim) {
         }
     }
     addToLastLine(lines, buffer);
+    displayLines(lines);
 }
 
 int testProcessShell(int argc, char** argv) {

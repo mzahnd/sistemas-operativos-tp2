@@ -6,7 +6,10 @@
 #include <regi.h>
 #include <stdint.h>
 #include <IO_driver.h>
+#include <scheduler/scheduler.h>
 #define BUFFER_SIZE 64
+
+uint64_t kbLockedPID = 0;
 
 static uint8_t shiftL = 0, shiftR = 0;
 static char pressCodes[][2] = {
@@ -62,6 +65,11 @@ void keyboardHandler(registerStruct *registers)
                 }
         }
 
+        if (kbLockedPID) {
+                unlockProcessByPID(kbLockedPID);
+                kbLockedPID = 0;
+        }
+
         if (keyCode < KEYS) {
                 uint8_t mayus = (shiftL || shiftR);
                 BUFFER[(endIndex++) % BUFFER_SIZE] = pressCodes[keyCode][mayus];
@@ -72,9 +80,8 @@ void readKeyboard(char *buff, uint64_t size, uint64_t *count)
 {
         int i = 0;
         while (endIndex <= startIndex) {
-                _sti(); //Open ints
-                _hlt();
-                _cli(); //Close ints
+                kbLockedPID = getCurrentProcessPID();
+                lockCurrentProcess();
         }
         for (i = 0; i < (endIndex - startIndex) && i < size; i++) {
                 buff[i] = BUFFER[(startIndex++) % BUFFER_SIZE];

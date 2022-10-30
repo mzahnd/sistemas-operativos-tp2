@@ -18,6 +18,9 @@
  */
 #include "lib.h"
 #include "mem/memory.h"
+#ifndef TESTING
+#include "scheduler/scheduler.h" /* getCurrentProcessPID() */
+#endif
 
 #include "semaphore.h"
 
@@ -44,6 +47,10 @@ static int add_semaphore_to_table(sosem_t **sem);
 static int remove_semaphore_from_table(unsigned int index);
 static int create_named_semaphore(const char *name, unsigned int initial_value,
                                   sosem_t **sem);
+static void userland_init(sosem_t *restrict sem, sosem_info_t *restrict info);
+static void userland_add_pid(sosem_t *restrict sem, uint64_t pid);
+static void userland_remove_pid(sosem_t *restrict sem, uint64_t pid);
+static void userland_destroy(sosem_t *restrict sem);
 
 /* ------------------------------ */
 
@@ -78,6 +85,8 @@ int sosem_close(sosem_t *sem)
         if (sosem_names_table[idx].v)
                 atomic_store(&(sosem_names_table[idx].v->value), SEM_MAX_VALUE);
 
+        userland_destroy(sem);
+
         return remove_semaphore_from_table(idx);
 }
 
@@ -88,9 +97,13 @@ int sosem_init(sosem_t *sem, unsigned int initial_value)
         if (sem == NULL)
                 return -1;
 
+        sem->name[0] = '\0';
+
         atomic_store(&sem->value, initial_value);
         atomic_flag_clear(&sem->lock);
         atomic_store(&sem->_n_waiting, 0);
+
+        userland_init(sem, &sem->userland);
 
         return 0;
 }
@@ -104,6 +117,9 @@ int sosem_destroy(sosem_t *sem)
 
         // Free all waiting processes (if any)
         atomic_store(&sem->value, SEM_MAX_VALUE);
+
+        userland_destroy(sem);
+
         return 0;
 }
 
@@ -126,7 +142,13 @@ int sosem_wait(sosem_t *sem)
 
         // We are guaranteed that atomic_* functions are atomic, but we do not
         // have any guarantees about them being executed atomically as a block
+        // Plus we have to update the Userland info (which is not atomic)
         acquire(&(sem->lock));
+#ifndef TESTING
+        // Userland
+        userland_add_pid(sem, getCurrentProcessPID());
+#endif
+
         atomic_fetch_add(&sem->_n_waiting, 1);
 
         while (atomic_load(&sem->value) == 0)
@@ -134,9 +156,24 @@ int sosem_wait(sosem_t *sem)
         atomic_fetch_sub(&sem->value, 1);
 
         atomic_fetch_sub(&sem->_n_waiting, 1);
+
+#ifndef TESTING
+        // Userland
+        userland_remove_pid(sem, getCurrentProcessPID());
+#endif
         release(&(sem->lock));
 
         return 0;
+}
+
+/* ------------------------------ */
+
+sosem_info_t *sosem_getinformation(sosem_t *restrict sem)
+{
+        if (sem == NULL)
+                return NULL;
+
+        return &sem->userland;
 }
 
 /* ------------------------------ */
@@ -236,5 +273,83 @@ static int create_named_semaphore(const char *name, unsigned int initial_value,
         atomic_flag_clear(&(*sem)->lock);
         atomic_store(&(*sem)->_n_waiting, 0);
 
+        userland_init(*sem, &(*sem)->userland);
+
         return 0;
+}
+
+/* ------------------------------ */
+
+static void userland_init(sosem_t *restrict sem, sosem_info_t *restrict info)
+{
+        info->name = &sem->name[0];
+        info->len = strnlen(sem->name, SEM_MAX_NAME_LEN);
+
+        info->value = atomic_load(&sem->value);
+
+        info->waiting_pid = NULL;
+        info->n_waiting = 0;
+}
+
+/* ------------------------------ */
+
+static void userland_add_pid(sosem_t *restrict sem, uint64_t pid)
+{
+        // TODO: Imeplement sorealloc()
+        uint64_t *n =
+                somalloc(sizeof(uint64_t) * (sem->userland.n_waiting + 1));
+        if (n == NULL)
+                return;
+
+        somemcpy(n, sem->userland.waiting_pid, sem->userland.n_waiting);
+        n[sem->userland.n_waiting] = pid;
+
+        sofree(sem->userland.waiting_pid);
+
+        sem->userland.n_waiting++;
+        sem->userland.waiting_pid = n;
+}
+
+/* ------------------------------ */
+
+static void userland_remove_pid(sosem_t *restrict sem, uint64_t pid)
+{
+        if (sem->userland.n_waiting == 0) {
+                return;
+        } else if (sem->userland.n_waiting == 1) {
+                sem->userland.waiting_pid[0] = 0;
+                sofree(sem->userland.waiting_pid);
+                sem->userland.n_waiting = 0;
+        } else {
+                uint64_t *n = somalloc(sizeof(uint64_t) *
+                                       (sem->userland.n_waiting - 1));
+                if (n == NULL)
+                        return;
+
+                for (size_t idx_n = 0, idx_wp = 0;
+                     idx_wp < sem->userland.n_waiting; idx_wp++) {
+                        if (sem->userland.waiting_pid[idx_wp] != pid) {
+                                n[idx_n] = sem->userland.waiting_pid[idx_wp];
+                                idx_n++;
+                        }
+                }
+
+                sofree(sem->userland.waiting_pid);
+
+                sem->userland.waiting_pid = n;
+                sem->userland.n_waiting--;
+        }
+}
+
+/* ------------------------------ */
+
+static void userland_destroy(sosem_t *restrict sem)
+{
+        sem->userland.name = NULL;
+        sem->userland.len = 0;
+
+        sem->userland.value = 0;
+
+        sofree(sem->userland.waiting_pid);
+        sem->userland.n_waiting = 0;
 }

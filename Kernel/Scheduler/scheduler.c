@@ -50,7 +50,8 @@ uint64_t schedule(uint64_t rsp)
         //Guardo el rsp en current
         current->rsp = (reg_t)rsp;
 
-        if (current->priority > currentProcessCycle && current->status == READY) {
+        if (current->priority > currentProcessCycle &&
+            current->status != KILLED) {
                 currentProcessCycle++;
                 return (uint64_t)current->rsp;
         }
@@ -70,8 +71,11 @@ uint64_t schedule(uint64_t rsp)
                         node nodeToKill = nextNode;
                         nextNode = nextNode->next;
                         next = nextNode->pcb;
-                        removeFromQueue(queue, nodeToKill->pcb->pid); // Remove makes the free of the process
-                        
+                        removeFromQueue(
+                                queue,
+                                nodeToKill->pcb
+                                        ->pid); // Remove makes the free of the process
+
                         totalReady--;
                         continue;
                 }
@@ -218,6 +222,18 @@ void getSchedulerInfo(schInfo_t * infoBlock) {
                 processInfo->priority = p->priority;
                 processInfo->status = p->status;
         }
+}
+
+uint64_t getCurrentProcessPID()
+{
+        if (!scheduler_initialized || currentNode == NULL) {
+                return 0;
+        }
+        process p = currentNode->pcb;
+        if (p == NULL || p->status == KILLED) {
+                return 0;
+        }
+        return p->pid;
 }
 
 #endif

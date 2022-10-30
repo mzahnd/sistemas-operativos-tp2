@@ -13,6 +13,7 @@
 
 #include <stdatomic.h> /* atomic_* */
 #include <stdint.h> /* int64_t */
+#include <stddef.h> /* size_t */
 
 /*
  * Maximum value a semaphore can take.
@@ -26,13 +27,25 @@
  */
 #define SEM_MAX_NAMED (2 << 4) // 256
 
+// Information for Userland.
+typedef struct SOSEM_INFO {
+        char *name;
+        size_t len;
+
+        unsigned int value;
+
+        uint64_t *waiting_pid;
+        size_t n_waiting;
+} sosem_info_t;
+
 typedef struct SOSEM {
-        char name[SEM_MAX_NAME_LEN + 2];
+        char name[SEM_MAX_NAME_LEN + 1];
 
         atomic_uint value;
         atomic_flag lock;
-
         atomic_uint _n_waiting;
+
+        sosem_info_t userland;
 } sosem_t;
 
 // Create a named semaphore starting with initial_value.
@@ -46,5 +59,7 @@ int sosem_destroy(sosem_t *sem);
 int sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval);
 int sosem_post(sosem_t *sem);
 int sosem_wait(sosem_t *sem);
+
+sosem_info_t *sosem_getinformation(sosem_t *restrict sem);
 
 #endif /* SEMAPHORE_H */

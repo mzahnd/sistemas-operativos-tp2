@@ -14,10 +14,11 @@
 #include <mem/memory.h>
 #include <utils.h>
 #include <mem/sys_memory.h> /* sys_somalloc(); sys_socalloc(); sys_sofree() */
+#include <sys_semaphore.h> /* sys_sosem_*() */
 
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
-void syscallCreateProcess(registerStruct *reg) ;
+void syscallCreateProcess(registerStruct *reg);
 
 void syscallHandler(registerStruct *registers)
 {
@@ -146,7 +147,6 @@ void syscallHandler(registerStruct *registers)
                 sys_sofree((void *)registers->rdi);
                 break;
 
-
         // From 20 -> Process management syscalls:
         case 20: // Create Process
                 //rdi -> char *: Nombre del proceso
@@ -160,40 +160,68 @@ void syscallHandler(registerStruct *registers)
                 // rdi -> schInfo_t*: pointer to struct
                 getSchedulerInfo((schInfo_t *)registers->rdi);
 
+
         case 30:
-                // rdi -> id
-                // rsi -> initValue
-                // rdx -> *toReturn
-                openSemaphore((uint32_t) registers->rdi, (uint32_t) registers->rsi, (int*) registers->rdx);
-                return 1;
-                // break;
+                // rdi -> name
+                // rsi -> initial value
+                // rdx -> semaphore pointer (sosem_t **)
+                sys_sosem_open((const char *)registers->rdi,
+                               (unsigned int)registers->rsi,
+                               (sosem_t **)registers->rdx);
+                break;
 
         case 31:
-                // rdi -> id
-                // rsi -> *toReturn
-                waitSemaphore((uint32_t) registers->rdi, (int*) registers->rsi);
-                return 1;
-                // break;
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int *)
+                sys_sosem_wait((sosem_t *)registers->rdi,
+                               (int *)registers->rsi);
+                break;
 
         case 32:
-                // rdi -> id
-                // rsi -> *toReturn
-                postSemaphore((uint32_t) registers->rdi, (int*) registers->rsi);
-                return 1;
-                // break;
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int *)
+                sys_sosem_post((sosem_t *)registers->rdi,
+                               (int *)registers->rsi);
+                break;
 
         case 33:
-                // rdi -> id
-                // rsi -> *toReturn
-                closeSemaphore((uint32_t) registers->rdi, (int*) registers->rsi);
-                return 1;
-                // break;
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int *)
+                sys_sosem_close((sosem_t *)registers->rdi,
+                                (int *)registers->rsi);
+                break;
 
         case 34:
-                // rdi -> buffer
-                printSemaphore((char *) registers->rdi);
-                return 1;
-                // break;
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> semaphore's value storage (int *)
+                // rdx -> function result (int *)
+                sys_sosem_getvalue((sosem_t *)registers->rdi,
+                                   (unsigned int *)registers->rsi,
+                                   (int *)registers->rdx);
+                break;
+
+        case 35:
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> initial value
+                // rdx -> result (int*)
+                sys_sosem_init((sosem_t *)registers->rdi,
+                               (unsigned int)registers->rsi,
+                               (int *)registers->rdx);
+                break;
+
+        case 36:
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (int*)
+                sys_sosem_destroy((sosem_t *)registers->rdi,
+                                  (int *)registers->rsi);
+                break;
+
+        case 37:
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> result (sosem_info_t **)
+                sys_sosem_getinformation((sosem_t *)registers->rdi,
+                                         (sosem_info_t **)registers->rsi);
+                break;
         }
 
 }
@@ -236,8 +264,10 @@ void writeStr(registerStruct *registers)
         //drawChar(0, 0, 'A',1, 0xFFFFFF, 0, 0);
 }
 
-void syscallCreateProcess(registerStruct *reg) {
-        createAndAddProcess((char *)reg->rdi,(int (*)(int, char**))reg->rsi, (int)reg->rdx, (char **)reg->rcx);
+void syscallCreateProcess(registerStruct *reg)
+{
+        createAndAddProcess((char *)reg->rdi, (int (*)(int, char **))reg->rsi,
+                            (int)reg->rdx, (char **)reg->rcx);
 }
 
 #endif

@@ -4,6 +4,7 @@
 #include "Kernel/lib.h"
 #include "Kernel/mem/memory.h"
 #include "Kernel/semaphore.h"
+#include "Kernel/pipes.h"
 
 void RunAllTests(void)
 {
@@ -13,6 +14,7 @@ void RunAllTests(void)
         CuSuiteAddSuite(suite, test_get_lib_suite());
         CuSuiteAddSuite(suite, test_get_memory_suite());
         CuSuiteAddSuite(suite, test_get_semaphore_suite());
+        CuSuiteAddSuite(suite, test_get_pipes_suite());
         printf("[INFO] All suites loaded.\n");
 
         printf("[INFO] Running tests...\n");

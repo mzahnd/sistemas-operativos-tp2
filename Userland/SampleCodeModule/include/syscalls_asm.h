@@ -27,4 +27,10 @@ void freeSyscall(void *ptr);
 void createProcessSyscall(char * name, int (*mainFunction)(int, char**), int argc, char** argv);
 void getSchedulerInfoSyscall(schInfo_t *);
 
+void openSemaphoreSyscall(uint32_t sem_id, uint32_t initialValue, int *toReturn);
+void waitSemaphoreSyscall(uint32_t id, int *toReturn);
+void postSemaphoreSyscall(uint32_t id, int *toReturn);
+void closeSemaphoreSyscall(uint32_t id, int *toReturn);
+void semSyscall(char * buffer);
+
 #endif

@@ -33,5 +33,6 @@ void lockCurrentProcess();
 void unlockCurrentProcess();
 void unlockProcessByPID(uint64_t pid);
 void getSchedulerInfo(schInfo_t * infoBlock);
+uint64_t getCurrentProcessPID();
 
 #endif

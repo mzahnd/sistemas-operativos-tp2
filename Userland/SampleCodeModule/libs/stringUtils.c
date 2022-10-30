@@ -55,4 +55,19 @@ void reverseStr(char str[])
         }
 }
 
+int isAlpha(char ch) {
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
+}
+
+int isDigit(char ch) {
+    return (ch >= '0' && ch <= '1');
+}
+
+int isSymbol(char ch) {
+    return (ch >= ' ' && ch <= '/') ||
+            (ch >= ':' && ch <= '@') ||
+            (ch >= '[' && ch <= '`') ||
+            (ch >= '{' && ch <= '~');
+}
+
 #endif

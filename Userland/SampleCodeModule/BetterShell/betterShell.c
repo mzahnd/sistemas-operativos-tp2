@@ -83,7 +83,7 @@ static void writeToCommandLine(char ch, char* commandLine, unsigned int* index, 
         displayCommandLine(commandLine, *index);
 
 
-    } else if (*index < (MAX_COMMAND_LENGTH - 1) && ch >= 0) {
+    } else if (*index < (MAX_COMMAND_LENGTH - 1) && (isAlpha(ch) || isDigit(ch) || isSymbol(ch))) {
         commandLine[*index] = ch;
         (*index)++;
         drawLastChar(commandLine, *index-1);
@@ -152,6 +152,7 @@ static void processCommand(char* command) {
             j = -1;
         } else if (command[i+1] == '\0') {
             addArgToArgv(argv, argIndex, buffer, j);
+            argIndex++;
         } else {
             buffer[j] = command[i];
         }     
@@ -209,7 +210,7 @@ static void addArgToArgv(char ** argv, unsigned int index, char * str, unsigned 
     }
     argv[index] = malloc(strDim * sizeof(char) + 1);
     strcpy(argv[index], str);
-    argv[index+1][strDim+1] = '\0';
+    argv[index][strDim+1] = '\0';
 }
 
 

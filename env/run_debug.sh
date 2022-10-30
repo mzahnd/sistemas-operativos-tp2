@@ -10,10 +10,14 @@ if [ -f /.dockerenv ]; then
     echo "Debugging inside docker";
 else
     echo "Debugging on host";
+    sudo rm -rf /itba/*
 fi
 
-cat .gdbinit
+echo $HOME
 
-sed -i "1 s/.*/target remote ${MY_IP}:1234/" ./.gdbinit
+cat .gdbinit > /home/pedro/.gdbinit
 
-gdb -iex "set auto-load safe-path ." -s ./.gdbinit
+sed -i "1 s/.*/target remote ${MY_IP}:1234/" ${HOME}/.gdbinit
+
+sudo cp -r -f ${PWD}/* /itba/
+gdb

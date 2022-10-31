@@ -15,6 +15,7 @@
 #include <utils.h>
 #include <mem/sys_memory.h> /* sys_somalloc(); sys_socalloc(); sys_sofree() */
 #include <sys_semaphore.h> /* sys_sosem_*() */
+#include <pipes.h>
 
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
@@ -160,6 +161,36 @@ void syscallHandler(registerStruct *registers)
                 // rdi -> schInfo_t*: pointer to struct
                 getSchedulerInfo((schInfo_t *)registers->rdi);
 
+
+        case 24:
+                // rdi -> fd
+                sopipe((int *) registers->rdi);
+                break;
+        
+        case 25:
+                // rdi -> fd
+                soclose((int) registers->rdi);
+                break;
+
+        case 26:
+                // rdx -> fd
+                // rsi -> buffer
+                // rdi -> buffer length
+                soread((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
+                break;
+
+        case 27:
+                // rdx -> fd
+                // rsi -> buffer
+                // rdi -> buffer length
+                sowrite((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
+                break;
+
+        // case 29:
+        //         // rdx -> buffer
+        //         get_fd_status((int *) registers->rdx);
+        //         break;
+        // no reconoce la funcion get_fd_status
 
         case 30:
                 // rdi -> name

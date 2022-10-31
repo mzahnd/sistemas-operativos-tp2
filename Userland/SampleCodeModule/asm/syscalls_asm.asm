@@ -25,6 +25,11 @@ GLOBAL initSemaphoreSyscall
 GLOBAL destroySemaphoreSyscall
 GLOBAL getSemaphoreInformationSyscall
 GLOBAL getSchedulerInfoSyscall
+GLOBAL pipeOpenSyscall
+GLOBAL pipeCloseSyscall
+GLOBAL pipeReadSyscall
+GLOBAL pipeWriteSyscall
+GLOBAL pipeSyscall
 
 section .text
 
@@ -313,6 +318,61 @@ getSemaphoreInformationSyscall:
     mov rbp, rsp
 
     mov rax, 37 ;ID sys_sosem_getinformation
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeOpenSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 24
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeCloseSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 25
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeReadSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 26
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeWriteSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 27
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeSyscall:    ;getValuePipes
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 29
     int 80h
 
     mov rsp, rbp

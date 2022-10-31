@@ -33,4 +33,10 @@ void postSemaphoreSyscall(uint32_t id, int *toReturn);
 void closeSemaphoreSyscall(uint32_t id, int *toReturn);
 void semSyscall(char * buffer);
 
+void pipeOpenSyscall(int fd);
+void pipeCloseSyscall(int fd);
+void pipeReadSyscall(int fd, char *buf, size_t count);
+void pipeWriteSyscall(int fd, const char *buf, size_t count);
+void pipeSyscall(char * buffer);
+
 #endif

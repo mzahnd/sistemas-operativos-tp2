@@ -119,15 +119,8 @@ static void clearCommandLine(char* commandLine, unsigned int* index) {
 
 }
 
-int testProcess1(int argc,  char ** argv) { // TODO Delete
-    uint64_t pidToWait = (uint64_t)argc;
-    printf("PID: %d\n", pidToWait);
-    waitPID(pidToWait);
-    printf("SOY EL PROCESO 1\n");
-}
-
 int testProcess2(int argc, char** argv) {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 50; i++) {
         printf("Proceso 2: %d\n", i);
     }
 }
@@ -147,7 +140,7 @@ static void processCommand(char* command) {
     unsigned int argc = 1; // At least 1
 
     for (int i = 0; i < commandLen; i++) {
-        if (command[i] == DETACH_PROCESS_CHAR && i > 0 && command[i] == ' ') {
+        if (command[i] == DETACH_PROCESS_CHAR && i > 0 && command[i-1] == ' ') {
             foreground = 0;
             argc--;
         }
@@ -162,8 +155,10 @@ static void processCommand(char* command) {
 
     // Here I have argc and argv
     //createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);
-    uint64_t test2 = createProcess("Test2", testProcess2, 0, NULL, 0);
-    createProcess("Test 1", testProcess1, test2, NULL, 0);
+    uint64_t test2 = createProcess("Test2", testProcess2, 0, NULL, foreground);
+    if (foreground) {
+        waitPID(test2);
+    }
 
     for (int i = 0; i < argc; i++) {
         free(argv[i]);

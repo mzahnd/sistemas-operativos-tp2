@@ -11,6 +11,7 @@
 #include <processManagement.h>
 
 #define SHELL_BG_COLOR 0x001017 //BUTTERFLY_BUSH
+#define DETACH_PROCESS_CHAR '&'
 
 typedef int (*processFunciton)(int,char*);
 
@@ -23,7 +24,7 @@ static void clearCommandLine(char* commandLine, unsigned int* index);
 static void processCommand(char* command);
 static void addArgToArgv(char ** argv, unsigned int index, char * str, unsigned int strDim);
 static processFunciton getProcess(char* name);
-
+void setupArgv(char** argv, int argc, char *command, unsigned int commandLen);
 void printOnShell(char* str, int dim);
 
 static shellLinesQueue lines;
@@ -129,43 +130,32 @@ static void processCommand(char* command) {
         return;
     }
 
+    unsigned int foreground = 1; // Process is foreground by default
     unsigned int argc = 1; // At least 1
 
     for (int i = 0; i < commandLen; i++) {
-        if (command[i] == ' ' && command[i+1] && command[i+1] != ' ') {
-            argc++;
-        }
+	if (command[i] == DETACH_PROCESS_CHAR && i > 0 && command[i] == ' ') {
+		foreground = 0;
+		argc--;
+	}
+        if (command[i] == ' ' && command[i+1] && command[i+1] != '\n' && command[i+1] != DETACH_PROCESS_CHAR && command[i+1] != ' ') { 
+		argc++; 
+	} 
     }
 
-    char buffer[MAX_COMMAND_LENGTH] = {0};
     char** argv = malloc(argc * sizeof(char*));
-    unsigned int argIndex = 0;
-    for (int i = 0, j = 0; i < commandLen; i++, j++) {
-        if (command[i] == ' ') {
-            if (command[i+1] && command[i+1] != ' ') {
-                addArgToArgv(argv, argIndex, buffer, j);
-                argIndex++;
-            }
-            for (int k = 0; k <= j; k++) {
-                buffer[k] = 0;
-            }
-            j = -1;
-        } else if (command[i+1] == '\0') {
-            addArgToArgv(argv, argIndex, buffer, j);
-            argIndex++;
-        } else {
-            buffer[j] = command[i];
-        }     
-    }
+
+    setupArgv(argv, argc, command, commandLen);
 
     // Here I have argc and argv
     createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv);
 
-    for (int i = 0; i < argIndex; i++) {
+    for (int i = 0; i < argc; i++) {
         free(argv[i]);
-    }
-    free(argv);
+    } 
+    free(argv); 
 }
+
 
 void printOnShell(char* str, int dim) {
     if (lines == NULL) {
@@ -190,6 +180,29 @@ void printOnShell(char* str, int dim) {
     }
     addToLastLine(lines, buffer);
     displayLines(lines);
+}
+
+void setupArgv(char** argv, int argc, char *command, unsigned int commandLen) {
+    char buffer[MAX_COMMAND_LENGTH] = {0};
+    unsigned int argIndex = 0;
+    for (int i = 0, j = 0; i < commandLen; i++, j++) {
+        if (command[i] == ' ') {
+            if (command[i+1] && command[i+1] != ' ') {
+                addArgToArgv(argv, argIndex, buffer, j);
+                argIndex++;
+            }
+            for (int k = 0; k <= j; k++) {
+                buffer[k] = 0;
+            }
+            j = -1;
+        } else if (command[i+1] == '\0') {
+            addArgToArgv(argv, argIndex, buffer, j);
+            argIndex++;
+        } else {
+            buffer[j] = command[i];
+        }     
+    }
+
 }
 
 int testProcessShell(int argc, char** argv) {

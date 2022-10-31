@@ -30,6 +30,13 @@
 
 /* ------------------------------ */
 
+// Information for Userland.
+typedef struct {
+        char buffer[PIPE_BUFFER_SIZE];
+        int fd[PIPE_N_FD];
+        int active;
+} pipe_info_t;
+
 typedef struct {
         sosem_t sem;
         int index;
@@ -43,6 +50,8 @@ typedef struct {
         int fd[PIPE_N_FD];
         pipe_flow_t read;
         pipe_flow_t write;
+
+        pipe_info_t userland;
 } pipe_t;
 
 /* ------------------------------ */
@@ -60,6 +69,7 @@ static inline void store_fd_pair(int fd[PIPE_N_FD]);
 static inline void dup_fd_pair(int dest[PIPE_N_FD], int src[PIPE_N_FD]);
 static inline void remove_fd(int fd);
 static int is_valid_fd(int fd);
+static void userland_pipe(pipe_t * pipe, pipe_info_t * info);
 
 /* ------------------------------ */
 
@@ -185,6 +195,8 @@ static inline void createPipe(int index)
         sosem_init(&pipes[index].read.sem, 0);
         // Initial value > 0 to allow writting
         sosem_init(&pipes[index].write.sem, 1);
+
+        userland_pipe(&pipes[index], &pipes[index].userland);
 }
 
 /* ------------------------------ */
@@ -259,3 +271,22 @@ static int is_valid_fd(int fd)
 
         return 0;
 }
+
+/* ------------------------------ */
+
+static void userland_pipe(pipe_t * pipe, pipe_info_t * info)
+{
+        //Copy contents from pipe buffer to info buffer
+        size_t buffer_size = sizeof(pipe->buffer);
+        somemcpy(info->buffer, pipe->buffer, buffer_size);
+        // strncpy(info->buffer, pipe->buffer, buffer_size);
+        info->buffer[buffer_size-1] = '\0';
+
+        //Copy contents from pipe fd to info fd
+        info->fd[0] = pipe->fd[0];
+        info->fd[1] = pipe->fd[1];
+      
+        info->active = pipe->active;
+}
+
+/* ------------------------------ */

@@ -35,6 +35,10 @@ process createProcess(char *name, uint64_t pid, uint64_t ppid,
         p->sleepingCyclesLeft = 0;
         // Priority goes from 1 to 20. It indicates the total quantums it executes before switching to the next process
         p->priority = 1; 
+	p->waitingCount = 0;
+	for (int i = 0; i < MAX_WAITING_COUNT; i++) {
+		p->waitingPIDs[i] = 0;
+	}
         initStack(p->rbp, p->rsp, mainF, argc, argv, &(p->status));
 
         return p;

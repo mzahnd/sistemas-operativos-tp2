@@ -28,7 +28,7 @@ typedef struct schInfo_t {
 void initScheduler();
 void TEMP_testProcess();
 void addProcess(process p);
-void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
+uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
                          char **argv, uint64_t foreground);
 void lockCurrentProcess();
 void unlockCurrentProcess();
@@ -36,5 +36,5 @@ void unlockProcessByPID(uint64_t pid);
 void getSchedulerInfo(schInfo_t * infoBlock);
 unsigned int isCurrentProcessForeground();
 uint64_t getCurrentProcessPID();
-
+void waitForPID(uint64_t pid);
 #endif

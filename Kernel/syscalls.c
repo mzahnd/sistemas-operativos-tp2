@@ -162,35 +162,7 @@ void syscallHandler(registerStruct *registers)
                 getSchedulerInfo((schInfo_t *)registers->rdi);
 
 
-        case 24:
-                // rdi -> fd
-                sopipe((int *) registers->rdi);
-                break;
         
-        case 25:
-                // rdi -> fd
-                soclose((int) registers->rdi);
-                break;
-
-        case 26:
-                // rdx -> fd
-                // rsi -> buffer
-                // rdi -> buffer length
-                soread((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
-                break;
-
-        case 27:
-                // rdx -> fd
-                // rsi -> buffer
-                // rdi -> buffer length
-                sowrite((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
-                break;
-
-        // case 29:
-        //         // rdx -> buffer
-        //         get_fd_status((int *) registers->rdx);
-        //         break;
-        // no reconoce la funcion get_fd_status
 
         case 30:
                 // rdi -> name
@@ -253,7 +225,40 @@ void syscallHandler(registerStruct *registers)
                 sys_sosem_getinformation((sosem_t *)registers->rdi,
                                          (sosem_info_t **)registers->rsi);
                 break;
+
+        // Pipes from 40
+        case 40:
+                // rdi -> int*: fd
+                sopipe((int *) registers->rdi);
+                break;
+        
+        case 41:
+                // rdi -> int: fd
+                soclose((int) registers->rdi);
+                break;
+
+        case 42:
+                // rdx -> int: fd
+                // rsi -> char*: buffer
+                // rdi -> size_t: buffer length
+                soread((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
+                break;
+
+        case 43:
+                // rdx -> int: fd
+                // rsi -> char*: buffer
+                // rdi -> size_t: buffer length
+                sowrite((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
+                break;
+
+        // case 44:
+        //         // rdx -> buffer
+        //         get_fd_status((int *) registers->rdx);
+        //         break;
+        // no reconoce la funcion get_fd_status
         }
+
+        
 
 }
 

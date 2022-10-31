@@ -29,7 +29,7 @@ GLOBAL pipeOpenSyscall
 GLOBAL pipeCloseSyscall
 GLOBAL pipeReadSyscall
 GLOBAL pipeWriteSyscall
-GLOBAL pipeSyscall
+GLOBAL pipeInfoSyscall
 
 section .text
 
@@ -328,7 +328,7 @@ pipeOpenSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 24
+    mov rax, 40; ID pipeOpen
     int 80h
 
     mov rsp, rbp
@@ -339,7 +339,7 @@ pipeCloseSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 25
+    mov rax, 41 ;ID Pipe Close
     int 80h
 
     mov rsp, rbp
@@ -350,7 +350,7 @@ pipeReadSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 26
+    mov rax, 42 ;ID PipeRead
     int 80h
 
     mov rsp, rbp
@@ -361,18 +361,18 @@ pipeWriteSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 27
+    mov rax, 43 ;ID PipeWrite 
     int 80h
 
     mov rsp, rbp
     pop rbp
     ret
 
-pipeSyscall:    ;getValuePipes
+pipeInfoSyscall:    ;getValuePipes
     push rbp
     mov rbp, rsp
 
-    mov rax, 29
+    mov rax, 44 ; ID pipe Info
     int 80h
 
     mov rsp, rbp

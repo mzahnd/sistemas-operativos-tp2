@@ -37,6 +37,6 @@ void pipeOpenSyscall(int fd);
 void pipeCloseSyscall(int fd);
 void pipeReadSyscall(int fd, char *buf, size_t count);
 void pipeWriteSyscall(int fd, const char *buf, size_t count);
-void pipeSyscall(char * buffer);
+void pipeInfoSyscall(char * buffer);
 
 #endif

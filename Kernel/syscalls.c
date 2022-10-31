@@ -15,6 +15,7 @@
 #include <utils.h>
 #include <mem/sys_memory.h> /* sys_somalloc(); sys_socalloc(); sys_sofree() */
 #include <sys_semaphore.h> /* sys_sosem_*() */
+#include <pipes.h>
 
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
@@ -156,35 +157,33 @@ void syscallHandler(registerStruct *registers)
                 syscallCreateProcess(registers);
 
         case 24:
-                // rdi -> id
-                // rsi -> toReturn
-                sopipe((int *) registers->rsi);
+                // rdi -> fd
+                sopipe((int *) registers->rdi);
                 break;
         
         case 25:
-                // rdi -> id
-                // rsi -> toReturn
-                soclose((int *) registers->rsi);
+                // rdi -> fd
+                soclose((int) registers->rdi);
                 break;
 
         case 26:
-                // rdi -> id
-                // rsi -> toReturn
-                soread((int *) registers->rdx, (char *) registers->rsi, (uint32_t) registers->rdi);
+                // rdx -> fd
+                // rsi -> buffer
+                // rdi -> buffer length
+                soread((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
                 break;
 
         case 27:
-                // rdi -> id
-                // rsi -> string
-                // rdx -> toReturn
-                sowrite((int *) registers->rdx, (char *) registers->rsi, (uint32_t) registers->rdi);
+                // rdx -> fd
+                // rsi -> buffer
+                // rdi -> buffer length
+                sowrite((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
                 break;
 
         // case 29:
-        //         // rdi -> buffer
+        //         // rdx -> buffer
         //         get_fd_status((int *) registers->rdx);
-        //         return 1;
-        //         // break;
+        //         break;
         // no reconoce la funcion get_fd_status
 
         case 30:

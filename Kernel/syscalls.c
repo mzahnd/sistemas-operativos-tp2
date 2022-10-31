@@ -155,6 +155,42 @@ void syscallHandler(registerStruct *registers)
                 //rcx -> char**: argv
                 syscallCreateProcess(registers);
 
+        case 24:
+                // rdi -> id
+                // rsi -> toReturn
+                sopipe((int *) registers->rsi);
+                return 1;
+                // break;
+        
+        case 25:
+                // rdi -> id
+                // rsi -> toReturn
+                soclose((int *) registers->rsi);
+                return 1;
+                // break;
+
+        case 26:
+                // rdi -> id
+                // rsi -> toReturn
+                soread((int *) registers->rdx, (char *) registers->rsi, (uint32_t) registers->rdi);
+                return 1;
+                // break;
+
+        case 27:
+                // rdi -> id
+                // rsi -> string
+                // rdx -> toReturn
+                sowrite((int *) registers->rdx, (char *) registers->rsi, (uint32_t) registers->rdi);
+                return 1;
+                // break;
+
+        // case 29:
+        //         // rdi -> buffer
+        //         get_fd_status((int *) registers->rdx);
+        //         return 1;
+        //         // break;
+        // no reconoce la funcion get_fd_status
+
         case 30:
                 // rdi -> name
                 // rsi -> initial value

@@ -159,30 +159,26 @@ void syscallHandler(registerStruct *registers)
                 // rdi -> id
                 // rsi -> toReturn
                 sopipe((int *) registers->rsi);
-                return 1;
-                // break;
+                break;
         
         case 25:
                 // rdi -> id
                 // rsi -> toReturn
                 soclose((int *) registers->rsi);
-                return 1;
-                // break;
+                break;
 
         case 26:
                 // rdi -> id
                 // rsi -> toReturn
                 soread((int *) registers->rdx, (char *) registers->rsi, (uint32_t) registers->rdi);
-                return 1;
-                // break;
+                break;
 
         case 27:
                 // rdi -> id
                 // rsi -> string
                 // rdx -> toReturn
                 sowrite((int *) registers->rdx, (char *) registers->rsi, (uint32_t) registers->rdi);
-                return 1;
-                // break;
+                break;
 
         // case 29:
         //         // rdi -> buffer

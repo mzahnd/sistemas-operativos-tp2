@@ -1,26 +1,17 @@
 #include <pipeUser.h>
 
-int pipe_open(uint32_t id) {
-    int ans = 0;
-    pipeOpenSyscall(id, &ans);
-    return ans;
+void pipe_open(int fd) {
+    pipeOpenSyscall(fd);
 }
 
-int pipe_close(uint32_t id) {
-    int ans = 0;
-    pipeCloseSyscall(id, &ans);
-    return ans;
+void pipe_close(int fd) {
+    pipeCloseSyscall(fd);
 }
 
-int pipe_read(uint32_t id) {
-    int ans = 0;
-    pipeReadSyscall(id, &ans);
-    return ans;
+void pipe_read(int fd, char *buf, size_t count) {
+    pipeReadSyscall(fd, buf, count);
 }
 
-int pipe_write(uint32_t id) {
-    char buffer[2048];
-    int ans = 0;
-    pipeWriteSyscall(id, buffer, &ans);
-    return ans;
+void pipe_write(int fd, const char *buf, size_t count) {
+    pipeWriteSyscall(fd, buf, count);
 }

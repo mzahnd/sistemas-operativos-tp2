@@ -4,9 +4,9 @@
 #include <syscalls_asm.h>
 #include <stdint.h>
 
-int pipe_open(uint32_t id);
-int pipe_close(uint32_t id);
-int pipe_read(uint32_t id);
-int pipe_write(uint32_t id);
+void pipe_open(int fd);
+void pipe_close(int fd);
+void pipe_read(int fd, char *buf, size_t count);
+void pipe_write(int fd, const char *buf, size_t count);
 
 #endif

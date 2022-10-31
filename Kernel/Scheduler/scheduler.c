@@ -244,4 +244,11 @@ uint64_t getCurrentProcessPID()
         return p->pid;
 }
 
+unsigned int isCurrentProcessForeground() {
+        if (!scheduler_initialized || queue == NULL || queue->size == 0) {
+                return 0; 
+        }
+        return currentNode->pcb->pid == foregroundProcessPID;
+}
+
 #endif

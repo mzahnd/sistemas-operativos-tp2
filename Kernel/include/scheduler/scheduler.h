@@ -34,6 +34,7 @@ void lockCurrentProcess();
 void unlockCurrentProcess();
 void unlockProcessByPID(uint64_t pid);
 void getSchedulerInfo(schInfo_t * infoBlock);
+unsigned int isCurrentProcessForeground();
 uint64_t getCurrentProcessPID();
 
 #endif

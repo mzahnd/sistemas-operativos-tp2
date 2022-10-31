@@ -148,7 +148,7 @@ static void processCommand(char* command) {
     setupArgv(argv, argc, command, commandLen);
 
     // Here I have argc and argv
-    createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv);
+    createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);
 
     for (int i = 0; i < argc; i++) {
         free(argv[i]);

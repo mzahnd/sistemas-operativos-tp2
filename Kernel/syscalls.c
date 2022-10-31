@@ -303,7 +303,7 @@ void writeStr(registerStruct *registers)
 void syscallCreateProcess(registerStruct *reg)
 {
         createAndAddProcess((char *)reg->rdi, (int (*)(int, char **))reg->rsi,
-                            (int)reg->rdx, (char **)reg->rcx);
+                            (int)reg->rdx, (char **)reg->rcx, reg->r8);
 }
 
 #endif

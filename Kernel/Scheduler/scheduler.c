@@ -9,6 +9,7 @@
 #include <interrupts.h>
 
 #define HALT_PROCESS_PID 2
+#define KERNEL_PROCESS_PID 1
 
 circularQueue queue = NULL;
 node currentNode = NULL;
@@ -17,6 +18,8 @@ static int scheduler_initialized = 0;
 static unsigned int totalReady = 0;
 static unsigned int maxPID = 100;
 static unsigned int currentProcessCycle = 0;
+static unsigned int foregroundProcessPID = KERNEL_PROCESS_PID;
+
 void putProcessToSleep(unsigned int seconds);
 
 int haltProcess(int argc, char **argv)
@@ -30,7 +33,7 @@ void initScheduler()
 {
         scheduler_initialized = 1;
         queue = newCircularQueue();
-        createAndAddProcess("___HLT___", haltProcess, 0, NULL);
+        createAndAddProcess("___HLT___", haltProcess, 0, NULL, 0);
         totalReady--; // Halt process should not count as ready for the scheduler
 }
 
@@ -111,7 +114,7 @@ void addProcess(process p)
 }
 
 void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
-                         char **argv)
+                         char **argv, uint64_t foreground)
 {
         if (!scheduler_initialized || queue == NULL) {
                 return;
@@ -127,9 +130,13 @@ void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
 
         uint64_t ppid;
         if (currentNode == NULL) {
-                ppid = 1;
+                ppid = KERNEL_PROCESS_PID;
         } else {
                 ppid = currentNode->pcb->pid;
+        }
+
+        if (ppid = foregroundProcessPID && foreground) {
+                foregroundProcessPID = ppid;
         }
 
         process p = createProcess(name, pid, ppid, mainF, argc, argv);

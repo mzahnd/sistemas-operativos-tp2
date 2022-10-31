@@ -24,7 +24,7 @@ void deleteTimerFunctionSyscall(int index);
 void mallocSyscall(size_t size, void **result);
 void callocSyscall(size_t nmemb, size_t size, void **result);
 void freeSyscall(void *ptr);
-void createProcessSyscall(char * name, int (*mainFunction)(int, char**), int argc, char** argv);
+void createProcessSyscall(char * name, int (*mainFunction)(int, char**), int argc, char** argv, uint64_t foreground);
 void getSchedulerInfoSyscall(schInfo_t *);
 
 void openSemaphoreSyscall(uint32_t sem_id, uint32_t initialValue, int *toReturn);

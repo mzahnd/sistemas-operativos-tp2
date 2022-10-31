@@ -29,7 +29,7 @@ void initScheduler();
 void TEMP_testProcess();
 void addProcess(process p);
 void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
-                         char **argv);
+                         char **argv, uint64_t foreground);
 void lockCurrentProcess();
 void unlockCurrentProcess();
 void unlockProcessByPID(uint64_t pid);

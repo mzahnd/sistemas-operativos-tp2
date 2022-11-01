@@ -1,9 +1,18 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef SEMAPHORE_USER_H
 #define SEMAPHORE_USER_H
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdatomic.h> /* atomic_* */
+#include <syscalls_definitions.h> /* sem_t, sem_info_t, SEM_MAX_NAME_LEN, 
+                                   * SEM_MAX_WAITING*/
 
 /*
  * Maximum value a semaphore can take.
@@ -15,28 +24,7 @@
 /**
  * Maximum number of named semaphores
  */
-#define SEM_MAX_NAMED (2 << 4) // 256
-
-// Information for Userland.
-typedef struct SOSEM_INFO {
-        char *name;
-        size_t len;
-
-        unsigned int value;
-
-        uint64_t *waiting_pid;
-        size_t n_waiting;
-} sem_info_t;
-
-typedef struct SEM {
-        char name[SEM_MAX_NAME_LEN + 1];
-
-        atomic_uint value;
-        atomic_flag lock;
-        atomic_uint _n_waiting;
-
-        sem_info_t userland;
-} sem_t;
+#define SEM_MAX_NAMED (2 << 4) // 32
 
 // Create a named semaphore starting with initial_value.
 sem_t *sosem_open(const char *name, unsigned int initial_value);
@@ -52,4 +40,4 @@ int sem_wait(sem_t *sem);
 
 sem_info_t *sem_getinformation(sem_t *restrict sem);
 
-#endif
+#endif /* SEMAPHORE_USER_H */

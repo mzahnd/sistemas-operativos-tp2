@@ -10,7 +10,7 @@ jobs:
     - name: Install clang
       run: |
         sudo apt update
-        sudo apt install clang-format -y
+        sudo apt install clang-format-14 -y
         clang-format --version
     - name: Checkout Repo
       uses: actions/checkout@v3

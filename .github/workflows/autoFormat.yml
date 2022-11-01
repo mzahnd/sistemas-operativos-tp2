@@ -13,7 +13,7 @@ jobs:
         sudo apt-key add llvm-snapshot.gpg.key
         sudo add-apt-repository 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main'
         sudo apt update
-        sudo apt install clang-format-14 -y
+        sudo apt install clang-format -y
         clang-format --version
     - name: Checkout Repo
       uses: actions/checkout@v3

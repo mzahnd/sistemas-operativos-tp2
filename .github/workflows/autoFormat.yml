@@ -1,0 +1,21 @@
+name: Format Code With CLang
+on: 
+  push:
+    beranches:
+    - 'master'
+jobs:
+  format-code:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install clang
+      run: |
+        apt install clang-format -y
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+    - name: Run formatter
+      run: |
+        ./env/restyle.sh
+    - name: Commit Changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Automatic commit with code formatted

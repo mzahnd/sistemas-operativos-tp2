@@ -14,7 +14,7 @@ char toLower(char letter);
 int round(double number);
 int isalpha(char ch);
 void reverseStr(char str[]);
-void* malloc(unsigned int size);
+void *malloc(unsigned int size);
 void free(void *ptr);
 
 #endif

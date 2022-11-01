@@ -9,7 +9,6 @@
 
 char *v = (char *)0xB8000 + 79 * 2;
 
-
 int main()
 {
         runShell(0, NULL);

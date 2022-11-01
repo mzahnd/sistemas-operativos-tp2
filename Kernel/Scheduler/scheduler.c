@@ -73,11 +73,11 @@ uint64_t schedule(uint64_t rsp)
 
                 if (next->status == KILLED) {
                         node nodeToKill = nextNode;
-                       	if (nodeToKill->pcb->pid == foregroundProcessPID) {
-				foregroundProcessPID = nodeToKill->pcb->ppid;
-			}
-			unlockWaitingProcesses(nodeToKill->pcb);
-			nextNode = nextNode->next;
+                        if (nodeToKill->pcb->pid == foregroundProcessPID) {
+                                foregroundProcessPID = nodeToKill->pcb->ppid;
+                        }
+                        unlockWaitingProcesses(nodeToKill->pcb);
+                        nextNode = nextNode->next;
                         next = nextNode->pcb;
                         removeFromQueue(
                                 queue,
@@ -119,7 +119,7 @@ void addProcess(process p)
 }
 
 uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
-                         char **argv, uint64_t foreground)
+                             char **argv, uint64_t foreground)
 {
         if (!scheduler_initialized || queue == NULL) {
                 return;
@@ -178,7 +178,8 @@ void lockCurrentProcess()
                 p->status = BLOCKED;
                 totalReady--;
         }
-        currentProcessCycle = MAX_PROCESS_PRIORITY + 1; // To force the context Switch
+        currentProcessCycle =
+                MAX_PROCESS_PRIORITY + 1; // To force the context Switch
         _sti();
         forceTimerTick();
 }
@@ -219,16 +220,18 @@ void unlockProcessByPID(uint64_t pid)
         }
 }
 
-void getSchedulerInfo(schInfo_t * infoBlock) {
+void getSchedulerInfo(schInfo_t *infoBlock)
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return;
         }
-        
+
         infoBlock->totalReady = totalReady;
         infoBlock->totalProcesses = queue->size;
         node infoNode = queue->first;
-        for (int i = 0; i < MAX_PROCESSES_INFO && i < queue->size; i++, infoNode=infoNode->next) {
-                processInfo_t * processInfo = &(infoBlock->processes[i]);
+        for (int i = 0; i < MAX_PROCESSES_INFO && i < queue->size;
+             i++, infoNode = infoNode->next) {
+                processInfo_t *processInfo = &(infoBlock->processes[i]);
                 process p = infoNode->pcb;
                 processInfo->name = p->name;
                 processInfo->pid = p->pid;
@@ -250,36 +253,38 @@ uint64_t getCurrentProcessPID()
         return p->pid;
 }
 
-unsigned int isCurrentProcessForeground() {
+unsigned int isCurrentProcessForeground()
+{
         if (!scheduler_initialized || queue == NULL || queue->size == 0) {
-                return 0; 
+                return 0;
         }
         return currentNode->pcb->pid == foregroundProcessPID;
 }
 
-void waitForPID(uint64_t pid) {
-	if (!scheduler_initialized || queue == NULL || queue->size == 0) {
-		return;
-	}
-	process p = getFromPID(queue, pid);
-	if (p == NULL) {
-		return;
-	}
-	if (p->waitingCount < MAX_WAITING_COUNT) {
-		p->waitingPIDs[p->waitingCount] = currentNode->pcb->pid;
-		p->waitingCount++;
-		lockCurrentProcess();
-	}
+void waitForPID(uint64_t pid)
+{
+        if (!scheduler_initialized || queue == NULL || queue->size == 0) {
+                return;
+        }
+        process p = getFromPID(queue, pid);
+        if (p == NULL) {
+                return;
+        }
+        if (p->waitingCount < MAX_WAITING_COUNT) {
+                p->waitingPIDs[p->waitingCount] = currentNode->pcb->pid;
+                p->waitingCount++;
+                lockCurrentProcess();
+        }
 }
 
-void unlockWaitingProcesses(process p) {
-	if (p == NULL) {
-		return;
-	}
-	for (int i = 0; i < p->waitingCount; i++) {
-		unlockProcessByPID(p->waitingPIDs[i]);
-	}
+void unlockWaitingProcesses(process p)
+{
+        if (p == NULL) {
+                return;
+        }
+        for (int i = 0; i < p->waitingCount; i++) {
+                unlockProcessByPID(p->waitingPIDs[i]);
+        }
 }
-
 
 #endif

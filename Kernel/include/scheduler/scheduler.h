@@ -10,30 +10,29 @@
 uint64_t schedule(uint64_t rsp);
 
 typedef struct processInfo_t {
-    unsigned char * name;
-    unsigned int pid;
-    unsigned int ppid;
-    unsigned int priority;
-    unsigned int status;
-    
+        unsigned char *name;
+        unsigned int pid;
+        unsigned int ppid;
+        unsigned int priority;
+        unsigned int status;
+
 } processInfo_t;
 
 typedef struct schInfo_t {
-    unsigned int totalReady;
-    unsigned int totalProcesses;
-    processInfo_t processes[MAX_PROCESSES_INFO];
-}  schInfo_t;
-
+        unsigned int totalReady;
+        unsigned int totalProcesses;
+        processInfo_t processes[MAX_PROCESSES_INFO];
+} schInfo_t;
 
 void initScheduler();
 void TEMP_testProcess();
 void addProcess(process p);
 uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
-                         char **argv, uint64_t foreground);
+                             char **argv, uint64_t foreground);
 void lockCurrentProcess();
 void unlockCurrentProcess();
 void unlockProcessByPID(uint64_t pid);
-void getSchedulerInfo(schInfo_t * infoBlock);
+void getSchedulerInfo(schInfo_t *infoBlock);
 unsigned int isCurrentProcessForeground();
 uint64_t getCurrentProcessPID();
 void waitForPID(uint64_t pid);

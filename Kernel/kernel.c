@@ -129,7 +129,8 @@ int main()
         return 0;
 }
 
-void startUserland() {
+void startUserland()
+{
         createAndAddProcess("root", sampleCodeModuleAddress, 0, NULL, 1);
         forceTimerTick();
 }

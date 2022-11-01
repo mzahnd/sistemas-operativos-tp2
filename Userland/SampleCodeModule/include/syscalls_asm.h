@@ -24,20 +24,23 @@ void deleteTimerFunctionSyscall(int index);
 void mallocSyscall(size_t size, void **result);
 void callocSyscall(size_t nmemb, size_t size, void **result);
 void freeSyscall(void *ptr);
-void createProcessSyscall(char * name, int (*mainFunction)(int, char**), int argc, char** argv, uint64_t foreground, uint64_t* returnedPID);
+void createProcessSyscall(char *name, int (*mainFunction)(int, char **),
+                          int argc, char **argv, uint64_t foreground,
+                          uint64_t *returnedPID);
 void getSchedulerInfoSyscall(schInfo_t *);
 void waitPIDSyscall(uint64_t pid);
 
-void openSemaphoreSyscall(uint32_t sem_id, uint32_t initialValue, int *toReturn);
+void openSemaphoreSyscall(uint32_t sem_id, uint32_t initialValue,
+                          int *toReturn);
 void waitSemaphoreSyscall(uint32_t id, int *toReturn);
 void postSemaphoreSyscall(uint32_t id, int *toReturn);
 void closeSemaphoreSyscall(uint32_t id, int *toReturn);
-void semSyscall(char * buffer);
+void semSyscall(char *buffer);
 
 void pipeOpenSyscall(int fd);
 void pipeCloseSyscall(int fd);
 void pipeReadSyscall(int fd, char *buf, size_t count);
 void pipeWriteSyscall(int fd, const char *buf, size_t count);
-void pipeInfoSyscall(char * buffer);
+void pipeInfoSyscall(char *buffer);
 
 #endif

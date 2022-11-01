@@ -127,13 +127,15 @@ int isalpha(char ch)
         return 0;
 }
 
-void* malloc(unsigned int size) {
-        void * result;
-        mallocSyscall(size, &result); 
+void *malloc(unsigned int size)
+{
+        void *result;
+        mallocSyscall(size, &result);
         return result;
 }
 
-void free(void* ptr) {
+void free(void *ptr)
+{
         freeSyscall(ptr);
 }
 

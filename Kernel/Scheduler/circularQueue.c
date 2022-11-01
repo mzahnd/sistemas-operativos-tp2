@@ -96,16 +96,17 @@ int deleteNode(circularQueue queue, node prev, node current, node next)
         return 1;
 }
 
-process getFromPID(circularQueue queue, uint64_t pid) {
-	if (queue == NULL || queue->size == 0) {
-		return NULL;
-	}
-	node current = queue->first;
-	for (int i = 0; i < queue->size; i++, current=current->next) {
-		if (current->pcb->pid == pid) {
-			return current->pcb;
-		}
-	}
-	return NULL;
+process getFromPID(circularQueue queue, uint64_t pid)
+{
+        if (queue == NULL || queue->size == 0) {
+                return NULL;
+        }
+        node current = queue->first;
+        for (int i = 0; i < queue->size; i++, current = current->next) {
+                if (current->pcb->pid == pid) {
+                        return current->pcb;
+                }
+        }
+        return NULL;
 }
 #endif

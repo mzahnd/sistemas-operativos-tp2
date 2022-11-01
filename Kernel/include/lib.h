@@ -27,7 +27,7 @@ void *somemcpy(void *dest, const void *src, uint64_t n);
  *
  * Source: http://www.cse.yorku.ca/~oz/hash.html
  */
-uint64_t djb2 (const unsigned char* str);
+uint64_t djb2(const unsigned char *str);
 
 size_t strnlen(const char *s, size_t maxlen);
 

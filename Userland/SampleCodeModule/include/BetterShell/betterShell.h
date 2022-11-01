@@ -3,6 +3,6 @@
 
 #define MAX_COMMAND_LENGTH 128
 
-int runShell(int argc, char** argv);
+int runShell(int argc, char **argv);
 
 #endif

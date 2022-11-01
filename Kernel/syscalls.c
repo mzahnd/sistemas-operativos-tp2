@@ -156,16 +156,15 @@ void syscallHandler(registerStruct *registers)
                 //rcx -> char**: argv
                 syscallCreateProcess(registers);
                 break;
-        
+
         case 21: // Get Scheduler Info
                 // rdi -> schInfo_t*: pointer to struct
                 getSchedulerInfo((schInfo_t *)registers->rdi);
 
-
-	case 22: // waitPID
-		//rdi -> unsigned int: pid of process to wait
-		waitForPID((uint64_t)registers->rdi);
-		break;
+        case 22: // waitPID
+                //rdi -> unsigned int: pid of process to wait
+                waitForPID((uint64_t)registers->rdi);
+                break;
 
         case 30:
                 // rdi -> name
@@ -232,37 +231,36 @@ void syscallHandler(registerStruct *registers)
         // Pipes from 40
         case 40:
                 // rdi -> int*: fd
-                sopipe((int *) registers->rdi);
+                sopipe((int *)registers->rdi);
                 break;
-        
+
         case 41:
                 // rdi -> int: fd
-                soclose((int) registers->rdi);
+                soclose((int)registers->rdi);
                 break;
 
         case 42:
                 // rdx -> int: fd
                 // rsi -> char*: buffer
                 // rdi -> size_t: buffer length
-                soread((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
+                soread((int)registers->rdx, (char *)registers->rsi,
+                       (size_t)registers->rdi);
                 break;
 
         case 43:
                 // rdx -> int: fd
                 // rsi -> char*: buffer
                 // rdi -> size_t: buffer length
-                sowrite((int) registers->rdx, (char *) registers->rsi, (size_t) registers->rdi);
+                sowrite((int)registers->rdx, (char *)registers->rsi,
+                        (size_t)registers->rdi);
                 break;
 
-        // case 44:
-        //         // rdx -> buffer
-        //         get_fd_status((int *) registers->rdx);
-        //         break;
-        // no reconoce la funcion get_fd_status
+                // case 44:
+                //         // rdx -> buffer
+                //         get_fd_status((int *) registers->rdx);
+                //         break;
+                // no reconoce la funcion get_fd_status
         }
-
-        
-
 }
 
 void getDateInfo(uint8_t mode, uint8_t *target)
@@ -305,11 +303,12 @@ void writeStr(registerStruct *registers)
 
 void syscallCreateProcess(registerStruct *reg)
 {
-        uint64_t* addressToReturn = (uint64_t *)reg->r9;
-        uint64_t result = createAndAddProcess((char *)reg->rdi, (int (*)(int, char **))reg->rsi,
-                            (int)reg->rdx, (char **)reg->rcx, reg->r8);
+        uint64_t *addressToReturn = (uint64_t *)reg->r9;
+        uint64_t result = createAndAddProcess((char *)reg->rdi,
+                                              (int (*)(int, char **))reg->rsi,
+                                              (int)reg->rdx, (char **)reg->rcx,
+                                              reg->r8);
         *addressToReturn = result;
 }
-        
 
 #endif

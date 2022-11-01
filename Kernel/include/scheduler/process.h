@@ -21,8 +21,8 @@ typedef struct process_t {
         void *stackPointer;
         uint8_t status;
         uint8_t priority;
-	uint64_t waitingCount;
-	uint64_t waitingPIDs[MAX_WAITING_COUNT];
+        uint64_t waitingCount;
+        uint64_t waitingPIDs[MAX_WAITING_COUNT];
         uint64_t sleepingCyclesLeft;
 } process_t;
 

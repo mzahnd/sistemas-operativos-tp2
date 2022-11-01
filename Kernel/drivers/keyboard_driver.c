@@ -78,6 +78,9 @@ void keyboardHandler(registerStruct *registers)
 
 void readKeyboard(char *buff, uint64_t size, uint64_t *count)
 {
+        if (!isCurrentProcessForeground()) {
+                return; // If a background process tries to read the keyboard, behaviour is not deterministic
+        }
         int i = 0;
         while (endIndex <= startIndex) {
                 kbLockedPID = getCurrentProcessPID();

@@ -162,7 +162,10 @@ void syscallHandler(registerStruct *registers)
                 getSchedulerInfo((schInfo_t *)registers->rdi);
 
 
-        
+	case 22: // waitPID
+		//rdi -> unsigned int: pid of process to wait
+		waitForPID((uint64_t)registers->rdi);
+		break;
 
         case 30:
                 // rdi -> name
@@ -302,8 +305,11 @@ void writeStr(registerStruct *registers)
 
 void syscallCreateProcess(registerStruct *reg)
 {
-        createAndAddProcess((char *)reg->rdi, (int (*)(int, char **))reg->rsi,
-                            (int)reg->rdx, (char **)reg->rcx);
+        uint64_t* addressToReturn = (uint64_t *)reg->r9;
+        uint64_t result = createAndAddProcess((char *)reg->rdi, (int (*)(int, char **))reg->rsi,
+                            (int)reg->rdx, (char **)reg->rcx, reg->r8);
+        *addressToReturn = result;
 }
+        
 
 #endif

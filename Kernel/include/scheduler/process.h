@@ -2,6 +2,7 @@
 #define PROCESS_H
 #define PROCESS_NAME_MAX_LEN 64
 #define PROCESS_STACK_SIZE 4096
+#define MAX_WAITING_COUNT 128
 
 #define READY 1
 #define BLOCKED 2
@@ -19,7 +20,9 @@ typedef struct process_t {
         reg_t rbp;
         void *stackPointer;
         uint8_t status;
-        uint8_t priority; 
+        uint8_t priority;
+	uint64_t waitingCount;
+	uint64_t waitingPIDs[MAX_WAITING_COUNT];
         uint64_t sleepingCyclesLeft;
 } process_t;
 

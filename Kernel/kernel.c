@@ -130,7 +130,7 @@ int main()
 }
 
 void startUserland() {
-        createAndAddProcess("root", sampleCodeModuleAddress, 0, NULL);
+        createAndAddProcess("root", sampleCodeModuleAddress, 0, NULL, 1);
         forceTimerTick();
 }
 

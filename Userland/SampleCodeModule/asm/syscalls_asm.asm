@@ -30,6 +30,7 @@ GLOBAL pipeCloseSyscall
 GLOBAL pipeReadSyscall
 GLOBAL pipeWriteSyscall
 GLOBAL pipeInfoSyscall
+GLOBAL waitPIDSyscall
 
 section .text
 
@@ -378,3 +379,16 @@ pipeInfoSyscall:    ;getValuePipes
     mov rsp, rbp
     pop rbp
     ret
+
+waitPIDSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 22; ID waitForPID
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+

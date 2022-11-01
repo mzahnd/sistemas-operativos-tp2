@@ -9,6 +9,7 @@
 #include <interrupts.h>
 
 #define HALT_PROCESS_PID 2
+#define KERNEL_PROCESS_PID 1
 
 circularQueue queue = NULL;
 node currentNode = NULL;
@@ -17,7 +18,10 @@ static int scheduler_initialized = 0;
 static unsigned int totalReady = 0;
 static unsigned int maxPID = 100;
 static unsigned int currentProcessCycle = 0;
+static unsigned int foregroundProcessPID = KERNEL_PROCESS_PID;
+
 void putProcessToSleep(unsigned int seconds);
+void unlockWaitingProcesses(process p);
 
 int haltProcess(int argc, char **argv)
 {
@@ -30,7 +34,7 @@ void initScheduler()
 {
         scheduler_initialized = 1;
         queue = newCircularQueue();
-        createAndAddProcess("___HLT___", haltProcess, 0, NULL);
+        createAndAddProcess("___HLT___", haltProcess, 0, NULL, 0);
         totalReady--; // Halt process should not count as ready for the scheduler
 }
 
@@ -69,7 +73,11 @@ uint64_t schedule(uint64_t rsp)
 
                 if (next->status == KILLED) {
                         node nodeToKill = nextNode;
-                        nextNode = nextNode->next;
+                       	if (nodeToKill->pcb->pid == foregroundProcessPID) {
+				foregroundProcessPID = nodeToKill->pcb->ppid;
+			}
+			unlockWaitingProcesses(nodeToKill->pcb);
+			nextNode = nextNode->next;
                         next = nextNode->pcb;
                         removeFromQueue(
                                 queue,
@@ -110,8 +118,8 @@ void addProcess(process p)
         totalReady++;
 }
 
-void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
-                         char **argv)
+uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
+                         char **argv, uint64_t foreground)
 {
         if (!scheduler_initialized || queue == NULL) {
                 return;
@@ -126,15 +134,20 @@ void createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
         }
 
         uint64_t ppid;
-        if (currentNode == NULL) {
-                ppid = 1;
+        if (currentNode == NULL || currentNode->pcb->pid == HALT_PROCESS_PID) {
+                ppid = KERNEL_PROCESS_PID;
         } else {
                 ppid = currentNode->pcb->pid;
+        }
+
+        if (ppid == foregroundProcessPID && foreground) {
+                foregroundProcessPID = pid;
         }
 
         process p = createProcess(name, pid, ppid, mainF, argc, argv);
         addToQueue(queue, p);
         totalReady++;
+        return pid;
 }
 
 void putProcessToSleep(unsigned int seconds)
@@ -236,5 +249,37 @@ uint64_t getCurrentProcessPID()
         }
         return p->pid;
 }
+
+unsigned int isCurrentProcessForeground() {
+        if (!scheduler_initialized || queue == NULL || queue->size == 0) {
+                return 0; 
+        }
+        return currentNode->pcb->pid == foregroundProcessPID;
+}
+
+void waitForPID(uint64_t pid) {
+	if (!scheduler_initialized || queue == NULL || queue->size == 0) {
+		return;
+	}
+	process p = getFromPID(queue, pid);
+	if (p == NULL) {
+		return;
+	}
+	if (p->waitingCount < MAX_WAITING_COUNT) {
+		p->waitingPIDs[p->waitingCount] = currentNode->pcb->pid;
+		p->waitingCount++;
+		lockCurrentProcess();
+	}
+}
+
+void unlockWaitingProcesses(process p) {
+	if (p == NULL) {
+		return;
+	}
+	for (int i = 0; i < p->waitingCount; i++) {
+		unlockProcessByPID(p->waitingPIDs[i]);
+	}
+}
+
 
 #endif

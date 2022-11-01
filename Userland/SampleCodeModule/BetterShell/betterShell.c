@@ -149,7 +149,7 @@ static void processCommand(char *command)
                 return;
         }
 
-   unsigned int foreground = 1; // Process is foreground by default
+        unsigned int foreground = 1; // Process is foreground by default
         unsigned int argc = 1; // At least 1
 
         for (int i = 0; i < commandLen; i++) {

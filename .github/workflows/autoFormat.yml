@@ -9,6 +9,7 @@ jobs:
     steps:
     - name: Install clang
       run: |
+        sudo apt update
         sudo apt install clang-format -y
         clang-format --version
     - name: Checkout Repo

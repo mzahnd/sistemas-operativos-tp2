@@ -15,7 +15,8 @@
 #include <utils.h>
 #include <mem/sys_memory.h> /* sys_somalloc(); sys_socalloc(); sys_sofree() */
 #include <sys_semaphore.h> /* sys_sosem_*() */
-#include <pipes.h>
+#include <sys_pipes.h> /* sys_sopipe(); sys_soread(); sys_sowrite(); 
+                        * sys_soclose(); sys_sopipe_getinformation() */
 
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
@@ -167,9 +168,9 @@ void syscallHandler(registerStruct *registers)
                 break;
 
         case 30:
-                // rdi -> name
-                // rsi -> initial value
-                // rdx -> semaphore pointer (sosem_t **)
+                // rdi -> const char *: name
+                // rsi -> unsigned int: initial value
+                // rdx -> sosem_t **: semaphore pointer
                 sys_sosem_open((const char *)registers->rdi,
                                (unsigned int)registers->rsi,
                                (sosem_t **)registers->rdx);
@@ -230,36 +231,41 @@ void syscallHandler(registerStruct *registers)
 
         // Pipes from 40
         case 40:
-                // rdi -> int*: fd
-                sopipe((int *)registers->rdi);
+                // rdi -> int [PIPE_N_FD]: fd
+                // rsi -> int *: result
+                sys_sopipe((int *)registers->rdi, (int *)registers->rsi);
                 break;
 
         case 41:
                 // rdi -> int: fd
-                soclose((int)registers->rdi);
+                // rsi -> int *: result
+                sys_soclose((int)registers->rdi, (int *)registers->rsi);
                 break;
 
         case 42:
-                // rdx -> int: fd
-                // rsi -> char*: buffer
-                // rdi -> size_t: buffer length
-                soread((int)registers->rdx, (char *)registers->rsi,
-                       (size_t)registers->rdi);
+                //rdi -> int: fd
+                //rsi -> char *: buf
+                //rdx -> size_t: count
+                //rcx -> ssize_t *: result
+                sys_soread((int)registers->rdi, (char *)registers->rsi,
+                           (size_t)registers->rdx, (ssize_t *)registers->rcx);
                 break;
 
         case 43:
-                // rdx -> int: fd
-                // rsi -> char*: buffer
-                // rdi -> size_t: buffer length
-                sowrite((int)registers->rdx, (char *)registers->rsi,
-                        (size_t)registers->rdi);
+                //rdi -> int: fd
+                //rsi -> const char *: buf
+                //rdx -> size_t: count
+                //rcx -> ssize_t *: result
+                sys_sowrite((int)registers->rdi, (const char *)registers->rsi,
+                            (size_t)registers->rdx, (ssize_t *)registers->rcx);
                 break;
 
-                // case 44:
-                //         // rdx -> buffer
-                //         get_fd_status((int *) registers->rdx);
-                //         break;
-                // no reconoce la funcion get_fd_status
+        case 44:
+                //rdi -> int: fd
+                //rsi -> pipe_info_t **: result
+                sys_sopipe_getinformation((int)registers->rdi,
+                                          (pipe_info_t **)registers->rsi);
+                break;
         }
 }
 

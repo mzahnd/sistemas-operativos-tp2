@@ -15,21 +15,20 @@ GLOBAL mallocSyscall
 GLOBAL callocSyscall
 GLOBAL freeSyscall
 GLOBAL createProcessSyscall
-GLOBAL initSemaphoresSyscall
-GLOBAL openSemaphoreSyscall
-GLOBAL waitSemaphoreSyscall
-GLOBAL postSemaphoreSyscall
-GLOBAL closeSemaphoreSyscall
-GLOBAL semSyscall
-GLOBAL initSemaphoreSyscall
-GLOBAL destroySemaphoreSyscall
-GLOBAL getSemaphoreInformationSyscall
-GLOBAL getSchedulerInfoSyscall
-GLOBAL pipeOpenSyscall
 GLOBAL pipeCloseSyscall
+GLOBAL pipeGetInformationSyscall
+GLOBAL pipePipeSyscall
 GLOBAL pipeReadSyscall
 GLOBAL pipeWriteSyscall
-GLOBAL pipeInfoSyscall
+GLOBAL semaphoreCloseSyscall
+GLOBAL semaphoreDestroySyscall
+GLOBAL semaphoreGetInformationSyscall
+GLOBAL semaphoreGetValueSyscall
+GLOBAL semaphoreInitSyscall
+GLOBAL semaphoreOpenSyscall
+GLOBAL semaphorePostSyscall
+GLOBAL semaphoreWaitSyscall
+GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
 
 section .text
@@ -226,11 +225,143 @@ createProcessSyscall:
     pop rbp
     ret
 
-openSemaphoreSyscall:
+pipeCloseSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 40 ;ID sys_soclose
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeGetInformationSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 44 ;ID sys_sopipe_getinformation
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipePipeSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 40 ;ID sys_sopipe
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeReadSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 42 ;ID sys_soread
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+pipeWriteSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 43 ;ID sys_sowrite
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreCloseSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 33 ;ID sys_sosem_close
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreDestroySyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 36 ;ID sys_sosem_destroy
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreGetInformationSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 37 ;ID sys_sosem_getinformation
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreGetValueSyscall: 
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 34 ;ID sys_sosem_getvalue
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreInitSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 35 ;ID sys_sosem_init
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreOpenSyscall:
     push rbp
     mov rbp, rsp
 
     mov rax, 30 ;ID sys_sosem_open
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphorePostSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 32 ;ID sys_sosem_post
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreWaitSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 31 ;ID sys_sosem_wait
     int 80h
 
     mov rsp, rbp
@@ -248,138 +379,6 @@ getSchedulerInfoSyscall:
     pop rbp
     ret
 
-waitSemaphoreSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 31 ;ID sys_sosem_wait
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-postSemaphoreSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 32 ;ID sys_sosem_post
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-closeSemaphoreSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 33 ;ID sys_sosem_close
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-semSyscall: 
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 34 ;ID sys_sosem_getvalue
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-initSemaphoreSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 35 ;ID sys_sosem_init
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-destroySemaphoreSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 36 ;ID sys_sosem_destroy
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-getSemaphoreInformationSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 37 ;ID sys_sosem_getinformation
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-pipeOpenSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 40; ID pipeOpen
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-pipeCloseSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 41 ;ID Pipe Close
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-pipeReadSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 42 ;ID PipeRead
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-pipeWriteSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 43 ;ID PipeWrite 
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
-pipeInfoSyscall:    ;getValuePipes
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 44 ; ID pipe Info
-    int 80h
-
-    mov rsp, rbp
-    pop rbp
-    ret
-
 waitPIDSyscall:
     push rbp
     mov rbp, rsp
@@ -390,5 +389,3 @@ waitPIDSyscall:
     mov rsp, rbp
     pop rbp
     ret
-
-

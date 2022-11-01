@@ -1,12 +1,31 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef PIPE_USER_H
 #define PIPE_USER_H
 
-#include <syscalls_asm.h>
-#include <stdint.h>
+#include <sys/types.h> /* ssize_t */
 
-void pipe_open(int fd);
-void pipe_close(int fd);
-void pipe_read(int fd, char *buf, size_t count);
-void pipe_write(int fd, const char *buf, size_t count);
+enum pipe_fd { PIPE_FD_READ = 0, PIPE_FD_WRITE, PIPE_N_FD };
 
-#endif
+typedef struct {
+        const char *buffer;
+        size_t size;
+
+        int fd[PIPE_N_FD];
+        int active;
+} pipe_info_t;
+
+int pipe(int fildes[PIPE_N_FD]);
+ssize_t read(int fd, char *buf, size_t count);
+ssize_t write(int fd, const char *buf, size_t count);
+int close(int fd);
+
+#endif /* PIPE_USER_H */

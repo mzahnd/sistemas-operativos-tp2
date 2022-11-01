@@ -43,6 +43,8 @@ typedef struct {
         int fd[PIPE_N_FD];
         pipe_flow_t read;
         pipe_flow_t write;
+
+        pipe_info_t userland;
 } pipe_t;
 
 /* ------------------------------ */
@@ -54,12 +56,14 @@ static int pipes_open = 0;
 /* ------------------------------ */
 
 static inline void createPipe(int index);
-static int get_pipe_index(int fd);
+static inline int get_pipe_index(int fd);
 static inline int get_fd_status(int fd);
 static inline void store_fd_pair(int fd[PIPE_N_FD]);
 static inline void dup_fd_pair(int dest[PIPE_N_FD], int src[PIPE_N_FD]);
 static inline void remove_fd(int fd);
-static int is_valid_fd(int fd);
+static inline int is_valid_fd(int fd);
+static inline void userland_create(pipe_t *pipe, pipe_info_t *info);
+static inline void userland_update(pipe_t *pipe);
 
 /* ------------------------------ */
 
@@ -111,6 +115,8 @@ ssize_t soread(int fd, char *buf, size_t count)
         } while (read_idx != pipes[index].write.index && n - 1 < count);
 
         pipes[index].read.index = read_idx; // Update. Downside of the alias (:
+
+        userland_update(&pipes[index]);
 
         sosem_post(&pipes[index].write.sem);
 
@@ -174,6 +180,17 @@ int soclose(int fd)
 
 /* ------------------------------ */
 
+pipe_info_t *sopipe_getinformation(int fd)
+{
+        int index = get_pipe_index(fd);
+        if (index == -1)
+                return NULL;
+
+        return &pipes[index].userland;
+}
+
+/* ------------------------------ */
+
 static inline void createPipe(int index)
 {
         pipes[index].active = 1;
@@ -185,11 +202,13 @@ static inline void createPipe(int index)
         sosem_init(&pipes[index].read.sem, 0);
         // Initial value > 0 to allow writting
         sosem_init(&pipes[index].write.sem, 1);
+
+        userland_create(&pipes[index], &pipes[index].userland);
 }
 
 /* ------------------------------ */
 
-static int get_pipe_index(int fd)
+static inline int get_pipe_index(int fd)
 {
         for (int i = 0; i < MAX_PIPES; i++) {
                 if (pipes[i].fd[PIPE_FD_READ] == fd ||
@@ -252,10 +271,34 @@ static inline void remove_fd(int fd)
 
 /* ------------------------------ */
 
-static int is_valid_fd(int fd)
+static inline int is_valid_fd(int fd)
 {
         if (fd < FIRST_FD || fd > FIRST_FD + MAX_PIPES * 2)
                 return -1;
 
         return 0;
+}
+
+/* ------------------------------ */
+
+static inline void userland_create(pipe_t *pipe, pipe_info_t *info)
+{
+        info->buffer = &pipe->buffer[0];
+        info->size = PIPE_BUFFER_SIZE;
+
+        //Copy contents from pipe fd to info fd
+        dup_fd_pair(info->fd, pipe->fd);
+
+        info->active = pipe->active;
+}
+
+/* ------------------------------ */
+
+static inline void userland_update(pipe_t *pipe)
+{
+        // In case someone rewrote it by mistake
+        pipe->userland.buffer = &pipe->buffer[0];
+        pipe->userland.size = PIPE_BUFFER_SIZE;
+
+        pipe->userland.active = pipe->active;
 }

@@ -35,6 +35,7 @@ typedef struct {
 
 /* ---------- sopipe & soclose ---------- */
 void test_sopipe_soclose_create_and_close(CuTest *const ct);
+void test_sopipe_soclose_create_close_and_recreate(CuTest *const ct);
 /* ---------- sowrite & soread ---------- */
 void test_sowrite_soread_fill_buffer(CuTest *const ct);
 void test_sowrite_soread_small_writes(CuTest *const ct);
@@ -48,6 +49,7 @@ CuSuite *test_get_pipes_suite(void)
 
         /* sopipe & soclose */
         SUITE_ADD_TEST(suite, test_sopipe_soclose_create_and_close);
+        SUITE_ADD_TEST(suite, test_sopipe_soclose_create_close_and_recreate);
         /* sowrite & soread */
         SUITE_ADD_TEST(suite, test_sowrite_soread_fill_buffer);
         SUITE_ADD_TEST(suite, test_sowrite_soread_small_writes);
@@ -86,6 +88,41 @@ void test_sopipe_soclose_create_and_close(CuTest *const ct)
         CuAssertIntEquals(ct, 0, ret);
 
         // fd2
+        ret = soclose(fd2[PIPE_FD_READ]);
+        CuAssertIntEquals(ct, 0, ret);
+        ret = soclose(fd2[PIPE_FD_WRITE]);
+        CuAssertIntEquals(ct, 0, ret);
+}
+
+void test_sopipe_soclose_create_close_and_recreate(CuTest *const ct)
+{
+        int ret = 0;
+        int fd[PIPE_N_FD] = { 0 };
+        int fd2[PIPE_N_FD] = { 0 };
+
+        // Create
+        ret = sopipe(fd);
+        CuAssertIntEquals(ct, 0, ret);
+
+        // First file descriptor ever created: expects index 3
+        // Remember: fd 0 "is" stdin, 1 stdout and 2 stderr
+        CuAssertIntEquals(ct, 3, fd[PIPE_FD_READ]);
+        CuAssertIntEquals(ct, 4, fd[PIPE_FD_WRITE]);
+
+        // Close
+        ret = soclose(fd[PIPE_FD_READ]);
+        CuAssertIntEquals(ct, 0, ret);
+        ret = soclose(fd[PIPE_FD_WRITE]);
+
+        // Recreate
+        CuAssertIntEquals(ct, 0, ret);
+        ret = sopipe(fd2);
+        CuAssertIntEquals(ct, 0, ret);
+
+        CuAssertIntEquals(ct, 3, fd2[PIPE_FD_READ]);
+        CuAssertIntEquals(ct, 4, fd2[PIPE_FD_WRITE]);
+
+        // Close
         ret = soclose(fd2[PIPE_FD_READ]);
         CuAssertIntEquals(ct, 0, ret);
         ret = soclose(fd2[PIPE_FD_WRITE]);

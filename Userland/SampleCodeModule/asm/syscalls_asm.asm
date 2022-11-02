@@ -229,7 +229,7 @@ pipeCloseSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 40 ;ID sys_soclose
+    mov rax, 41 ;ID sys_soclose
     int 80h
 
     mov rsp, rbp

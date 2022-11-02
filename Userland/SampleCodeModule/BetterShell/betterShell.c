@@ -8,21 +8,23 @@
 #include <colors.h>
 #include <BetterShell/betterShell.h>
 #include <BetterShell/shellLines.h>
+#include <BetterShell/commandList.h>
 #include <processManagement.h>
+
 
 #define SHELL_BG_COLOR 0x001017 //BUTTERFLY_BUSH
 #define DETACH_PROCESS_CHAR '&'
 
 typedef int (*processFunciton)(int, char *);
 
-static void writeToCommandLine(char ch, char *commandLine, unsigned int *index,
+static int writeToCommandLine(char ch, char *commandLine, unsigned int *index,
                                shellLinesQueue lines);
 static void displayCommandLine(char *commandLine, unsigned int index);
 static void deleteLastChar(char *commandLine, unsigned int *index);
 static void undrawLastChar(char *commandLine, unsigned int index);
 static void drawLastChar(char *commandLine, unsigned int index);
 static void clearCommandLine(char *commandLine, unsigned int *index);
-static void processCommand(char *command);
+static void processCommand(char *command, commandList commands, unsigned int* indexPtr);
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim);
 static processFunciton getProcess(char *name);
@@ -31,10 +33,26 @@ void printOnShell(char *str, int dim);
 
 static shellLinesQueue lines;
 
+int testProcess2(int argc, char **argv)
+{
+        for (int i = 0; i < 50; i++) {
+                printf("Proceso 2: %d\n", i);
+        }
+}
+
+int testProcess3(int argc, char** argv) {
+        printf("I'm alive");
+        return 0;
+}
+
+
 int runShell(int argc, char **argv)
 {
         unsigned int commandLineIndex = 0;
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
+        commandList commands = newCommandList();
+        addCommand(commands, "asd1", testProcess3);
+
 
         lines = newShellLines(64);
 
@@ -60,14 +78,15 @@ int runShell(int argc, char **argv)
         while (1) {
                 char inputChar = getChar();
                 // Write the char
-                writeToCommandLine(inputChar, commandLine, &commandLineIndex,
-                                   lines);
+                if(writeToCommandLine(inputChar, commandLine, &commandLineIndex, lines)) {
+                        processCommand(commandLine, commands, &commandLineIndex);
+                }
         }
 
         free(commandLine);
 }
 
-static void writeToCommandLine(char ch, char *commandLine, unsigned int *index,
+static int writeToCommandLine(char ch, char *commandLine, unsigned int *index,
                                shellLinesQueue lines)
 {
         //Writes a char to the last avaiable position of the commandLine
@@ -79,12 +98,8 @@ static void writeToCommandLine(char ch, char *commandLine, unsigned int *index,
                 (*index)++;
                 addShellLine(lines, commandLine);
                 displayLines(lines);
-
                 //Process Command
-                processCommand(commandLine);
-
-                clearCommandLine(commandLine, index);
-                displayCommandLine(commandLine, *index);
+                return 1;
 
         } else if (*index < (MAX_COMMAND_LENGTH - 1) &&
                    (isAlpha(ch) || isDigit(ch) || isSymbol(ch))) {
@@ -92,6 +107,7 @@ static void writeToCommandLine(char ch, char *commandLine, unsigned int *index,
                 (*index)++;
                 drawLastChar(commandLine, *index - 1);
         }
+        return 0;
 }
 
 static void displayCommandLine(char *commandLine, unsigned int index)
@@ -130,20 +146,15 @@ static void clearCommandLine(char *commandLine, unsigned int *index)
         *index = 0;
 }
 
-int testProcess2(int argc, char **argv)
-{
-        for (int i = 0; i < 50; i++) {
-                printf("Proceso 2: %d\n", i);
-        }
-}
 
-static void processCommand(char *command)
+
+static void processCommand(char *command, commandList commands, unsigned int* lenPtr)
 {
         if (command == NULL) {
                 //print ERROR
                 return;
         }
-        int commandLen = strlen(command);
+        unsigned int commandLen = *lenPtr;
         if (commandLen == 0) {
                 //print ERROR
                 return;
@@ -170,18 +181,26 @@ static void processCommand(char *command)
 
         setupArgv(argv, argc, command, commandLen);
 
-        // Here I have argc and argv
-        //createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);
-        uint64_t test2 =
-                createProcess("Test2", testProcess2, 0, NULL, foreground);
-        if (foreground) {
-                waitPID(test2);
+        unsigned int commandType = 0;
+        processMainFunction_t function = getCommand(commands, argv[0], &commandType);
+        if (function) {
+                // Here I have argc and argv
+                //createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);
+                uint64_t test2 =
+                        createProcess(argv[0], function, 0, NULL, foreground);
+                if (foreground) {
+                        waitPID(test2);
+                }
+        } else {
+                printf("[%s] Is not a valid command\n", argv[0]);
         }
 
         for (int i = 0; i < argc; i++) {
                 free(argv[i]);
         }
         free(argv);
+        clearCommandLine(command, lenPtr);
+        displayCommandLine(command, *lenPtr);
 }
 
 void printOnShell(char *str, int dim)

@@ -31,6 +31,7 @@
 #define SEM_INITIAL_CHAR '$'
 
 #define acquire(lock) while (atomic_flag_test_and_set(lock))
+#define try_acquire(lock) atomic_flag_test_and_set(lock)
 #define release(lock) atomic_flag_clear(lock)
 
 /* ------------------------------ */
@@ -168,10 +169,11 @@ int sosem_post(sosem_t *sem)
         }
         ret = atomic_fetch_add(&sem->value, 1);
 
-        acquire(&(sem->lock));
-        // Userland
-        userland_update(sem);
-        release(&(sem->lock));
+        if (try_acquire(&(sem->lock)) == 0) {
+                // Userland
+                userland_update(sem);
+                release(&(sem->lock));
+        }
 
         return ret;
 }

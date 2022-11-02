@@ -22,7 +22,7 @@
 # DEALINGS IN THE SOFTWARE.
 #
 readonly SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
-pushd $SCRIPT_DIR &> /dev/null
+pushd "$SCRIPT_DIR" &> /dev/null
 
 REPO_NAME="itba-so-tp1-grupo11"
 VERSION="1.0"
@@ -39,4 +39,4 @@ else
     echo -e "\e[31m\e[1mBuild failed.\e[0m"
 fi
 
-popd &> /dev/null
+popd &> /dev/null # $SCRIPT_DIR

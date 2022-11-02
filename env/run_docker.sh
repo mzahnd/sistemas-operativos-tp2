@@ -23,7 +23,7 @@
 #
 
 readonly SCRIPT_DIR="$(dirname ${BASH_SOURCE[0]})"
-pushd $SCRIPT_DIR &> /dev/null
+pushd "$SCRIPT_DIR" &> /dev/null
 
 readonly PROJECT_DIR="$(dirname "$PWD")"
 
@@ -38,5 +38,4 @@ docker run \
     itba-so-tp1-grupo11:1.0
 
 
-popd &> /dev/null
-
+popd &> /dev/null # $SCRIPT_DIR

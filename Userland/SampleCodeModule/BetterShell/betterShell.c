@@ -11,20 +11,20 @@
 #include <BetterShell/commandList.h>
 #include <processManagement.h>
 
-
 #define SHELL_BG_COLOR 0x001017 //BUTTERFLY_BUSH
 #define DETACH_PROCESS_CHAR '&'
 
 typedef int (*processFunciton)(int, char *);
 
 static int writeToCommandLine(char ch, char *commandLine, unsigned int *index,
-                               shellLinesQueue lines);
+                              shellLinesQueue lines);
 static void displayCommandLine(char *commandLine, unsigned int index);
 static void deleteLastChar(char *commandLine, unsigned int *index);
 static void undrawLastChar(char *commandLine, unsigned int index);
 static void drawLastChar(char *commandLine, unsigned int index);
 static void clearCommandLine(char *commandLine, unsigned int *index);
-static void processCommand(char *command, commandList commands, unsigned int* indexPtr);
+static void processCommand(char *command, commandList commands,
+                           unsigned int *indexPtr);
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim);
 static processFunciton getProcess(char *name);
@@ -40,11 +40,11 @@ int testProcess2(int argc, char **argv)
         }
 }
 
-int testProcess3(int argc, char** argv) {
+int testProcess3(int argc, char **argv)
+{
         printf("I'm alive");
         return 0;
 }
-
 
 int runShell(int argc, char **argv)
 {
@@ -52,7 +52,6 @@ int runShell(int argc, char **argv)
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
         addCommand(commands, "asd1", testProcess3);
-
 
         lines = newShellLines(64);
 
@@ -78,8 +77,10 @@ int runShell(int argc, char **argv)
         while (1) {
                 char inputChar = getChar();
                 // Write the char
-                if(writeToCommandLine(inputChar, commandLine, &commandLineIndex, lines)) {
-                        processCommand(commandLine, commands, &commandLineIndex);
+                if (writeToCommandLine(inputChar, commandLine,
+                                       &commandLineIndex, lines)) {
+                        processCommand(commandLine, commands,
+                                       &commandLineIndex);
                 }
         }
 
@@ -87,7 +88,7 @@ int runShell(int argc, char **argv)
 }
 
 static int writeToCommandLine(char ch, char *commandLine, unsigned int *index,
-                               shellLinesQueue lines)
+                              shellLinesQueue lines)
 {
         //Writes a char to the last avaiable position of the commandLine
         if (ch == '\b') {
@@ -146,9 +147,8 @@ static void clearCommandLine(char *commandLine, unsigned int *index)
         *index = 0;
 }
 
-
-
-static void processCommand(char *command, commandList commands, unsigned int* lenPtr)
+static void processCommand(char *command, commandList commands,
+                           unsigned int *lenPtr)
 {
         if (command == NULL) {
                 //print ERROR
@@ -182,7 +182,8 @@ static void processCommand(char *command, commandList commands, unsigned int* le
         setupArgv(argv, argc, command, commandLen);
 
         unsigned int commandType = 0;
-        processMainFunction_t function = getCommand(commands, argv[0], &commandType);
+        processMainFunction_t function =
+                getCommand(commands, argv[0], &commandType);
         if (function) {
                 // Here I have argc and argv
                 //createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);

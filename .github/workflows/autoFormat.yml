@@ -1,7 +1,7 @@
 name: Format Code With CLang
 on: 
   push:
-    beranches:
+    branches:
     - 'master'
 jobs:
   format-code:

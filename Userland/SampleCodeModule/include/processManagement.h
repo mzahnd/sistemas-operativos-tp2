@@ -4,5 +4,5 @@
 
 uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,
                        char **argv, unsigned int foreground);
-int waitPID(uint64_t pid);
+void waitPID(uint64_t pid);
 #endif

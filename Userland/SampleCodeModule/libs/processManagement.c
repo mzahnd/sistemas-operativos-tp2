@@ -11,7 +11,7 @@ uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,
         return returnPID;
 }
 
-int waitPID(uint64_t pid)
+void waitPID(uint64_t pid)
 {
         waitPIDSyscall(pid);
 }

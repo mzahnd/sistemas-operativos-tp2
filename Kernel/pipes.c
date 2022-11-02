@@ -16,10 +16,10 @@
  * In case you do not have the manual entry for stdatomic.h is available online
  * https://en.cppreference.com/w/c/atomic
  */
-#include "lib.h"
-#include "semaphore.h"
+#include <lib.h>
+#include <semaphore.h>
 
-#include "pipes.h"
+#include <pipes.h>
 
 /* ------------------------------ */
 

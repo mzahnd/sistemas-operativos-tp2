@@ -10,6 +10,7 @@
 #include <BetterShell/shellLines.h>
 #include <BetterShell/commandList.h>
 #include <processManagement.h>
+#include <processes.h>
 
 #define SHELL_BG_COLOR 0x001017 //BUTTERFLY_BUSH
 #define DETACH_PROCESS_CHAR '&'
@@ -51,7 +52,7 @@ int runShell(int argc, char **argv)
         unsigned int commandLineIndex = 0;
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
-        addCommand(commands, "asd1", testProcess3);
+        addCommand(commands, "test", testPipes);
 
         lines = newShellLines(64);
 
@@ -64,12 +65,6 @@ int runShell(int argc, char **argv)
         for (int i = 0; i <= MAX_COMMAND_LENGTH; i++) {
                 commandLine[i] = '\0';
         }
-
-        // printf("Hola\n");
-        // printf("Otra Linea\n");
-        printf("Line 1\nLine 2 ");
-        printf("ASDASD = ");
-        printf("%X.\n", 0x11234);
 
         displayCommandLine(commandLine, commandLineIndex);
         displayLines(lines);

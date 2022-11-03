@@ -11,7 +11,7 @@
 #include <syscalls_asm.h>
 #include <semaphoreUser.h>
 
-sem_t *sosem_open(const char *name, unsigned int initial_value)
+sem_t *sem_open(const char *name, unsigned int initial_value)
 {
         sem_t *sp;
         semaphoreOpenSyscall(name, initial_value, &sp);

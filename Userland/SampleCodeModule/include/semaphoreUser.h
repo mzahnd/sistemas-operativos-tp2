@@ -27,7 +27,7 @@
 #define SEM_MAX_NAMED (2 << 4) // 32
 
 // Create a named semaphore starting with initial_value.
-sem_t *sosem_open(const char *name, unsigned int initial_value);
+sem_t *sem_open(const char *name, unsigned int initial_value);
 // Close a named semaphore
 int sem_close(sem_t *sem);
 // Create an unnamed semaphore starting with initial_value.

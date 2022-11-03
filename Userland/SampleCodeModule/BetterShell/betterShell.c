@@ -53,6 +53,8 @@ int runShell(int argc, char **argv)
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
         addCommand(commands, "test", testPipes);
+        addCommand(commands, "testRead", testRead);
+        addCommand(commands, "testWrite", testWrite);
 
         lines = newShellLines(64);
 

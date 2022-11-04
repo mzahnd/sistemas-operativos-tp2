@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #include <processes.h>
 #include <stdio.h>
 #include <syscalls_asm.h>
@@ -12,8 +22,8 @@ int testWrite(int argc, char **argv)
         printf("[testWrite] OK. PIPE_FD_WRITE = %d\n", fds[PIPE_FD_WRITE]);
 
         s = write(fds[PIPE_FD_WRITE], buf, 13);
-        printf("[Call] %s = write(fd = %d, %s, 13)\n", s, fds[PIPE_FD_WRITE],
-               buf);
+        printf("[Call] %d = write(fd = %d, %s, 13)\n", s, //-V576
+               fds[PIPE_FD_WRITE], buf);
 
         printf("Wrote: %s\n", buf);
 
@@ -27,7 +37,8 @@ int testRead(int argc, char **argv)
 
         printf("[testRead] OK. PIPE_FD_READ = %d\n", fds[PIPE_FD_READ]);
         s = read(fds[PIPE_FD_READ], buf, 32);
-        printf("[Call] %s = read(fd = %d, buf, 32)\n", s, fds[PIPE_FD_READ]);
+        printf("[Call] %d = read(fd = %d, buf, 32)\n", s, //-V576
+               fds[PIPE_FD_READ]);
 
         printf("Read: %s\n", buf);
 
@@ -36,7 +47,8 @@ int testRead(int argc, char **argv)
 
 int testPipes(int argc, char **argv)
 {
-        int result = 1234;
+        int result;
+
         result = pipe(fds);
         printf("[Call] %d = pipe(%p)\n", result, fds);
 

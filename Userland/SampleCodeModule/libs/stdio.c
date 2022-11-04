@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef STD_IO
 #define STD_IO
 
@@ -80,6 +90,8 @@ void printf(char *fmt, ...)
                 i++;
         }
         updateConsolePointer(buffer, j);
+
+        va_end(vl);
 }
 
 void setConsoleUpdateFunction(void (*f)(char *, int))
@@ -93,9 +105,9 @@ void putChar(char ch)
         updateConsolePointer(&ch, 1);
 }
 
-char getChar()
+int getChar()
 {
-        char ch = 0;
+        int ch = 0;
         uint64_t count;
         readKeyboardSysCall(&ch, 1, &count);
         return ch;
@@ -124,4 +136,4 @@ void format(char *str, int value)
         str[2] = 0;
 }
 
-#endif
+#endif /* STD_IO */

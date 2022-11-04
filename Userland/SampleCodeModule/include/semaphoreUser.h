@@ -12,7 +12,7 @@
 #define SEMAPHORE_USER_H
 
 #include <syscalls_definitions.h> /* sem_t, sem_info_t, SEM_MAX_NAME_LEN, 
-                                   * SEM_MAX_WAITING*/
+                                   * SEM_MAX_WAITING */
 
 /*
  * Maximum value a semaphore can take.

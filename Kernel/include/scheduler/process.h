@@ -1,5 +1,16 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef PROCESS_H
 #define PROCESS_H
+
 #define PROCESS_NAME_MAX_LEN 64
 #define PROCESS_STACK_SIZE 4096
 #define MAX_WAITING_COUNT 128
@@ -32,4 +43,4 @@ process createProcess(char *name, uint64_t pid, uint64_t ppid,
                       int (*mainF)(int, char **), int argc, char **argv);
 void freeProcess(process p);
 
-#endif
+#endif /* PROCESS_H */

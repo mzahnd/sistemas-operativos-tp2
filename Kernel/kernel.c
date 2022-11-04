@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #include <stdint.h>
 #include <string.h>
 #include <lib.h>
@@ -22,8 +32,8 @@ extern uint8_t endOfKernel;
 
 static const uint64_t PageSize = 0x1000;
 
-static void *const sampleCodeModuleAddress = (void *)0x400000;
-static void *const sampleDataModuleAddress = (void *)0x500000;
+static void *const sampleCodeModuleAddress = (void *)0x400000; //-V566
+static void *const sampleDataModuleAddress = (void *)0x500000; //-V566
 
 typedef int (*EntryPoint)();
 
@@ -95,7 +105,7 @@ int main()
         initializeTickMethods();
 
         //Test para printmem
-        uint8_t *pos = (uint8_t *)0x12345678;
+        uint8_t *pos = (uint8_t *)0x12345678; //-V566
         for (uint8_t i = 0; i < 32; i++) {
                 *(pos + i) = 0x10 + i;
         }
@@ -131,8 +141,14 @@ int main()
 
 void startUserland()
 {
-        createAndAddProcess("root", sampleCodeModuleAddress, 0, NULL, 1);
-        forceTimerTick();
+        int r = createAndAddProcess("root", sampleCodeModuleAddress, 0, NULL,
+                                    1);
+        if (r == 0) {
+                ncPrint("ERROR: Could not start Userland");
+                ncNewline();
+        } else {
+                forceTimerTick();
+        }
 }
 
 // int printA(int argc, char **argv)

@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef BETTER_SHELL
 #define BETTER_SHELL
 
@@ -17,7 +27,7 @@
 
 typedef int (*processFunciton)(int, char *);
 
-static int writeToCommandLine(char ch, char *commandLine, unsigned int *index,
+static int writeToCommandLine(int ch, char *commandLine, unsigned int *index,
                               shellLinesQueue lines);
 static void displayCommandLine(char *commandLine, unsigned int index);
 static void deleteLastChar(char *commandLine, unsigned int *index);
@@ -39,6 +49,8 @@ int testProcess2(int argc, char **argv)
         for (int i = 0; i < 50; i++) {
                 printf("Proceso 2: %d\n", i);
         }
+
+        return 0;
 }
 
 int testProcess3(int argc, char **argv)
@@ -72,7 +84,7 @@ int runShell(int argc, char **argv)
         displayLines(lines);
         // Game Loop
         while (1) {
-                char inputChar = getChar();
+                int inputChar = getChar();
                 // Write the char
                 if (writeToCommandLine(inputChar, commandLine,
                                        &commandLineIndex, lines)) {
@@ -82,9 +94,11 @@ int runShell(int argc, char **argv)
         }
 
         free(commandLine);
+
+        return 0;
 }
 
-static int writeToCommandLine(char ch, char *commandLine, unsigned int *index,
+static int writeToCommandLine(int ch, char *commandLine, unsigned int *index,
                               shellLinesQueue lines)
 {
         //Writes a char to the last avaiable position of the commandLine
@@ -176,11 +190,12 @@ static void processCommand(char *command, commandList commands,
 
         char **argv = malloc(argc * sizeof(char *));
 
+        // setupArgv handles **argv == NULL
         setupArgv(argv, argc, command, commandLen);
 
         unsigned int commandType = 0;
         processMainFunction_t function =
-                getCommand(commands, argv[0], &commandType);
+                getCommand(commands, argv[0], &commandType); //-V522
         if (function) {
                 // Here I have argc and argv
                 //createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);
@@ -234,8 +249,12 @@ void printOnShell(char *str, int dim)
 
 void setupArgv(char **argv, int argc, char *command, unsigned int commandLen)
 {
+        if (command == NULL)
+                return;
+
         char buffer[MAX_COMMAND_LENGTH] = { 0 };
         unsigned int argIndex = 0;
+
         for (int i = 0, j = 0; i < commandLen; i++, j++) {
                 if (command[i] == ' ') {
                         if (command[i + 1] && command[i + 1] != ' ') {
@@ -273,12 +292,17 @@ static processFunciton getProcess(char *name)
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim)
 {
-        if (argv == NULL || str == NULL) {
+        if (argv == NULL || *argv == NULL || str == NULL) {
                 return;
         }
+
         argv[index] = malloc(strDim * sizeof(char) + 1);
+        if (argv[index] == NULL) {
+                return;
+        }
+
         strcpy(argv[index], str);
         argv[index][strDim + 1] = '\0';
 }
 
-#endif
+#endif /* BETTER_SHELL */

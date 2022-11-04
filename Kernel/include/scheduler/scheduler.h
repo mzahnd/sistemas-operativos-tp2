@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
@@ -10,7 +20,7 @@
 uint64_t schedule(uint64_t rsp);
 
 typedef struct processInfo_t {
-        unsigned char *name;
+        char *name;
         unsigned int pid;
         unsigned int ppid;
         unsigned int priority;
@@ -36,4 +46,5 @@ void getSchedulerInfo(schInfo_t *infoBlock);
 unsigned int isCurrentProcessForeground();
 uint64_t getCurrentProcessPID();
 void waitForPID(uint64_t pid);
-#endif
+
+#endif /* SCHEDULER_H */

@@ -1,5 +1,16 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef STD_LIB_C
-#define STD_LIB_C value
+#define STD_LIB_C
+
 #include <stdlib.h>
 #include <syscalls_asm.h>
 
@@ -57,24 +68,27 @@ char toUpper(char letter)
 
 int intToBase(unsigned long long num, int base, char *buffer)
 {
+        if (buffer == NULL)
+                return 0;
+
         if (num == 0) {
                 buffer[0] = '0';
                 buffer[1] = 0;
                 return 2;
         }
+
         char stack[11];
         int c = 0;
         int i = 0;
-        int remainder = 0;
-        if (num == 0)
-                stack[i++] = '0';
+
         while (num != 0) {
-                remainder = num % base;
+                int remainder = num % base;
                 stack[i] = remainder >= 10 ? remainder + 'A' - 10 :
                                              remainder + '0';
                 num = num / base;
                 i++;
         }
+
         c = i;
         i--;
         while (i >= 0) {
@@ -82,6 +96,7 @@ int intToBase(unsigned long long num, int base, char *buffer)
                 buffer++;
                 i--;
         }
+
         *buffer = 0;
         return c;
 }
@@ -107,18 +122,17 @@ int round(double number)
         return (int)number;
 }
 
-int isalpha(char ch)
-{
-        if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
-                return 1;
-        }
-        return 0;
-}
-
 void *malloc(unsigned int size)
 {
         void *result;
         mallocSyscall(size, &result);
+        return result;
+}
+
+void *calloc(size_t nmemb, size_t size)
+{
+        void *result;
+        callocSyscall(nmemb, size, &result);
         return result;
 }
 
@@ -127,4 +141,4 @@ void free(void *ptr)
         freeSyscall(ptr);
 }
 
-#endif
+#endif /* STD_LIB_C */

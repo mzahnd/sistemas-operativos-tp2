@@ -1,5 +1,16 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef SYSCALLS
 #define SYSCALLS
+
 #include <stdint.h>
 #include <regi.h>
 #include <keyboard_driver.h>
@@ -31,7 +42,7 @@ void syscallHandler(registerStruct *registers)
                 //rdi -> puntero a buffer
                 //rsi -> uint8_t size
                 //rdx -> putero a uint64_t count
-                readKeyboard((char *)registers->rdi, (uint8_t)registers->rsi,
+                readKeyboard((int *)registers->rdi, (uint8_t)registers->rsi,
                              (uint64_t *)registers->rdx);
                 break;
 
@@ -161,6 +172,7 @@ void syscallHandler(registerStruct *registers)
         case 21: // Get Scheduler Info
                 // rdi -> schInfo_t*: pointer to struct
                 getSchedulerInfo((schInfo_t *)registers->rdi);
+                break;
 
         case 22: // waitPID
                 //rdi -> unsigned int: pid of process to wait
@@ -317,4 +329,4 @@ void syscallCreateProcess(registerStruct *reg)
         *addressToReturn = result;
 }
 
-#endif
+#endif /* SYSCALLS */

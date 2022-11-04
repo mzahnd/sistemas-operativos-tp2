@@ -28,12 +28,11 @@
 
 /* ---------- scheduler ---------- */
 typedef struct processInfo_t {
-        unsigned char *name;
+        char *name;
         unsigned int pid;
         unsigned int ppid;
         unsigned int priority;
         unsigned int status;
-
 } processInfo_t;
 
 typedef struct schInfo_t {

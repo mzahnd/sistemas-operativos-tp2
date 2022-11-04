@@ -1,8 +1,21 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef STRING_UTILS
 #define STRING_UTILS
-#define NULL 0
 
 #include <stringUtils.h>
+
+#ifndef NULL
+#define NULL 0
+#endif /* NULL */
 
 unsigned int strlen(char *str)
 {
@@ -62,20 +75,20 @@ void reverseStr(char str[])
         }
 }
 
-int isAlpha(char ch)
+int isAlpha(int ch)
 {
         return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 }
 
-int isDigit(char ch)
+int isDigit(int ch)
 {
         return (ch >= '0' && ch <= '1');
 }
 
-int isSymbol(char ch)
+int isSymbol(int ch)
 {
         return (ch >= ' ' && ch <= '/') || (ch >= ':' && ch <= '@') ||
                (ch >= '[' && ch <= '`') || (ch >= '{' && ch <= '~');
 }
 
-#endif
+#endif /* STRING_UTILS */

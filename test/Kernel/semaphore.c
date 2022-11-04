@@ -82,12 +82,18 @@ CuSuite *test_get_semaphore_suite(void)
         SUITE_ADD_TEST(suite, test_sosem_open_long_name);
         /* sosem_close */
         SUITE_ADD_TEST(suite, test_sosem_close_close_recreate);
+        SUITE_ADD_TEST(suite, test_sosem_close_NULL_args);
         /* sosem_wait */
         SUITE_ADD_TEST(suite, test_sosem_wait_two_threads);
         SUITE_ADD_TEST(suite, test_sosem_wait_NULL_args);
         /* sosem_post */
         SUITE_ADD_TEST(suite, test_sosem_post_non_zero_initial_value);
         SUITE_ADD_TEST(suite, test_sosem_post_zero_initial_value);
+        /* sosem_getvalue */
+        SUITE_ADD_TEST(suite, test_sosem_getvalue_zero_sem);
+        SUITE_ADD_TEST(suite, test_sosem_getvalue_non_zero_sem);
+        SUITE_ADD_TEST(suite, test_sosem_getvalue_non_zero_waiting);
+        SUITE_ADD_TEST(suite, test_sosem_getvalue_NULL_args);
 
         printf("[INFO] Loaded semaphores suite.\n");
 
@@ -165,7 +171,10 @@ void test_sosem_open_create_and_reopen(CuTest *const ct)
         CuAssertPtrNotNull(ct, sem_1);
 
         // Name
-        ret = memcmp(ok_name, sem_1->name, 1 + TEST_SEM_NAME_LEN);
+        // Note that the comparison is performed ONLY agains the first
+        // TEST_SEM_NAME_LEN (plus the string terminator) because the semaphore
+        // does not guarantee ereasing the rest of its name buffer
+        ret = memcmp(ok_name, sem_1->name, 1 + TEST_SEM_NAME_LEN); //-V512
         CuAssertIntEquals(ct, 0, ret);
 
         // Value
@@ -178,7 +187,10 @@ void test_sosem_open_create_and_reopen(CuTest *const ct)
         CuAssertPtrEquals(ct, sem_1, sem_2);
 
         // Name
-        ret = memcmp(ok_name, sem_2->name, 1 + TEST_SEM_NAME_LEN);
+        // Note that the comparison is performed ONLY agains the first
+        // TEST_SEM_NAME_LEN (plus the string terminator) because the semaphore
+        // does not guarantee ereasing the rest of its name buffer
+        ret = memcmp(ok_name, sem_2->name, 1 + TEST_SEM_NAME_LEN); //-V512
         CuAssertIntEquals(ct, 0, ret);
 
         // Value
@@ -204,7 +216,7 @@ void test_sosem_open_long_name(CuTest *const ct)
         char ok_name[1 + SEM_MAX_NAME_LEN] = { 0 };
         sosem_t *sem = NULL;
 
-        memset(&ok_name[0], TEST_SEM_NAME[0], SEM_MAX_NAME_LEN);
+        ok_name[0] = TEST_SEM_NAME[0];
 
         sem = sosem_open(&ok_name[0], initial_value);
         CuAssertPtrNotNull(ct, sem);
@@ -456,8 +468,7 @@ void test_sosem_getvalue_non_zero_sem(CuTest *const ct)
 
         ret = sosem_getvalue(&sem, &sval);
         CuAssertIntEquals(ct, 0, ret);
-
-        CuAssertIntEquals(ct, 0, sval);
+        CuAssertIntEquals(ct, initial_value, sval);
 
         // Post + wait
         ret = sosem_post(&sem);
@@ -467,9 +478,8 @@ void test_sosem_getvalue_non_zero_sem(CuTest *const ct)
 
         // Should be initial_value again
         ret = sosem_getvalue(&sem, &sval);
-        CuAssertIntEquals(ct, initial_value, ret);
-
-        CuAssertIntEquals(ct, 0, sval);
+        CuAssertIntEquals(ct, 0, ret);
+        CuAssertIntEquals(ct, initial_value, sval);
 
         ret = sosem_destroy(&sem);
         CuAssertIntEquals(ct, 0, ret);

@@ -1,5 +1,16 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef VIDEO_DRIVER
 #define VIDEO_DRIVER
+
 #include <video_driver.h>
 #include <stdint.h>
 #include <font.h>
@@ -119,7 +130,7 @@ void drawLine(uint64_t xStart, uint64_t yStart, uint64_t xEnd, uint64_t yEnd,
                 uint8_t b = col & 0x0000FF;
                 uint8_t g = (col >> 8) & 0x0000FF;
                 uint8_t r = (col >> 16) & 0x0000FF;
-                float m = (yEnd - yStart) / (xEnd - xStart);
+                float m = (float)(yEnd - yStart) / (xEnd - xStart);
                 float b0 = 1.0f * yStart - m * xStart;
                 for (uint64_t i = xStart; i <= xEnd; i++) {
                         uint64_t y = (uint64_t)(m * i + b0);
@@ -221,7 +232,7 @@ uint64_t getScreenHeightRes()
 //Auxiliares
 static uint8_t legalCoordinates(uint64_t x, uint64_t y)
 {
-        if (x >= WIDTH || y >= HEIGHT || x < 0 || y < 0) {
+        if (x >= WIDTH || y >= HEIGHT) {
                 return 0;
         }
         return 1;
@@ -245,4 +256,4 @@ static void drawVerticalLine(uint64_t x, uint64_t yStart, uint64_t yEnd,
         }
 }
 
-#endif
+#endif /* VIDEO_DRIVER */

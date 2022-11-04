@@ -12,8 +12,8 @@
  *
  * See: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/portable/MemMang/heap_4.c
  */
-#include "lib.h"
-#include "mem/memory.h"
+#include <lib.h>
+#include <mem/memory.h>
 
 /* ------------------------------ */
 
@@ -66,7 +66,7 @@ inline static memory_block *move_to_free_header_to_real_start(void *ptr);
 
 #ifdef TESTING
 inline static uint64_t test_get_mem_heap_start_addr();
-#endif
+#endif /* TESTING */
 
 /* ------------------------------ */
 
@@ -175,8 +175,9 @@ void *socalloc(size_t nmemb, size_t size)
 
 void sofree(void *ptr)
 {
-        if (ptr < (void *)MEM_HEAP_START_ADDR ||
-            ptr > (void *)(MEM_HEAP_START_ADDR + MEM_HEAP_SIZE))
+        // Prevent user trying to free memory out of heap boundaries
+        if (ptr < (void *)MEM_HEAP_START_ADDR || //-V566
+            ptr > (void *)(MEM_HEAP_START_ADDR + MEM_HEAP_SIZE)) //-V566
                 return;
 
         memory_block *block_to_free = move_to_free_header_to_real_start(ptr);
@@ -201,7 +202,7 @@ void sofree(void *ptr)
                 nextp = prevp->next;
 
                 // At least two free blocks left
-                if (heap_freep != NULL && heap_freep != heap_freep->next) {
+                if (heap_freep != heap_freep->next) {
                         int found_block = 0;
                         do {
                                 if (prevp < block_to_free &&
@@ -341,4 +342,4 @@ inline static uint64_t test_get_mem_heap_start_addr()
 
         return (uint64_t)&heap_mem_addr;
 }
-#endif
+#endif /* TESTING */

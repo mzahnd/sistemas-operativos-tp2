@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef PROCESS
 #define PROCESS
 
@@ -78,7 +88,7 @@ static void initStack(reg_t rbp, reg_t rsp,
 static void mainFunctionWrapper(int (*mainF)(int, char **), int argc,
                                 char **agrv, uint8_t *processStatus)
 {
-        int result = mainF(argc, agrv);
+        mainF(argc, agrv);
         *processStatus = KILLED;
         forceTimerTick();
         return;
@@ -90,4 +100,4 @@ void freeProcess(process p)
         sofree(p);
 }
 
-#endif
+#endif /* PROCESS */

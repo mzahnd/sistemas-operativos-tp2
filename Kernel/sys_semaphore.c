@@ -12,8 +12,7 @@
  *
  * See: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/portable/MemMang/heap_4.c
  */
-
-#include "sys_semaphore.h"
+#include <sys_semaphore.h>
 
 inline void sys_sosem_open(const char *name, unsigned int initial_value,
                            sosem_t **result)

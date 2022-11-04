@@ -489,4 +489,4 @@ unsigned char *charBitmap(int c)
         return (__font_bitmap__ + (c - ' ') * CHAR_HEIGHT);
 }
 
-#endif
+#endif /* FONT_BITMAPS_H */

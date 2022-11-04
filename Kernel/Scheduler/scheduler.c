@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef SCHEDULER
 #define SCHEDULER
 
@@ -122,7 +132,7 @@ uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
                              char **argv, uint64_t foreground)
 {
         if (!scheduler_initialized || queue == NULL) {
-                return;
+                return 0;
         }
 
         uint64_t pid;
@@ -287,4 +297,4 @@ void unlockWaitingProcesses(process p)
         }
 }
 
-#endif
+#endif /* SCHEDULER */

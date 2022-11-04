@@ -186,7 +186,8 @@ void test_sowrite_soread_small_writes(CuTest *const ct)
         for (int i = 0; i < 10; i++) {
                 // Change character every time to make sure we are reading
                 // properly
-                memset(&write_buf, TEST_WRITE_CHAR + i, PIPE_BUFFER_SIZE / 8);
+                memset(&write_buf, TEST_WRITE_CHAR + i, //-V512
+                       PIPE_BUFFER_SIZE / 8);
 
                 ret = sowrite(fd[PIPE_FD_WRITE], write_buf,
                               PIPE_BUFFER_SIZE / 8);
@@ -194,7 +195,7 @@ void test_sowrite_soread_small_writes(CuTest *const ct)
                 ret = soread(fd[PIPE_FD_READ], read_buf, PIPE_BUFFER_SIZE / 8);
                 CuAssertIntEquals(ct, PIPE_BUFFER_SIZE / 8, ret);
 
-                ret = memcmp(write_buf, read_buf, PIPE_BUFFER_SIZE / 8);
+                ret = memcmp(write_buf, read_buf, PIPE_BUFFER_SIZE / 8); //-V512
                 CuAssertIntEquals(ct, 0, ret);
         }
 
@@ -238,8 +239,6 @@ void test_sowrite_soread_ipc_full_buff(CuTest *const ct)
         pthread_join(thread_reader, NULL);
         pthread_join(thread_writer, NULL);
 
-        ret = memcmp(write_buf, read_buf, 1 + strlen(TEST_WRITE_MESSAGE));
-        /* CuAssertIntEquals(ct, 0, ret); */
         CuAssertStrEquals(ct, TEST_WRITE_MESSAGE, read_buf);
 
         ret = soclose(fd[PIPE_FD_READ]);

@@ -7,13 +7,8 @@
  *                    López, P.
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
- *
- * This source code has been insipred in FreeRTOS heap_4 and K&R malloc.
- *
- * See: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/portable/MemMang/heap_4.c
  */
-
-#include "sys_pipes.h"
+#include <sys_pipes.h>
 
 void sys_sopipe(int fildes[PIPE_N_FD], int *result)
 {

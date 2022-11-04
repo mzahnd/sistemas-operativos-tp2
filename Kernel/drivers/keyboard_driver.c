@@ -1,5 +1,16 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef KEYBOARD_DRIVER
 #define KEYBOARD_DRIVER
+
 #include <keyboard_asm.h>
 #include <keyboard_driver.h>
 #include <interrupts.h>
@@ -7,6 +18,7 @@
 #include <stdint.h>
 #include <IO_driver.h>
 #include <scheduler/scheduler.h>
+
 #define BUFFER_SIZE 64
 
 uint64_t kbLockedPID = 0;
@@ -30,7 +42,7 @@ static char pressCodes[][2] = {
         { 0, 0 },       { ' ', ' ' }, { 0, 0 }
 };
 
-static char BUFFER[BUFFER_SIZE] = { 0 }; //Buffer circular
+static int BUFFER[BUFFER_SIZE] = { 0 }; // Buffer circular
 static uint64_t startIndex = 0; //Indice del comienzo para el read
 static uint64_t endIndex = 0; //Indice del final para el read
 static void (*functionKeysMethods[10])(void);
@@ -76,7 +88,7 @@ void keyboardHandler(registerStruct *registers)
         }
 }
 
-void readKeyboard(char *buff, uint64_t size, uint64_t *count)
+void readKeyboard(int *buff, uint64_t size, uint64_t *count)
 {
         if (!isCurrentProcessForeground()) {
                 return; // If a background process tries to read the keyboard, behaviour is not deterministic
@@ -117,4 +129,4 @@ void setFunctionKeyMethod(uint64_t index, void (*function)())
         }
 }
 
-#endif
+#endif /* KEYBOARD_DRIVER */

@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef SHELL_LINES
 #define SHELL_LINES
 
@@ -37,13 +47,18 @@ void addShellLine(shellLinesQueue lines, char *str)
 {
         unsigned int len = strlen(str);
         char *line = malloc((len + 1) * sizeof(char));
+        if (line == NULL) {
+                return;
+        }
+
         strcpy(line, str);
 
         shellLineNode node = malloc(sizeof(shellLineNode_t));
         if (node == NULL) {
-                //TODO: Exit
+                free(line);
                 return;
         }
+
         node->line = line;
         node->next = NULL;
 
@@ -98,6 +113,10 @@ void addToLastLine(shellLinesQueue lines, char *str)
         unsigned int lastStringLen = strlen(lastString);
         char *destination =
                 malloc((lastStringLen + strlen(str) + 1) * sizeof(char));
+        if (destination == NULL) {
+                return;
+        }
+
         strcpy(destination, lastString);
         strcpy((destination + lastStringLen), str);
         free(lines->last->line);
@@ -125,4 +144,4 @@ static void freeNode(shellLineNode node)
         return;
 }
 
-#endif
+#endif /* SHELL_LINES */

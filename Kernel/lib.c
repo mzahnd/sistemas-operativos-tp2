@@ -8,10 +8,8 @@
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
  */
-
 #include <stdint.h>
-
-#include "lib.h"
+#include <lib.h>
 
 /* Type to use for aligned memory operations.
  *

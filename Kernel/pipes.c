@@ -7,14 +7,6 @@
  *                    López, P.
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
- *
- *
- * This implementation is based on Michael Cotterell (@mepcotterell) Gist's
- * on semaphores.
- * See: https://gist.github.com/mepcotterell/6f0a779befe388ab822764255e3776ae
- *
- * In case you do not have the manual entry for stdatomic.h is available online
- * https://en.cppreference.com/w/c/atomic
  */
 #include <lib.h>
 #include <semaphore.h>

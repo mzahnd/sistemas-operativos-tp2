@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #include <processes.h>
 #include <syscalls_definitions.h>
 #include <syscalls_asm.h>
@@ -18,8 +28,10 @@ int schedulerInfo(int argc, char **argv)
                         status = "BLOCKED";
                 } else if (info.processes[i].status == 3) {
                         status = "KILLED";
+                } else {
+                        status = "ERROR";
                 }
-                printf("%s\t%d\t%d\t%s\n", info.processes[i].name,
+                printf("%s\t%d\t%d\t%s\n", info.processes[i].name, //-V576
                        info.processes[i].pid, info.processes[i].ppid, status);
         }
 

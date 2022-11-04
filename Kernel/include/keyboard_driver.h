@@ -1,3 +1,13 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ */
 #ifndef KEYBOARD_DRIVER_H
 #define KEYBOARD_DRIVER_H
 
@@ -22,9 +32,10 @@
 #include <stdint.h>
 
 void keyboardHandler(registerStruct *);
-void readKeyboard(char *buff, uint64_t size, uint64_t *count);
+void readKeyboard(int *buff, uint64_t size, uint64_t *count);
 void bufferEmpty(uint64_t *target);
 void isMayus(uint64_t *target);
 void initializeFunctionKeys();
 void setFunctionKeyMethod(uint64_t index, void (*function)());
-#endif
+
+#endif /* KEYBOARD_DRIVER_H */

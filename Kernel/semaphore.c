@@ -13,8 +13,8 @@
  * on semaphores.
  * See: https://gist.github.com/mepcotterell/6f0a779befe388ab822764255e3776ae
  *
- * In case you do not have the manual entry for stdatomic.h is available online
- * https://en.cppreference.com/w/c/atomic
+ * In case you do not have the manual entry for stdatomic.h it's available 
+ * online: https://en.cppreference.com/w/c/atomic
  */
 #include "lib.h"
 #include "mem/memory.h"
@@ -155,8 +155,6 @@ int sosem_post(sosem_t *sem)
         if (sem == NULL)
                 return -1;
 
-        int ret = 0;
-
         // Acquiring the lock (sem->lock) can result in a deadlock if
         // another process is in the middle of waiting. Fortunately,
         // the "worst case sceneario" is a single process busy waiting
@@ -167,7 +165,7 @@ int sosem_post(sosem_t *sem)
         if (pid_queue_shift(sem, &pid) == 0) {
                 unlockProcessByPID(pid);
         }
-        ret = atomic_fetch_add(&sem->value, 1);
+        atomic_fetch_add(&sem->value, 1);
 
         if (try_acquire(&(sem->lock)) == 0) {
                 // Userland
@@ -175,7 +173,7 @@ int sosem_post(sosem_t *sem)
                 release(&(sem->lock));
         }
 
-        return ret;
+        return 0;
 }
 
 /* ------------------------------ */
@@ -251,6 +249,10 @@ static int get_semaphore_index_from_table(const char *name)
 
         for (int i = 0; i < SEM_MAX_NAMED; i++) {
                 idx = i + hash % SEM_MAX_NAMED;
+                // Avoid possible array overrun
+                if (idx >= SEM_MAX_NAMED) {
+                        idx -= SEM_MAX_NAMED;
+                }
 
                 if (sosem_names_table[idx].k == hash)
                         break;
@@ -273,6 +275,10 @@ static int add_semaphore_to_table(sosem_t **sem)
 
         for (int i = 0; i < SEM_MAX_NAMED; i++) {
                 idx = i + hash % SEM_MAX_NAMED;
+                // Avoid possible array overrun
+                if (idx >= SEM_MAX_NAMED) {
+                        idx -= SEM_MAX_NAMED;
+                }
 
                 if (sosem_names_table[idx].k == 0) {
                         sosem_names_table[idx].k = hash;
@@ -284,14 +290,14 @@ static int add_semaphore_to_table(sosem_t **sem)
                 }
         }
 
-        return idx >= 0;
+        return (idx >= 0 ? 0 : -1);
 }
 
 /* ------------------------------ */
 
 static int remove_semaphore_from_table(unsigned int index)
 {
-        if (index > SEM_MAX_NAMED)
+        if (index >= SEM_MAX_NAMED)
                 return -1;
 
         sosem_names_table[index].k = 0;

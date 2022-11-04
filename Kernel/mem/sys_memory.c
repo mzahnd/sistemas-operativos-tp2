@@ -12,9 +12,8 @@
  *
  * See: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/portable/MemMang/heap_4.c
  */
-
-#include "mem/memory.h"
-#include "mem/sys_memory.h"
+#include <mem/memory.h>
+#include <mem/sys_memory.h>
 
 inline void sys_somalloc(size_t size, void **result)
 {

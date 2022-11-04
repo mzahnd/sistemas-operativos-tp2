@@ -292,7 +292,7 @@ static processFunciton getProcess(char *name)
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim)
 {
-        if (argv == NULL || *argv == NULL || str == NULL) {
+        if (argv == NULL || str == NULL) {
                 return;
         }
 

@@ -166,6 +166,10 @@ void syscallHandler(registerStruct *registers)
                 //rsi -> int (*)(int, char**): Puntero a la funcion principal del procesp
                 //rdx -> int: argc
                 //rcx -> char**: argv
+                //r8 -> unsigned int: foreground Flag
+                //r9 -> uiint64_t: stdin
+                //r10 -> uint64_t: stdout
+                //r11 -> unsigned int*: address to return PID
                 syscallCreateProcess(registers);
                 break;
 
@@ -321,11 +325,11 @@ void writeStr(registerStruct *registers)
 
 void syscallCreateProcess(registerStruct *reg)
 {
-        uint64_t *addressToReturn = (uint64_t *)reg->r9;
+        uint64_t *addressToReturn = (uint64_t *)reg->r11;
         uint64_t result = createAndAddProcess((char *)reg->rdi,
                                               (int (*)(int, char **))reg->rsi,
                                               (int)reg->rdx, (char **)reg->rcx,
-                                              reg->r8);
+                                              reg->r8, reg->r9, reg->r10);
         *addressToReturn = result;
 }
 

@@ -37,7 +37,7 @@ void mallocSyscall(size_t size, void **result);
 void callocSyscall(size_t nmemb, size_t size, void **result);
 void freeSyscall(void *ptr);
 void createProcessSyscall(char *name, int (*mainFunction)(int, char **),
-                          int argc, char **argv, uint64_t foreground,
+                          int argc, char **argv, uint64_t foreground, uint64_t stdin, uint64_t stdout,
                           uint64_t *returnedPID);
 void getSchedulerInfoSyscall(schInfo_t *);
 void waitPIDSyscall(uint64_t pid);

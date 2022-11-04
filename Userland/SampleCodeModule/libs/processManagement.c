@@ -10,6 +10,8 @@
  */
 #ifndef PROCESS_MANAGEMENT
 #define PROCESS_MANAGEMENT
+#define STDIN 0
+#define STDOUT 1
 
 #include <syscalls_asm.h>
 #include <processManagement.h>
@@ -18,7 +20,15 @@ uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,
                        char **argv, unsigned int foreground)
 {
         uint64_t returnPID = 0;
-        createProcessSyscall(name, mainF, argc, argv, foreground, &returnPID);
+        createProcessSyscall(name, mainF, argc, argv, foreground, &returnPID, STDIN, STDOUT);
+        return returnPID;
+}
+
+uint64_t createProcessWithFD(char *name, int (*mainF)(int, char **), int argc,
+                       char **argv, unsigned int foreground, uint64_t stdin, uint64_t stdout)
+{
+        uint64_t returnPID = 0;
+        createProcessSyscall(name, mainF, argc, argv, foreground, &returnPID, stdin, stdout);
         return returnPID;
 }
 

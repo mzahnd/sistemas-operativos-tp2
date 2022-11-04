@@ -142,7 +142,7 @@ int main()
 void startUserland()
 {
         int r = createAndAddProcess("root", sampleCodeModuleAddress, 0, NULL,
-                                    1);
+                                    1, 0, 1);
         if (r == 0) {
                 ncPrint("ERROR: Could not start Userland");
                 ncNewline();

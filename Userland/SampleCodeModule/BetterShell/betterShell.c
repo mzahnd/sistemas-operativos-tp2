@@ -38,7 +38,6 @@ static void processCommand(char *command, commandList commands,
                            unsigned int *indexPtr);
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim);
-static processFunciton getProcess(char *name);
 void setupArgv(char **argv, int argc, char *command, unsigned int commandLen);
 void printOnShell(char *str, int dim);
 static void initCommands(commandList list);
@@ -311,7 +310,7 @@ static void initCommands(commandList list) {
         addCommand(list, "testWrite", testWrite);
 //         addCommand(list, "sh", commandSh);
         addCommand(list, "help", commandHelp);
-//         addCommand(list, "mem", commandMem);
+        addCommand(list, "mem", commandMem);
 //         addCommand(list, "ps", commandPs);
 //         addCommand(list, "loop", commandLoop);
 //         addCommand(list, "kill", commandKill);

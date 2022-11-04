@@ -1,9 +1,12 @@
-// int commandMem(int argc, char **argv) {
-//     putChar('\n');
-//     int strSize = 2048;
-//     char str[strSize];
-//     memSyscall(str, strSize); //cambiar
-//     printf("%s\n", str);
+#include <processes.h>
+#include <syscalls_asm.h>
 
-//     return 1;
-// }
+int commandMem(int argc, char **argv) {
+    putChar('\n');
+    int strSize = 2048;
+    char str[strSize];
+    memSyscall(str, strSize); 
+    printf("%s\n", str);
+
+    return 1;
+}

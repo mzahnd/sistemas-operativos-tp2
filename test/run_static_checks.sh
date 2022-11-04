@@ -21,7 +21,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 #
-readonly SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
+readonly SCRIPT_DIR="$PWD/$(dirname "${BASH_SOURCE[0]}")"
 pushd "$SCRIPT_DIR" &> /dev/null || exit 1
 
 readonly OUT_DIR_CPP="$SCRIPT_DIR/staticCheckOutput/cppcheck"
@@ -34,7 +34,7 @@ mkdir -p "$OUT_DIR_CPP"
 mkdir -p "$OUT_DIR_PVS"
 mkdir -p "$OUT_DIR_VALGRIND"
 
-SRC_DIRS=("Kernel" "Userland")
+SRC_DIRS=("Kernel" "Userland" "test")
 # EXECS=()
 # TEST_FILE="Makefile"
 
@@ -73,11 +73,21 @@ echo "-------------------------"
 echo -e "\e[34m\e[1mPVS Studio\e[0m"
 
 for src_dir in "${SRC_DIRS[@]}"; do
+    if [[ "$src_dir" != "test" ]]; then
+        pushd "$src_dir" &> /dev/null || continue
+    fi
+
     make clean
 
-    pvs-studio-analyzer trace \
-        --output "$OUT_DIR_PVS/${src_dir}_strace_out" \
-        -- make -j"$(nproc)"
+    if [[ "$src_dir" == "test" ]]; then
+        pvs-studio-analyzer trace \
+            --output "$OUT_DIR_PVS/${src_dir}_strace_out" \
+            -- make test -j"$(nproc)"
+    else
+        pvs-studio-analyzer trace \
+            --output "$OUT_DIR_PVS/${src_dir}_strace_out" \
+            -- make -j"$(nproc)"
+    fi
 
     if [[ ! -s "$OUT_DIR_PVS/${src_dir}_strace_out" ]]; then
         echo -ne "\e[32m\e[1mError:\e[0m "
@@ -111,6 +121,9 @@ for src_dir in "${SRC_DIRS[@]}"; do
         continue
     fi
 
+    if [[ "$src_dir" != "test" ]]; then
+        popd &> /dev/null || continue
+    fi
 done
 
 

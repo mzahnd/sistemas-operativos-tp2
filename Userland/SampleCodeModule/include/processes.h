@@ -17,4 +17,16 @@ int testPipes(int, char **);
 int testWrite(int argc, char **argv);
 int testRead(int argc, char **argv);
 
+void commandHelp(int argc, char **argv);
+// int commandMem(int argc, char **argv);
+// int commandPs(int argc, char **argv);
+// static void commandLoop(int argc, char **argv);
+// int commandKill(int argc, char **argv);
+// int commandNice(int argc, char **argv);
+// int commandBlock(int argc, char **argv);
+// void commandCat(int argc, char **argv);
+// void commandWc(int argc, char **argv);
+// void commandFilter(int argc, char **argv);
+// int commandPipe(int argc, char **argv);
+
 #endif /* PROCESSES_H */

@@ -11,6 +11,9 @@
 #ifndef PROCESS_MANAGEMENT_H
 #define PROCESS_MANAGEMENT_H
 
+#define STDIN 0
+#define STDOUT 1
+
 #include <stdint.h>
 
 uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,

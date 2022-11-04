@@ -1,12 +1,3 @@
-// int commandMem(int argc, char **argv) {
-//     putChar('\n');
-//     int strSize = 2048;
-//     char str[strSize];
-//     memSyscall(str, strSize); //cambiar
-//     printf("%s\n", str);
-
-//     return 1;
-// }
 
 // int commandPs(int argc, char **argv) {
 //     putChar('\n');
@@ -153,13 +144,7 @@
 //     return buildProcess("filter", filter, args);
 // }
 
-// int commandPipe(int argc, char **argv) {
-//     putChar('\n');
-//     char buffer[BUFFER_SIZE] = {0};
-//     pipeSyscall(buffer);
-//     printf("%s\n", buffer);
-//     return 1;
-// }
+
 
 // int commandPhylo(int argc, char **argv) {
 //     return phyloProcess("phylo", philosopherProblem(), args);

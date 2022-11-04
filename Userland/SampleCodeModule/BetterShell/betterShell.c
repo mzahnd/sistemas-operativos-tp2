@@ -94,6 +94,9 @@ int runShell(int argc, char **argv)
                 }
         }
 
+        // printf("Welcome to our Operating Systems proyect!");
+        // printf("For further options, enter 'help'");
+
         free(commandLine);
 
         return 0;
@@ -320,7 +323,7 @@ static void initCommands(commandList list) {
 //         addCommand(list, "cat", commandCat);
 //         addCommand(list, "wc", commandWc);
 //         addCommand(list, "filter", commandFilter);
-//         addCommand(list, "pipe", commandPipe);
+        addCommand(list, "pipe", commandPipe);
 //         addCommand(list, "phylo", commandPhylo);
 }
 

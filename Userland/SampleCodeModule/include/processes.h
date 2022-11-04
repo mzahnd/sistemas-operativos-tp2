@@ -27,6 +27,6 @@ int commandMem(int argc, char **argv);
 // void commandCat(int argc, char **argv);
 // void commandWc(int argc, char **argv);
 // void commandFilter(int argc, char **argv);
-// int commandPipe(int argc, char **argv);
+int commandPipe(int argc, char **argv);
 
 #endif /* PROCESSES_H */

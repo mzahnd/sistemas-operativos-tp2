@@ -243,7 +243,7 @@ sosem_info_t *sosem_getinformation(sosem_info_t *restrict last)
         if (c->next == NULL)
                 return NULL;
 
-        return &c->sem->userland;
+        return &c->next->sem->userland;
 }
 
 /* ------------------------------ */
@@ -484,7 +484,6 @@ static inline int list_sosem_push(sosem_t *restrict sem)
 }
 
 /* ------------------------------ */
-
 
 static inline int list_sosem_remove(sosem_t *restrict sem)
 {

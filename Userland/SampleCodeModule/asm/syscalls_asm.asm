@@ -14,6 +14,7 @@ GLOBAL deleteTimerFunctionSyscall
 GLOBAL mallocSyscall
 GLOBAL callocSyscall
 GLOBAL freeSyscall
+GLOBAL memGetInformationSyscall
 GLOBAL createProcessSyscall
 GLOBAL pipeCloseSyscall
 GLOBAL pipeGetInformationSyscall
@@ -30,8 +31,6 @@ GLOBAL semaphorePostSyscall
 GLOBAL semaphoreWaitSyscall
 GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
-
-GLOBAL memSyscall
 
 section .text
 
@@ -216,6 +215,17 @@ freeSyscall:
     pop rbp
     ret
 
+memGetInformationSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 19 ;ID sys_somem_getinformation
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
 createProcessSyscall:
     push rbp
     mov rbp, rsp
@@ -388,17 +398,6 @@ waitPIDSyscall:
     mov rax, 22; ID waitForPID
     int 80h
 
-    mov rsp, rbp
-    pop rbp
-    ret
-
-memSyscall:
-    push rbp
-    mov rbp, rsp
-
-    mov rax, 28
-    int 80h
-    
     mov rsp, rbp
     pop rbp
     ret

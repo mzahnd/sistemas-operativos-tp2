@@ -28,8 +28,6 @@
 
 /* ------------------------------ */
 
-#define SEM_INITIAL_CHAR '$'
-
 #define acquire(lock) while (atomic_flag_test_and_set(lock))
 #define try_acquire(lock) atomic_flag_test_and_set(lock)
 #define release(lock) atomic_flag_clear(lock)
@@ -41,7 +39,18 @@ typedef struct {
         sosem_t *v; // semaphore
 } sosem_kv_t;
 
+typedef struct SOSEM_NODE_T {
+        sosem_t *sem; // Current semaphore
+        struct SOSEM_NODE_T *next;
+        struct SOSEM_NODE_T *prev;
+} sosem_node_t;
+
 static sosem_kv_t sosem_names_table[SEM_MAX_NAMED] = {};
+
+// For Userland.
+// See function sosem_getinformation()
+static sosem_node_t *list_sosem_head = NULL;
+static sosem_node_t *list_sosem_tail = NULL;
 
 /* ------------------------------ */
 
@@ -58,6 +67,9 @@ static inline void userland_update(sosem_t *restrict sem);
 static inline void pid_queue_init(sosem_t *restrict sem);
 static inline int pid_queue_shift(sosem_t *restrict sem, uint64_t *pid);
 static inline int pid_queue_push(sosem_t *restrict sem, uint64_t pid);
+
+static inline int list_sosem_push(sosem_t *restrict sem);
+static inline int list_sosem_remove(sosem_t *restrict sem);
 
 #ifdef TESTING
 // Replace Scheduler/scheduler.h functions with dummies
@@ -214,12 +226,24 @@ int sosem_wait(sosem_t *sem)
 
 /* ------------------------------ */
 
-sosem_info_t *sosem_getinformation(sosem_t *restrict sem)
+sosem_info_t *sosem_getinformation(sosem_info_t *restrict last)
 {
-        if (sem == NULL)
+        if (list_sosem_head == NULL)
+                return NULL;
+        else if (last == NULL)
+                return &list_sosem_head->sem->userland;
+
+        sosem_node_t *c = list_sosem_head;
+        while (&c->sem->userland != last) {
+                c = c->next;
+
+                if (c == NULL)
+                        return NULL;
+        }
+        if (c->next == NULL)
                 return NULL;
 
-        return &sem->userland;
+        return &c->sem->userland;
 }
 
 /* ------------------------------ */
@@ -343,8 +367,10 @@ static inline void userland_init(sosem_t *restrict sem,
 
         info->value = atomic_load(&sem->value);
 
-        somemset(info->waiting_pid, 0, SEM_MAX_WAITING);
+        info->waiting_pid = somalloc(SEM_MAX_WAITING * sizeof(uint64_t));
         info->n_waiting = sem->_processes._n_waiting;
+
+        list_sosem_push(sem);
 }
 
 /* ------------------------------ */
@@ -356,6 +382,11 @@ static inline void userland_destroy(sosem_t *restrict sem)
 
         sem->userland.value = 0;
         sem->userland.n_waiting = sem->_processes._n_waiting;
+
+        sofree(sem->userland.waiting_pid);
+        sem->userland.waiting_pid = NULL;
+
+        list_sosem_remove(sem);
 }
 
 /* ------------------------------ */
@@ -422,6 +453,75 @@ static inline int pid_queue_push(sosem_t *restrict sem, uint64_t pid)
 
         return 0;
 }
+
+/* ------------------------------ */
+
+static inline int list_sosem_push(sosem_t *restrict sem)
+{
+        if (sem == NULL)
+                return -1;
+
+        if (list_sosem_head == NULL) {
+                list_sosem_head = somalloc(sizeof(sosem_node_t));
+                if (list_sosem_head == NULL)
+                        return -1;
+
+                list_sosem_head->prev = NULL;
+                list_sosem_tail = list_sosem_head;
+        } else {
+                list_sosem_tail->next = somalloc(sizeof(sosem_node_t));
+                if (list_sosem_tail->next == NULL)
+                        return -1;
+
+                list_sosem_tail->next->prev = list_sosem_tail;
+                list_sosem_tail = list_sosem_tail->next;
+        }
+
+        list_sosem_tail->sem = sem;
+        list_sosem_tail->next = NULL;
+
+        return 0;
+}
+
+/* ------------------------------ */
+
+
+static inline int list_sosem_remove(sosem_t *restrict sem)
+{
+        if (sem == NULL)
+                return -1;
+        if (list_sosem_head == NULL)
+                return 0;
+
+        sosem_node_t *c = list_sosem_head;
+        while (c != NULL && c->sem != sem) {
+                c = c->next;
+        }
+        if (c == NULL)
+                return 0;
+
+        sosem_node_t *p = c->prev;
+        sosem_node_t *n = c->next;
+
+        if (p != NULL) // Current (c) could be head
+                p->next = n;
+
+        if (n != NULL) // Current (c) could be tail
+                n->prev = p;
+
+        if (p == NULL && n == NULL && c == list_sosem_head) {
+                list_sosem_head = NULL;
+                list_sosem_tail = NULL;
+        } else if (n == NULL && c == list_sosem_tail) {
+                list_sosem_tail = p;
+        }
+
+        sofree(c);
+
+        return 0;
+}
+
+/* ------------------------------ */
 
 #ifdef TESTING
 static const uint64_t pids[SEM_MAX_WAITING + 1] = {

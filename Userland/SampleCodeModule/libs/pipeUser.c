@@ -38,3 +38,10 @@ int close(int fd)
         pipeCloseSyscall(fd, &ret);
         return ret;
 }
+
+pipe_info_t *pipe_getinformation(pipe_info_t *restrict last)
+{
+        pipe_info_t *ret;
+        pipeGetInformationSyscall(last, &ret);
+        return ret;
+}

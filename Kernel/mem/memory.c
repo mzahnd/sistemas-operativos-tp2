@@ -61,8 +61,10 @@ typedef struct MEMORY_BLOCK {
 
 /* Prototypes */
 static void mem_init();
-inline static memory_block *move_to_free_header_to_real_start(void *ptr);
+inline static memory_block *move_header_to_free_to_real_start_addr(void *ptr);
 // static memory_block *request_more_space(uint32_t nu); // Not implemented
+static void info_update_malloc(void *ptr);
+static void info_update_free(void *ptr);
 
 #ifdef TESTING
 inline static uint64_t test_get_mem_heap_start_addr();
@@ -74,8 +76,10 @@ inline static uint64_t test_get_mem_heap_start_addr();
 // Correctly align the structure at the begginig of each allocated memory block
 static const size_t memblock_size = MEMBLOCK_SIZE_DEF;
 
-// List with the list
+// Free blocks list
 static memory_block *heap_freep = NULL;
+
+static somem_info_t memory_information = {};
 
 /* ------------------------------ */
 
@@ -152,6 +156,9 @@ void *somalloc(size_t wanted_size)
                 }
         }
 
+        // Update information for Userland
+        info_update_malloc((void *)to_return);
+
         return (void *)to_return;
 }
 
@@ -179,10 +186,16 @@ void sofree(void *ptr)
         if (ptr < (void *)MEM_HEAP_START_ADDR || //-V566
             ptr > (void *)(MEM_HEAP_START_ADDR + MEM_HEAP_SIZE)) //-V566
                 return;
+        else if (ptr == NULL)
+                return;
 
-        memory_block *block_to_free = move_to_free_header_to_real_start(ptr);
+        memory_block *block_to_free =
+                move_header_to_free_to_real_start_addr(ptr);
         memory_block *prevp = NULL;
         memory_block *nextp = NULL;
+
+        // Update information for Userland
+        info_update_free(ptr);
 
         if (heap_freep == NULL) {
                 /* First block being freed */
@@ -286,16 +299,67 @@ void sofree(void *ptr)
 
 /* ------------------------------ */
 
+somem_info_t *somem_getinformation()
+{
+        return &memory_information;
+}
+
+/* ------------------------------ */
+
+static void info_update_malloc(void *ptr)
+{
+        if (ptr == NULL)
+                return;
+
+        memory_information.n_reserved_blocks++;
+
+        memory_information.reserved_size += ALLOC_BLOCK_HEADER(ptr)->size;
+        memory_information.user_size += ALLOC_BLOCK_HEADER(ptr)->user_size;
+        memory_information.free_size -= ALLOC_BLOCK_HEADER(ptr)->size;
+
+        if ((void *)ALLOC_BLOCK_HEADER(ptr) < memory_information.first_address)
+                memory_information.first_address =
+                        (void *)ALLOC_BLOCK_HEADER(ptr);
+}
+
+/* ------------------------------ */
+
+static void info_update_free(void *ptr)
+{
+        if (ptr == NULL)
+                return;
+
+        memory_information.n_reserved_blocks--;
+
+        memory_information.reserved_size -= ALLOC_BLOCK_HEADER(ptr)->size;
+        memory_information.user_size -= ALLOC_BLOCK_HEADER(ptr)->user_size;
+        memory_information.free_size += ALLOC_BLOCK_HEADER(ptr)->size;
+
+        if ((void *)ALLOC_BLOCK_HEADER(ptr) == memory_information.first_address)
+                memory_information.first_address =
+                        (void *)ALLOC_BLOCK_HEADER(ptr)->next;
+}
+
+/* ------------------------------ */
+
 static void mem_init()
 {
         heap_freep = (memory_block *)MEM_HEAP_START_ADDR;
         heap_freep->size = MEM_HEAP_SIZE;
         heap_freep->user_size = 0;
         heap_freep->next = heap_freep;
+
+        // Information for Userland
+        memory_information.n_reserved_blocks = 0;
+        memory_information.reserved_size = 0;
+        memory_information.user_size = 0;
+        memory_information.free_size = 0;
+        memory_information.first_address =
+                (void *)(MEM_HEAP_START_ADDR + MEM_HEAP_SIZE); //-V566
 }
 /* ------------------------------ */
 
-inline static memory_block *move_to_free_header_to_real_start(void *ptr)
+inline static memory_block *move_header_to_free_to_real_start_addr(void *ptr)
 {
         memory_block tmp = { 0 };
         memory_block *header = ALLOC_BLOCK_HEADER(ptr);

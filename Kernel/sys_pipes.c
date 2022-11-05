@@ -30,7 +30,7 @@ void sys_soclose(int fd, int *result)
         *result = soclose(fd);
 }
 
-void sys_sopipe_getinformation(int fd, pipe_info_t **result)
+void sys_sopipe_getinformation(sopipe_info_t *last, sopipe_info_t **result)
 {
-        *result = sopipe_getinformation(fd);
+        *result = sopipe_getinformation(last);
 }

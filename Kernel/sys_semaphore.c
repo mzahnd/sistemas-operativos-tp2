@@ -66,7 +66,7 @@ inline void sys_sosem_wait(sosem_t *sem, int *result)
 
 /* ------------------------------ */
 
-inline void sys_sosem_getinformation(sosem_t *sem, sosem_info_t **result)
+inline void sys_sosem_getinformation(sosem_info_t *last, sosem_info_t **result)
 {
-        *result = sosem_getinformation(sem);
+        *result = sosem_getinformation(last);
 }

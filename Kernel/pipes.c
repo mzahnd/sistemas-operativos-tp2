@@ -36,7 +36,7 @@ typedef struct {
         pipe_flow_t read;
         pipe_flow_t write;
 
-        pipe_info_t userland;
+        sopipe_info_t userland;
 } pipe_t;
 
 /* ------------------------------ */
@@ -54,7 +54,7 @@ static inline void store_fd_pair(int fd[PIPE_N_FD]);
 static inline void dup_fd_pair(int dest[PIPE_N_FD], int src[PIPE_N_FD]);
 static inline void remove_fd(int fd);
 static inline int is_valid_fd(int fd);
-static inline void userland_create(pipe_t *pipe, pipe_info_t *info);
+static inline void userland_init(pipe_t *pipe, sopipe_info_t *info);
 static inline void userland_update(pipe_t *pipe);
 
 /* ------------------------------ */
@@ -140,6 +140,8 @@ ssize_t sowrite(int fd, const char *buf, size_t count)
                 pipes[index].write.index = (write_idx + 1) % PIPE_BUFFER_SIZE;
         }
 
+        userland_update(&pipes[index]);
+
         sosem_post(&pipes[index].read.sem);
 
         return n;
@@ -165,6 +167,16 @@ int soclose(int fd)
 
                 sosem_destroy(&pipes[index].read.sem);
                 sosem_destroy(&pipes[index].write.sem);
+
+                pipes_open--;
+        } else if (get_fd_status(pipes[index].fd[PIPE_FD_READ]) ==
+                   NOT_ASSIGNED) {
+                // Userland
+                pipes[index].userland.fd[PIPE_FD_READ] = USERLAND_FD_CLOSED;
+        } else if (get_fd_status(pipes[index].fd[PIPE_FD_WRITE]) ==
+                   NOT_ASSIGNED) {
+                // Userland
+                pipes[index].userland.fd[PIPE_FD_WRITE] = USERLAND_FD_CLOSED;
         }
 
         return 0;
@@ -172,13 +184,24 @@ int soclose(int fd)
 
 /* ------------------------------ */
 
-pipe_info_t *sopipe_getinformation(int fd)
+sopipe_info_t *sopipe_getinformation(sopipe_info_t *restrict last)
 {
-        int index = get_pipe_index(fd);
-        if (index == -1)
-                return NULL;
+        if (last == NULL && pipes_open > 0)
+                return &pipes[0].userland;
 
-        return &pipes[index].userland;
+        int index = -1;
+
+        for (int i = 0; i < pipes_open; i++) {
+                if (&pipes[i].userland == last) {
+                        index = i;
+                        break;
+                }
+        }
+
+        if (index + 1 < pipes_open)
+                return &pipes[index + 1].userland;
+
+        return NULL;
 }
 
 /* ------------------------------ */
@@ -195,7 +218,7 @@ static inline void createPipe(int index)
         // Initial value > 0 to allow writting
         sosem_init(&pipes[index].write.sem, 1);
 
-        userland_create(&pipes[index], &pipes[index].userland);
+        userland_init(&pipes[index], &pipes[index].userland);
 }
 
 /* ------------------------------ */
@@ -273,15 +296,13 @@ static inline int is_valid_fd(int fd)
 
 /* ------------------------------ */
 
-static inline void userland_create(pipe_t *pipe, pipe_info_t *info)
+static inline void userland_init(pipe_t *pipe, sopipe_info_t *info)
 {
         info->buffer = &pipe->buffer[0];
-        info->size = PIPE_BUFFER_SIZE;
+        info->size = 0;
 
         //Copy contents from pipe fd to info fd
         dup_fd_pair(info->fd, pipe->fd);
-
-        info->active = pipe->active;
 }
 
 /* ------------------------------ */
@@ -289,8 +310,11 @@ static inline void userland_create(pipe_t *pipe, pipe_info_t *info)
 static inline void userland_update(pipe_t *pipe)
 {
         // In case someone rewrote it by mistake
-        pipe->userland.buffer = &pipe->buffer[0];
-        pipe->userland.size = PIPE_BUFFER_SIZE;
+        pipe->userland.buffer = &pipe->buffer[pipe->read.index];
 
-        pipe->userland.active = pipe->active;
+        if (pipe->read.index <= pipe->write.index)
+                pipe->userland.size = pipe->write.index - pipe->read.index;
+        else
+                pipe->userland.size =
+                        PIPE_BUFFER_SIZE - pipe->read.index + pipe->write.index;
 }

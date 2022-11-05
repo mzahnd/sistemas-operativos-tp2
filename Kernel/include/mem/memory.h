@@ -22,10 +22,24 @@
 #define MEM_HEAP_SIZE (256 * 1024 * 1024) // 256 MiB
 #endif
 
+typedef struct {
+        unsigned int n_reserved_blocks;
+
+        size_t reserved_size;
+        size_t user_size;
+        size_t free_size;
+
+        // Allocated memory blocks are between
+        // first_address and MEM_HEAP_START_ADDR + MEM_HEAP_SIZE
+        void *first_address;
+} somem_info_t;
+
 void *somalloc(size_t size);
 
 void *socalloc(size_t nmemb, size_t size);
 
 void sofree(void *ptr);
+
+somem_info_t *somem_getinformation();
 
 #endif /* MEMORY_H */

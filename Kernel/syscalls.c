@@ -160,6 +160,11 @@ void syscallHandler(registerStruct *registers)
                 sys_sofree((void *)registers->rdi);
                 break;
 
+        case 19: /* somem_getinformation */
+                // rdi -> somem_info_t *: Información de la memoria
+                sys_somem_getinformation((somem_info_t **)registers->rdi);
+                break;
+
         // From 20 -> Process management syscalls:
         case 20: // Create Process
                 //rdi -> char *: Nombre del proceso
@@ -235,9 +240,9 @@ void syscallHandler(registerStruct *registers)
                 break;
 
         case 37:
-                // rdi -> semaphore pointer (sosem_t *)
+                // rdi -> last info structure pointer (sosem_info_t *)
                 // rsi -> result (sosem_info_t **)
-                sys_sosem_getinformation((sosem_t *)registers->rdi,
+                sys_sosem_getinformation((sosem_info_t *)registers->rdi,
                                          (sosem_info_t **)registers->rsi);
                 break;
 
@@ -273,10 +278,10 @@ void syscallHandler(registerStruct *registers)
                 break;
 
         case 44:
-                //rdi -> int: fd
+                //rdi -> pipe_info_t *: last
                 //rsi -> pipe_info_t **: result
-                sys_sopipe_getinformation((int)registers->rdi,
-                                          (pipe_info_t **)registers->rsi);
+                sys_sopipe_getinformation((sopipe_info_t *)registers->rdi,
+                                          (sopipe_info_t **)registers->rsi);
                 break;
         }
 }

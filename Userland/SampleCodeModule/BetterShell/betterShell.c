@@ -313,12 +313,12 @@ static void initCommands(commandList list) {
 //         addCommand(list, "sh", commandSh);
         addCommand(list, "help", commandHelp);
         addCommand(list, "mem", commandMem);
-//         addCommand(list, "ps", commandPs);
+        addCommand(list, "ps", commandPs);
 //         addCommand(list, "loop", commandLoop);
 //         addCommand(list, "kill", commandKill);
 //         addCommand(list, "nice", commandNice);
 //         addCommand(list, "block", commandBlock);
-//         addCommand(list, "sem", commandSem);
+        addCommand(list, "sem", commandSem);
 //         addCommand(list, "cat", commandCat);
 //         addCommand(list, "wc", commandWc);
 //         addCommand(list, "filter", commandFilter);

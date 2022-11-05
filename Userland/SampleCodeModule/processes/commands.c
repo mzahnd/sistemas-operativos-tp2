@@ -1,12 +1,3 @@
-
-// int commandPs(int argc, char **argv) {
-//     putChar('\n');
-//     char buffer[BUFFER_SIZE] = {0};
-//     psSyscall(buffer); //cambiar
-//     printf("%s\n", buffer);
-//     return 1;
-// }
-
 // static void commandLoop(int argc, char **argv) {
 //     unsigned int pid = getPid();
 //     putChar('\n');
@@ -74,14 +65,6 @@
 //     } else {
 //         printf("Process failed to unblock\n");
 //     }
-//     return 1;
-// }
-
-// int commandSem(int argc, char **argv) {
-//     putChar('\n');
-//     char buffer[BUFFER_SIZE] = {0};
-//     semSyscall(buffer); //cambiar
-//     printf("%s\n", buffer);
 //     return 1;
 // }
 

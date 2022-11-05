@@ -3,9 +3,10 @@
 
 int commandSem(int argc, char **argv) {
     putChar('\n');
-    int strSize = 2048;
-    char str[strSize];
-    semaphoreGetInformationSyscall(str, strSize); //cambiar
-    printf("%s\n", str);
+    sem_t *sem;
+    unsigned int *restrict sval;
+    int *toReturn;
+    semaphoreGetInformationSyscall(sem, sval, toReturn); //cambiar
+    printf("%s\n", toReturn->value);
     return 1;
 }

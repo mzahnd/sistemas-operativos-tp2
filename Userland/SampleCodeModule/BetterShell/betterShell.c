@@ -72,6 +72,8 @@ int runShell(int argc, char **argv)
         lines = newShellLines(64);
 
         setConsoleUpdateFunction(printOnShell);
+        printf("Welcome to our Operating Systems proyect!\n");
+        printf("For further options, enter 'help'");
 
         if (commandLine == NULL) {
                 //TODO: Exit
@@ -93,9 +95,6 @@ int runShell(int argc, char **argv)
                                        &commandLineIndex);
                 }
         }
-
-        // printf("Welcome to our Operating Systems proyect!");
-        // printf("For further options, enter 'help'");
 
         free(commandLine);
 

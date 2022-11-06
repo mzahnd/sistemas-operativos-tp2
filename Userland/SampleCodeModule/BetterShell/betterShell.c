@@ -355,11 +355,11 @@ static void addToTokens(char *tokens[MAX_COMMAND_TOKENS], char *token, unsigned 
 static void executeCommand(commandList commands, char ** argv, int argc, unsigned int stdin, unsigned int stdout) {
         unsigned int type = 0;
         processMainFunction_t function = getCommand(commands, argv[0], &type);
-        unsigned int foreground = 0;
-        if (argc > 1 && strcmp(argv[argc-1], "&")) {
+        unsigned int foreground = 1;
+        if (argc > 1 && strcmp(argv[argc-1], "&") == 0) {
                 argv[argc-1] = NULL;
                 argc--;
-                foreground = 1;
+                foreground = 0;
         }
 
         if (function == NULL) {

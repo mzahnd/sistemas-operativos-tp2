@@ -356,7 +356,7 @@ void syscallRead(registerStruct *reg) {
                 // if the stdin pipe of the process is not 0, it has a pipe where it wants to read from
                 fd = currentProcessStdin;
         }
-        sys_soread((int)reg->rdi, (char *)reg->rsi,
+        sys_soread(fd, (char *)reg->rsi,
                 (size_t)reg->rdx, (ssize_t *)reg->rcx);
 }
 

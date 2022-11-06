@@ -39,14 +39,18 @@ ssize_t read(int fd, char *buf, size_t count)
 
 ssize_t write(int fd, const char *buf, size_t count)
 {
-        int fds[2] = {-1, -1};
-        getCurrentProcessFDSyscall(fds);
-        if (fds[STDOUT] == STDOUT) {
-                updateConsolePointer(buf, count);
-                return count;
+        int fdToWrite = fd;
+        if (fd == STDOUT) {
+                int fds[2] = {-1, -1};
+                getCurrentProcessFDSyscall(fds);
+                if (fds[STDOUT] == STDOUT) {
+                        updateConsolePointer(buf, count);
+                        return count;
+                }
+                fdToWrite = fds[STDOUT];
         }
         ssize_t ret;
-        pipeWriteSyscall(fd, buf, count, &ret);
+        pipeWriteSyscall(fdToWrite, buf, count, &ret);
         return ret;
 }
 

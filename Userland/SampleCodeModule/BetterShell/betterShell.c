@@ -51,13 +51,13 @@ void printOnShell(char *str, int dim);
 static shellLinesQueue lines;
 
 int testPrint1(int argc, char** argv) {
-        printf("ASD\n");
+        printf("ASD");
 }
 
 int testRead1(int argc, char** argv) {
         char* buffer[64] = {0};
         read(STDIN, buffer, 64);
-        printf("[%s]\n", buffer);
+        printf("Read from STDIN: [%s]\n", buffer);
 }
 
 int testProcess2(int argc, char **argv)
@@ -252,47 +252,7 @@ static void processCommand(char *command, commandList commands,
                 free(tokens[i]);
         }
 
-        // unsigned int foreground = 1; // Process is foreground by default
-        // unsigned int argc = 1; // At least 1
 
-        // for (int i = 0; i < commandLen; i++) {
-        //         if (command[i] == DETACH_PROCESS_CHAR && i > 0 &&
-        //             command[i - 1] == ' ') {c
-        //                 foreground = 0;
-        //                 argc--;
-        //         }
-        //         if (command[i] == ' ' && command[i + 1] &&
-        //             command[i + 1] != '\n' &&
-        //             command[i + 1] != DETACH_PROCESS_CHAR &&
-        //             command[i + 1] != ' ') {
-        //                 argc++;
-        //         }
-        // }
-
-        // char **argv = malloc(argc * sizeof(char *));
-
-        // // setupArgv handles **argv == NULL
-        // setupArgv(argv, argc, command, commandLen);
-
-        // unsigned int commandType = 0;
-        // processMainFunction_t function =
-        //         getCommand(commands, argv[0], &commandType); //-V522
-        // if (function) {
-        //         // Here I have argc and argv
-        //         //createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);
-        //         uint64_t test2 =
-        //                 createProcess(argv[0], function, 0, NULL, foreground);
-        //         if (foreground) {
-        //                 waitPID(test2);
-        //         }
-        // } else {
-        //         printf("[%s] Is not a valid command\n", argv[0]);
-        // }
-
-        // for (int i = 0; i < argc; i++) {
-        //         free(argv[i]);
-        // }
-        // free(argv);
         clearCommandLine(command, lenPtr);
         displayCommandLine(command, *lenPtr);
 }

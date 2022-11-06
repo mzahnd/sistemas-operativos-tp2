@@ -110,7 +110,7 @@ ssize_t soread(int fd, char *buf, size_t count)
 
         userland_update(&pipes[index]);
 
-        sosem_post(&pipes[index].write.sem);
+        // sosem_post(&pipes[index].write.sem);
 
         return n;
 }
@@ -130,7 +130,7 @@ ssize_t sowrite(int fd, const char *buf, size_t count)
 
         ssize_t n = 0;
 
-        sosem_wait(&pipes[index].write.sem);
+        //sosem_wait(&pipes[index].write.sem);
 
         for (n = 0; n < count && n < PIPE_BUFFER_SIZE; n++) {
                 int write_idx =

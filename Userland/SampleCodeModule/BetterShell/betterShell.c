@@ -51,7 +51,10 @@ static void initCommands(commandList list);
 static shellLinesQueue lines;
 
 int testPrint1(int argc, char** argv) {
-        printf("ASD");
+        printf("123\n");
+        printf("456\n");
+        printf("567\n");
+        printf("890\n");
 }
 
 int testRead1(int argc, char** argv) {
@@ -84,10 +87,6 @@ int runShell(int argc, char **argv)
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
         initCommands(commands);
-        // addCommand(commands, "test", testPipes);
-        // addCommand(commands, "testRead", testRead);
-        // addCommand(commands, "testWrite", testWrite);
-
         lines = newShellLines(64);
 
         setConsoleUpdateFunction(printOnShell);

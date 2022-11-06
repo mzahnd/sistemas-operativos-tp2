@@ -41,6 +41,7 @@ uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
                              char **argv, uint64_t foreground, uint64_t stdin, uint64_t stdout);
 void lockCurrentProcess();
 void unlockCurrentProcess();
+void lockProcessByPID(uint64_t pid);
 void unlockProcessByPID(uint64_t pid);
 void getSchedulerInfo(schInfo_t *infoBlock);
 unsigned int isCurrentProcessForeground();
@@ -50,5 +51,9 @@ void waitForPID(uint64_t pid);
 int getCurrentStdin();
 int getCurrentStdout();
 void getCurrentProcessFDs(int *fds);
+
+void changeProcessPriority(unsigned int PID, unsigned int priority);
+void changeProcessStatus(unsigned int PID);
+void killProcessByPID(unsigned int pid);
 
 #endif /* SCHEDULER_H */

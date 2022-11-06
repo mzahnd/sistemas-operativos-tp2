@@ -189,6 +189,22 @@ void syscallHandler(registerStruct *registers)
                 waitForPID((uint64_t)registers->rdi);
                 break;
 
+        case 23: // Change Process Priority
+                //rdi -> unsigned int: pid
+                //rsi -> unsigned int: new priority
+                changeProcessPriority((unsigned int)registers->rdi, registers->rsi);
+                break;
+
+        case 24: // Change Process status
+                //rdi -> unsigned int: pid
+                changeProcessStatus((unsigned int)registers->rdi);
+                break;
+        
+        case 25: // Kill Process
+                //rdi -> unsigned int PID
+                killProcessByPID((unsigned int)registers->rdi);
+                break;
+
         case 30:
                 // rdi -> const char *: name
                 // rsi -> unsigned int: initial value

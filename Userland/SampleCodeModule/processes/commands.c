@@ -42,7 +42,7 @@
 //     return 1;
 // }
 
-// int unblockFunc(char args[MAX_ARGS][MAX_ARG_LEN]) {
+// int commandUnblock(char args[MAX_ARGS][MAX_ARG_LEN]) {
 //     putChar('\n');
 //     unsigned int id = atoi(args[1]);
 //     if(unblock(id) == 0) {

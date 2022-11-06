@@ -378,20 +378,20 @@ static void initCommands(commandList list) {
         addCommand(list, "test", testPipes);
         addCommand(list, "testRead", testRead1);
         addCommand(list, "testWrite", testPrint1);
-//         addCommand(list, "sh", commandSh);
         addCommand(list, "help", commandHelp);
         addCommand(list, "mem", commandMem);
         addCommand(list, "ps", commandPs);
-//         addCommand(list, "loop", commandLoop);
-        addCommand(list, "kill", commandKill);
-        addCommand(list, "nice", commandNice);
-//         addCommand(list, "block", commandBlock);
+        addCommand(list, "loop", commandLoop);
+        addCommand(list, "kill", commandKill); // -> usa syscall q falta
+        addCommand(list, "nice", commandNice); // -> usa syscall q falta
+        addCommand(list, "block", commandBlock); // -> usa syscall q falta
+        addCommand(list, "unblock", commandUnblock);
         addCommand(list, "sem", commandSem);
-//         addCommand(list, "cat", commandCat);
-//         addCommand(list, "wc", commandWc);
-//         addCommand(list, "filter", commandFilter);
+        addCommand(list, "cat", commandCat); // -> usa syscall q falta
+        addCommand(list, "wc", commandWc); // -> usa syscall q falta
+        addCommand(list, "filter", commandFilter);
         addCommand(list, "pipe", commandPipe);
-//         addCommand(list, "phylo", commandPhylo);
+        addCommand(list, "phylo", commandPhylo);  //falta
 }
 
 #endif /* BETTER_SHELL */

@@ -15,14 +15,18 @@
 #include <stdlib.h>
 
 
-int commandKill(int argc, char **argv) {
-    printf('\n');
-    unsigned int id = atoi(argv[1]);
-    if(kill(id) == 0) 
-        printf("Process successfully killed\n");
-    else
-        printf("Process kill failed\n");
-    
+int commandWc(int argc, char **argv){
+    char c;
+    int lineCount = 0;
+
+    while ((c = getChar()) != EOF) {
+        printf(c);
+
+        if (c == '\n') {
+            lineCount++;
+        }
+    }
+    printf("\n\nLine Count: %d\n", lineCount);
+    processKiller();
     return 1;
 }
-

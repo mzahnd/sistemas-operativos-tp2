@@ -53,15 +53,7 @@
 //     return 1;
 // }
 
-// static void commandCat(int argc, char **argv) {
-//     putChar('\n');
-//     char c;
-//     while((c = getChar()) != '\n' && c != (char) EOF) {
-//         putChar(c);
-//     }
-//     putChar('\n');
-//     processKiller();
-// }
+
 
 // int catFunc(int argc, char **argv) {
 //     return buildProcess("cat", cat, args);

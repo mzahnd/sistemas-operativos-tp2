@@ -14,15 +14,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-int commandKill(int argc, char **argv) {
-    printf('\n');
+int commandBlock(int argc, char **argv) {
+    putChar('\n');
     unsigned int id = atoi(argv[1]);
-    if(kill(id) == 0) 
-        printf("Process successfully killed\n");
-    else
-        printf("Process kill failed\n");
+    if(block(id) == 0) {
+        printf("Process successfully blocked\n");
+    } else {
+        printf("Process failed to block\n");
+    }
     
     return 1;
 }
-

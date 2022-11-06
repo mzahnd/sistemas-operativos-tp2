@@ -14,15 +14,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-int commandKill(int argc, char **argv) {
+int commandCat(int argc, char **argv) {
+  
+    char c;
+    while((c = getChar()) != EOF) {
+      printf(c);
+    }
     printf('\n');
-    unsigned int id = atoi(argv[1]);
-    if(kill(id) == 0) 
-        printf("Process successfully killed\n");
-    else
-        printf("Process kill failed\n");
-    
+    processKiller();
     return 1;
 }
-

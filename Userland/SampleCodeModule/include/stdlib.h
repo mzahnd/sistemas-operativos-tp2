@@ -13,6 +13,7 @@
 
 #ifndef NULL
 #define NULL 0
+#define EOF -1
 #endif /* NULL */
 
 #include <stddef.h> /* size_t */

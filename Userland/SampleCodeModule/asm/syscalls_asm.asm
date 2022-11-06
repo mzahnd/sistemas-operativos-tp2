@@ -31,9 +31,9 @@ GLOBAL semaphorePostSyscall
 GLOBAL semaphoreWaitSyscall
 GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
+GLOBAL getPIDSyscall
 GLOBAL getCurrentProcessFDSyscall
 
-GLOBAL psSyscall
 GLOBAL niceSyscall
 section .text
 
@@ -408,6 +408,17 @@ waitPIDSyscall:
     pop rbp
     ret
 
+getPIDSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 16; getCurrentPRocessPID syscall
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
 getCurrentProcessFDSyscall:
     push rbp
     mov rbp, rsp
@@ -418,6 +429,7 @@ getCurrentProcessFDSyscall:
     mov rsp, rbp
     pop rbp
     ret
+
 niceSyscall:    ;changeProcessPriority
     push rbp
     mov rbp, rsp

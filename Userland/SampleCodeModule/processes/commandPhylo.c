@@ -13,16 +13,8 @@
 #include <syscalls_asm.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <phylo.h>
 
-
-int commandKill(int argc, char **argv) {
-    printf('\n');
-    unsigned int id = atoi(argv[1]);
-    if(kill(id) == 0) 
-        printf("Process successfully killed\n");
-    else
-        printf("Process kill failed\n");
+int commandPhylo(char *name, int argc, char **argv) {
     
-    return 1;
 }
-

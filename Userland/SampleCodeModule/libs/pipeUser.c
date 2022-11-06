@@ -18,20 +18,6 @@ int pipe(int fildes[PIPE_N_FD])
         return ret;
 }
 
-ssize_t read(int fd, char *buf, size_t count)
-{
-        ssize_t ret;
-        pipeReadSyscall(fd, buf, count, &ret);
-        return ret;
-}
-
-ssize_t write(int fd, const char *buf, size_t count)
-{
-        ssize_t ret;
-        pipeWriteSyscall(fd, buf, count, &ret);
-        return ret;
-}
-
 int close(int fd)
 {
         int ret;

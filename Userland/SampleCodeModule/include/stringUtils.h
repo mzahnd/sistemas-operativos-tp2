@@ -14,10 +14,12 @@
 unsigned int strlen(char *);
 char *strcat(char *destination, const char *source);
 char *strcpy(char *destination, const char *source);
+char* strncpy(char* destination, const char* source, unsigned int num);
 int strcmp(const char *, const char *);
 void reverseStr(char str[]);
 int isAlpha(int ch);
 int isDigit(int ch);
 int isSymbol(int ch);
+int isWritable(int ch);
 
 #endif /* STRING_UTILS_H */

@@ -44,7 +44,7 @@ void initScheduler()
 {
         scheduler_initialized = 1;
         queue = newCircularQueue();
-        createAndAddProcess("___HLT___", haltProcess, 0, NULL, 0);
+        createAndAddProcess("___HLT___", haltProcess, 0, NULL, 0, 0, 1);
         totalReady--; // Halt process should not count as ready for the scheduler
 }
 
@@ -129,7 +129,7 @@ void addProcess(process p)
 }
 
 uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
-                             char **argv, uint64_t foreground)
+                             char **argv, uint64_t foreground, uint64_t stdin, uint64_t stdout)
 {
         if (!scheduler_initialized || queue == NULL) {
                 return 0;
@@ -154,7 +154,7 @@ uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
                 foregroundProcessPID = pid;
         }
 
-        process p = createProcess(name, pid, ppid, mainF, argc, argv);
+        process p = createProcess(name, pid, ppid, mainF, argc, argv, stdin, stdout);
         addToQueue(queue, p);
         totalReady++;
         return pid;
@@ -295,6 +295,29 @@ void unlockWaitingProcesses(process p)
         for (int i = 0; i < p->waitingCount; i++) {
                 unlockProcessByPID(p->waitingPIDs[i]);
         }
+}
+
+int getCurrentStdin() {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return -1;
+        }
+        return currentNode->pcb->stdin;
+}
+
+int getCurrentStdout() {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return -1;
+        }
+        return currentNode->pcb->stdout;
+}
+
+void getCurrentProcessFDs(int *fds) {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return -1;
+        }
+        process current = currentNode->pcb;
+        fds[0] = current->stdin;
+        fds[1] = current->stdout;
 }
 
 #endif /* SCHEDULER */

@@ -35,12 +35,20 @@ typedef struct process_t {
         uint64_t waitingCount;
         uint64_t waitingPIDs[MAX_WAITING_COUNT];
         uint64_t sleepingCyclesLeft;
+        uint64_t stdin;
+        uint64_t stdout;
+
+        // result = close(fds[0]);
+        // printf("[Call] %d = close(%d)\n", result, fds[0]);
+
+        // result = close(fds[1]);
+        // printf("[Call] %d = close(%d)\n", result, fds[1]);
 } process_t;
 
 typedef process_t *process;
 
 process createProcess(char *name, uint64_t pid, uint64_t ppid,
-                      int (*mainF)(int, char **), int argc, char **argv);
+                      int (*mainF)(int, char **), int argc, char **argv, uint64_t stdin, uint64_t stdout);
 void freeProcess(process p);
 
 #endif /* PROCESS_H */

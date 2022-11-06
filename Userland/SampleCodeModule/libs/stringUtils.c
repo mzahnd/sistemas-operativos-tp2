@@ -57,6 +57,23 @@ char *strcpy(char *destination, const char *source)
         return ptr;
 }
 
+char* strncpy(char* destination, const char* source, unsigned int num)
+{
+    if (destination == NULL) {
+        return NULL;
+    }
+    char* ptr = destination;
+    while (*source && num--)
+    {
+        *destination = *source;
+        destination++;
+        source++;
+    }
+ 
+    *destination = '\0';
+    return ptr;
+}
+
 int strcmp(const char *str1, const char *str2)
 {
         while (*str1 && *str1 == *str2) {
@@ -82,13 +99,17 @@ int isAlpha(int ch)
 
 int isDigit(int ch)
 {
-        return (ch >= '0' && ch <= '1');
+        return (ch >= '0' && ch <= '9');
 }
 
 int isSymbol(int ch)
 {
         return (ch >= ' ' && ch <= '/') || (ch >= ':' && ch <= '@') ||
                (ch >= '[' && ch <= '`') || (ch >= '{' && ch <= '~');
+}
+
+int isWritable(int ch) {
+        return ch >= ' ' && ch <= '~';
 }
 
 #endif /* STRING_UTILS */

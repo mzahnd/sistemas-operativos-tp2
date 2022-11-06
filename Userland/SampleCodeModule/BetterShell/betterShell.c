@@ -52,12 +52,15 @@ static void initCommands(commandList list);
 static shellLinesQueue lines;
 
 int testPrint1(int argc, char** argv) {
-        printf("ASD");
+        printf("FIRST PRINT\n");
+        printf("Second Print\n");
 }
 
 int testRead1(int argc, char** argv) {
         char* buffer[64] = {0};
+        printf("Before Read\n");
         read(STDIN, buffer, 64);
+        printf("After Read");
         printf("Read from STDIN: [%s]\n", buffer);
 }
 
@@ -85,9 +88,6 @@ int runShell(int argc, char **argv)
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
         initCommands(commands);
-        // addCommand(commands, "test", testPipes);
-        // addCommand(commands, "testRead", testRead);
-        // addCommand(commands, "testWrite", testWrite);
 
         lines = newShellLines(64);
 
@@ -376,8 +376,8 @@ static void initCommands(commandList list) {
                 return;
         }
         addCommand(list, "test", testPipes);
-        addCommand(list, "testRead", testRead1);
-        addCommand(list, "testWrite", testPrint1);
+        addCommand(list, "a", testRead1);
+        addCommand(list, "b", testPrint1);
 //         addCommand(list, "sh", commandSh);
         addCommand(list, "help", commandHelp);
         addCommand(list, "mem", commandMem);

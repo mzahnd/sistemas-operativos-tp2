@@ -31,6 +31,7 @@ GLOBAL semaphorePostSyscall
 GLOBAL semaphoreWaitSyscall
 GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
+GLOBAL getCurrentProcessFDSyscall
 
 GLOBAL psSyscall
 GLOBAL niceSyscall
@@ -232,6 +233,9 @@ createProcessSyscall:
     push rbp
     mov rbp, rsp
 
+    mov r10, [rbp+2*8] ;sexto argumento
+    mov r11, [rbp+3*8] ;septimo argumento
+
     mov rax, 20 ;ID createProcess
     int 80h
 
@@ -404,17 +408,16 @@ waitPIDSyscall:
     pop rbp
     ret
 
-psSyscall:  ;printProcessList
+getCurrentProcessFDSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 17
+    mov rax, 45; ID getCurrentProcessFD
     int 80h
 
     mov rsp, rbp
     pop rbp
     ret
-
 niceSyscall:    ;changeProcessPriority
     push rbp
     mov rbp, rsp

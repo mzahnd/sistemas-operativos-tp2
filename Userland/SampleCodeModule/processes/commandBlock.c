@@ -14,6 +14,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static int block(int pid) {
+    int ans;
+    blockSyscall(pid, &ans); 
+    return ans;
+}
+
 int commandBlock(int argc, char **argv) {
     putChar('\n');
     unsigned int id = atoi(argv[1]);

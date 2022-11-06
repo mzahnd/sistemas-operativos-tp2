@@ -34,9 +34,5 @@ int commandPhylo(int argc, char **argv);
 
 void processKiller();
 int getPid();
-int nice(int pid, int prio);
-int block(int pid);
-int unblock(int pid);
-int kill(int pid);
 
 #endif /* PROCESSES_H */

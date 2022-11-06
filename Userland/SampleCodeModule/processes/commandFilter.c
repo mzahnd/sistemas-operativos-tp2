@@ -22,7 +22,7 @@ int commandFilter(int argc, char **argv) {
     unsigned int i = 0;
 
     while((c = getChar()) != '\n'){
-        putChar(c);
+        printf(c);
         if(!isVowel(c)) {
             // strcat(buffer, c, &i);
             buffer[i++] = c;

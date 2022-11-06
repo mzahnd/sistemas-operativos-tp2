@@ -2,6 +2,12 @@
 #include <syscalls_asm.h>
 #include <stdio.h>
 
+static int nice(int pid, int prio){
+    int ans;
+    niceSyscall(pid, prio, &ans);
+    return ans;
+}
+
 int commandNice(int argc, char **argv) {
     putChar('\n');
     int id = atoi(argv[1]);

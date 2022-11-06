@@ -14,6 +14,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static int kill(int pid){
+    int ans;
+    killSyscall(pid, &ans);
+    return ans;
+}
 
 int commandKill(int argc, char **argv) {
     printf('\n');

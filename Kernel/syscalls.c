@@ -283,6 +283,11 @@ void syscallHandler(registerStruct *registers)
                 sys_sopipe_getinformation((int)registers->rdi,
                                           (pipe_info_t **)registers->rsi);
                 break;
+        
+        case 45:
+                //rdi -> int[2]: array to file descriptors
+                getCurrentProcessFDs((int *)registers->rdi);
+                break;
         }
 }
 

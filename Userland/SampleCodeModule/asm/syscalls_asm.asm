@@ -30,6 +30,7 @@ GLOBAL semaphorePostSyscall
 GLOBAL semaphoreWaitSyscall
 GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
+GLOBAL getCurrentProcessFDSyscall
 
 section .text
 
@@ -218,6 +219,9 @@ createProcessSyscall:
     push rbp
     mov rbp, rsp
 
+    mov r10, [rbp+2*8] ;sexto argumento
+    mov r11, [rbp+3*8] ;septimo argumento
+
     mov rax, 20 ;ID createProcess
     int 80h
 
@@ -384,6 +388,17 @@ waitPIDSyscall:
     mov rbp, rsp
 
     mov rax, 22; ID waitForPID
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+getCurrentProcessFDSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 45; ID getCurrentProcessFD
     int 80h
 
     mov rsp, rbp

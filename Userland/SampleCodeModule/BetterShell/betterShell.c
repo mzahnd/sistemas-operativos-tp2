@@ -50,6 +50,16 @@ void printOnShell(char *str, int dim);
 
 static shellLinesQueue lines;
 
+int testPrint1(int argc, char** argv) {
+        printf("ASD\n");
+}
+
+int testRead1(int argc, char** argv) {
+        char* buffer[64] = {0};
+        read(STDIN, buffer, 64);
+        printf("[%s]\n", buffer);
+}
+
 int testProcess2(int argc, char **argv)
 {
         for (int i = 0; i < 50; i++) {
@@ -73,9 +83,8 @@ int runShell(int argc, char **argv)
         unsigned int commandLineIndex = 0;
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
-        addCommand(commands, "initPipe", testPipes);
-        addCommand(commands, "testRead", testRead);
-        addCommand(commands, "testWrite", testWrite);
+        addCommand(commands, "testPrint", testPrint1);
+        addCommand(commands, "testRead", testRead1);
 
         lines = newShellLines(64);
 
@@ -216,7 +225,7 @@ static void processCommand(char *command, commandList commands,
                         
                         pipe(pipes[pipeIndex]);
                         if (pipeIndex == 0) { // If it is the first command 
-                                executeCommand(commands, argv, argc, STDIN, pipes[0][PIPE_FD_WRITE]);
+                                executeCommand(commands, argv, argc, 0, pipes[0][PIPE_FD_WRITE]);
                         } else {
                                 executeCommand(commands, argv, argc, pipes[pipeIndex-1][PIPE_FD_READ], pipes[pipeIndex][PIPE_FD_WRITE]);
                         }
@@ -233,9 +242,9 @@ static void processCommand(char *command, commandList commands,
         }
 
         if (pipeIndex > 0) {
-                executeCommand(commands, argv, argc, pipes[pipeIndex-1][PIPE_FD_READ], STDOUT);
+                executeCommand(commands, argv, argc, pipes[pipeIndex-1][PIPE_FD_READ], 1);
         } else {
-                executeCommand(commands, argv, argc, STDIN, STDOUT);
+                executeCommand(commands, argv, argc, 0, 1);
         }
 
         free(argv);

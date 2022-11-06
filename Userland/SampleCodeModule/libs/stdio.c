@@ -39,6 +39,12 @@ ssize_t read(int fd, char *buf, size_t count)
 
 ssize_t write(int fd, const char *buf, size_t count)
 {
+        int fds[2] = {-1, -1};
+        getCurrentProcessFDSyscall(fds);
+        if (fds[STDOUT] == STDOUT) {
+                updateConsolePointer(buf, count);
+                return count;
+        }
         ssize_t ret;
         pipeWriteSyscall(fd, buf, count, &ret);
         return ret;
@@ -103,12 +109,12 @@ void printf(char *fmt, ...)
                 }
                 i++;
         }
-        updateConsolePointer(buffer, j);
+        
 
         va_end(vl);
 
         // Call to write syscall
-        //write(STDOUT, buffer, j);
+        write(STDOUT, buffer, j);
 }
 
 void setConsoleUpdateFunction(void (*f)(char *, int))

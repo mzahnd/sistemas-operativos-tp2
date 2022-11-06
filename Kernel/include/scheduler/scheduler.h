@@ -49,5 +49,6 @@ void waitForPID(uint64_t pid);
 
 int getCurrentStdin();
 int getCurrentStdout();
+void getCurrentProcessFDs(int *fds);
 
 #endif /* SCHEDULER_H */

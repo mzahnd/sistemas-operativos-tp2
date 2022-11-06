@@ -59,4 +59,6 @@ void semaphoreOpenSyscall(const char *name, unsigned int initialValue,
 void semaphorePostSyscall(sem_t *sem, int *toReturn);
 void semaphoreWaitSyscall(sem_t *sem, int *toReturn);
 
+void getCurrentProcessFDSyscall(int fd[2]);
+
 #endif /* SYSCALLS_ASM_H */

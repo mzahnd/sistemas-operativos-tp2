@@ -21,15 +21,15 @@ uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,
                        char **argv, unsigned int foreground)
 {
         uint64_t returnPID = 0;
-        createProcessSyscall(name, mainF, argc, argv, foreground, &returnPID, STDIN, STDOUT);
+        createProcessSyscall(name, mainF, argc, argv, foreground, STDIN, STDOUT, &returnPID);
         return returnPID;
 }
 
 uint64_t createProcessWithFD(char *name, int (*mainF)(int, char **), int argc,
-                       char **argv, unsigned int foreground, uint64_t stdin, uint64_t stdout)
+                       char **argv, unsigned int foreground, unsigned int stdin, unsigned int stdout)
 {
         uint64_t returnPID = 0;
-        createProcessSyscall(name, mainF, argc, argv, foreground, &returnPID, stdin, stdout);
+        createProcessSyscall(name, mainF, argc, argv, foreground, stdin, stdout, &returnPID);
         return returnPID;
 }
 

@@ -47,4 +47,7 @@ unsigned int isCurrentProcessForeground();
 uint64_t getCurrentProcessPID();
 void waitForPID(uint64_t pid);
 
+int getCurrentStdin();
+int getCurrentStdout();
+
 #endif /* SCHEDULER_H */

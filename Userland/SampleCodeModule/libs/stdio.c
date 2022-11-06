@@ -30,6 +30,20 @@ static int updateConsoleInitialized = 0;
 
 void (*updateConsolePointer)(char *, int);
 
+ssize_t read(int fd, char *buf, size_t count)
+{
+        ssize_t ret;
+        pipeReadSyscall(fd, buf, count, &ret);
+        return ret;
+}
+
+ssize_t write(int fd, const char *buf, size_t count)
+{
+        ssize_t ret;
+        pipeWriteSyscall(fd, buf, count, &ret);
+        return ret;
+}
+
 void scanf(char *buffer)
 {
         int aux = 0;
@@ -92,6 +106,9 @@ void printf(char *fmt, ...)
         updateConsolePointer(buffer, j);
 
         va_end(vl);
+
+        // Call to write syscall
+        //write(STDOUT, buffer, j);
 }
 
 void setConsoleUpdateFunction(void (*f)(char *, int))
@@ -109,7 +126,7 @@ int getChar()
 {
         int ch = 0;
         uint64_t count;
-        readKeyboardSysCall(&ch, 1, &count);
+        pipeReadSyscall(STDIN, &ch, 1, &count);
         return ch;
 }
 

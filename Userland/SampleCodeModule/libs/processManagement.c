@@ -14,6 +14,7 @@
 #define STDOUT 1
 
 #include <syscalls_asm.h>
+#include <stdio.h>
 #include <processManagement.h>
 
 uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,

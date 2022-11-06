@@ -73,8 +73,7 @@ int runShell(int argc, char **argv)
         unsigned int commandLineIndex = 0;
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
-        addCommand(commands, "test", testProcess2);
-        addCommand(commands, "test2", testProcess3);
+        addCommand(commands, "initPipe", testPipes);
         addCommand(commands, "testRead", testRead);
         addCommand(commands, "testWrite", testWrite);
 

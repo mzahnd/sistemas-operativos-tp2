@@ -297,4 +297,18 @@ void unlockWaitingProcesses(process p)
         }
 }
 
+int getCurrentStdin() {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return -1;
+        }
+        return currentNode->pcb->stdin;
+}
+
+int getCurrentStdout() {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return -1;
+        }
+        return currentNode->pcb->stdout;
+}
+
 #endif /* SCHEDULER */

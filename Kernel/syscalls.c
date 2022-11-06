@@ -32,6 +32,7 @@
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
 void syscallCreateProcess(registerStruct *reg);
+void syscallRead(registerStruct *reg);
 
 void syscallHandler(registerStruct *registers)
 {
@@ -263,8 +264,8 @@ void syscallHandler(registerStruct *registers)
                 //rsi -> char *: buf
                 //rdx -> size_t: count
                 //rcx -> ssize_t *: result
-                sys_soread((int)registers->rdi, (char *)registers->rsi,
-                           (size_t)registers->rdx, (ssize_t *)registers->rcx);
+                syscallRead(registers);
+
                 break;
 
         case 43:
@@ -331,6 +332,27 @@ void syscallCreateProcess(registerStruct *reg)
                                               (int)reg->rdx, (char **)reg->rcx,
                                               reg->r8, reg->r9, reg->r10);
         *addressToReturn = result;
+}
+
+void syscallRead(registerStruct *reg) {
+        int fd = (int)reg->rdi;
+        if (fd == 0) { //STDIN
+                int currentProcessStdin = getCurrentStdin();
+                if (currentProcessStdin == -1) {
+                        return; // Not initialized
+                }
+                if (currentProcessStdin == 0) {
+                        char* buff =  (int *)reg->rsi;
+                        uint64_t size = (uint64_t)reg->rdx; 
+                        uint64_t* resultPtr = (uint64_t *)reg->rcx;
+                        readKeyboard(buff, size, resultPtr);
+                        return;
+                }
+                // if the stdin pipe of the process is not 0, it has a pipe where it wants to read from
+                fd = currentProcessStdin;
+        }
+        sys_soread((int)reg->rdi, (char *)reg->rsi,
+                (size_t)reg->rdx, (ssize_t *)reg->rcx);
 }
 
 #endif /* SYSCALLS */

@@ -33,10 +33,10 @@ int commandPipe(int argc, char **argv);
 int commandPhylo(int argc, char **argv);
 
 void processKiller();
-uint64_t getPid();
-int nice(uint64_t pid, uint64_t prio);
-int block(uint64_t pid);
-int unblock(uint64_t pid);
-int kill(uint64_t pid);
+int getPid();
+int nice(int pid, int prio);
+int block(int pid);
+int unblock(int pid);
+int kill(int pid);
 
 #endif /* PROCESSES_H */

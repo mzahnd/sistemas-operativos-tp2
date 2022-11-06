@@ -40,7 +40,6 @@ static void processCommand(char *command, commandList commands,
                            unsigned int *indexPtr);
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim);
-static processFunciton getProcess(char *name);
 static void addToTokens(char *tokens[MAX_COMMAND_TOKENS], char *token, unsigned int *index);
 static void executeCommand(commandList commands, char ** argv, int argc, unsigned int stdin, unsigned int stdout);
 

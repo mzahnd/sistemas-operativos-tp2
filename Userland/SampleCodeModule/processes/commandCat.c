@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define EOF -1
+
 int commandCat(int argc, char **argv) {
   
     char c;

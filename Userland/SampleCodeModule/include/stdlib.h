@@ -26,6 +26,7 @@ int iabs(int num);
 int atohex(char *str);
 char toUpper(char letter);
 char toLower(char letter);
+int isVowel(char letter);
 int round(double number);
 void reverseStr(char str[]);
 void *malloc(unsigned int size);

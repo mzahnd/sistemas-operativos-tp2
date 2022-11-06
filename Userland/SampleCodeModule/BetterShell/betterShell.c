@@ -376,8 +376,8 @@ static void initCommands(commandList list) {
                 return;
         }
         addCommand(list, "test", testPipes);
-        addCommand(list, "testRead", testRead);
-        addCommand(list, "testWrite", testWrite);
+        addCommand(list, "testRead", testRead1);
+        addCommand(list, "testWrite", testPrint1);
 //         addCommand(list, "sh", commandSh);
         addCommand(list, "help", commandHelp);
         addCommand(list, "mem", commandMem);

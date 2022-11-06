@@ -32,6 +32,9 @@ GLOBAL semaphoreWaitSyscall
 GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
 
+GLOBAL memSyscall
+GLOBAL psSyscall
+GLOBAL niceSyscall
 section .text
 
 
@@ -396,6 +399,39 @@ waitPIDSyscall:
     mov rbp, rsp
 
     mov rax, 22; ID waitForPID
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+memSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 28
+    int 80h
+    
+    mov rsp, rbp
+    pop rbp
+    ret
+
+psSyscall:  ;printProcessList
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 17
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+niceSyscall:    ;changeProcessPriority
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 18
     int 80h
 
     mov rsp, rbp

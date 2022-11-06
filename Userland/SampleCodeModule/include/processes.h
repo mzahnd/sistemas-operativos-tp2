@@ -22,7 +22,7 @@ int commandMem(int argc, char **argv);
 int commandPs(int argc, char **argv);
 // static void commandLoop(int argc, char **argv);
 // int commandKill(int argc, char **argv);
-// int commandNice(int argc, char **argv);
+int commandNice(int argc, char **argv);
 // int commandBlock(int argc, char **argv);
 int commandSem(int argc, char **argv);
 // void commandCat(int argc, char **argv);

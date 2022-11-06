@@ -63,4 +63,8 @@ void semaphoreOpenSyscall(const char *name, unsigned int initialValue,
 void semaphorePostSyscall(sem_t *sem, int *toReturn);
 void semaphoreWaitSyscall(sem_t *sem, int *toReturn);
 
+void memSyscall(char *str, int strSize);
+void psSyscall(char *);
+void niceSyscall(uint64_t pid, uint64_t priority, int *result);
+
 #endif /* SYSCALLS_ASM_H */

@@ -28,22 +28,7 @@
 //     return 1;
 // }
 
-// int commandNice(int argc, char **argv) {
-//     putChar('\n');
-//     uint64_t id = atoi(args[1]);
-//     uint64_t priority = atoi(args[2]);
-//     if(id < 0 || priority <= 0) {
-//         printf("Invalid arguments\n");
-//         return -1;
-//     }
-//     if(nice(id, priority) < 0) {
-//         printf("Priority change failed\n");
-//     } else {
-//         printf("Priority successfully changed\n");
-//     }
-    
-//     return 1;
-// }
+
 
 // int commandBlock(int argc, char **argv) {
 //     putChar('\n');

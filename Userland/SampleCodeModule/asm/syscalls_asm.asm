@@ -34,6 +34,10 @@ GLOBAL waitPIDSyscall
 GLOBAL getPIDSyscall
 GLOBAL getCurrentProcessFDSyscall
 
+GLOBAL changeProcessPrioritySyscall
+GLOBAL changeProcessStatusSyscall
+GLOBAL killProcessSyscall
+
 GLOBAL niceSyscall
 section .text
 
@@ -430,11 +434,34 @@ getCurrentProcessFDSyscall:
     pop rbp
     ret
 
-niceSyscall:    ;changeProcessPriority
+changeProcessPrioritySyscall:    ;changeProcessPriority
     push rbp
     mov rbp, rsp
 
-    mov rax, 18
+    mov rax, 23
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+    
+changeProcessStatusSyscall:    ;changeProcessPriority
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 24
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+killProcessSyscall:    ;changeProcessPriority
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 25
     int 80h
 
     mov rsp, rbp

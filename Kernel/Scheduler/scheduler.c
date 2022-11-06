@@ -207,6 +207,27 @@ void unlockCurrentProcess()
         totalReady++;
 }
 
+void lockProcessByPID(uint64_t pid) {
+        if (!scheduler_initialized || queue == NULL || queue->size == 0) {
+                return;
+        }
+        process p = getFromPID(queue, pid);
+        if (p == NULL) {
+                return;
+        }
+        if (p->status == READY) {
+                p->status = BLOCKED;
+                totalReady--;
+                if (currentNode->pcb->pid == p->pid) {
+                        currentProcessCycle =
+                                MAX_PROCESS_PRIORITY + 1; // To force the context Switch
+                        _sti();
+                        forceTimerTick();
+                }
+        }
+        
+}
+
 void unlockProcessByPID(uint64_t pid)
 {
         if (!scheduler_initialized || queue == NULL || queue->size == 0) {
@@ -227,6 +248,26 @@ void unlockProcessByPID(uint64_t pid)
                         return;
                 }
                 current = current->next;
+        }
+}
+
+void killProcessByPID(unsigned int pid) {
+        if (!scheduler_initialized || queue == NULL || queue->size == 0) {
+                return;
+        }
+        process p = getFromPID(queue, pid);
+        if (p == NULL) {
+                return;
+        }
+        if (p->status == READY) {
+                totalReady--;
+        }
+        p->status = KILLED;
+        if (p->pid == currentNode->pcb->pid) {
+                currentProcessCycle =
+                                MAX_PROCESS_PRIORITY + 1; // To force the context Switch
+                        _sti();
+                        forceTimerTick();
         }
 }
 
@@ -318,6 +359,37 @@ void getCurrentProcessFDs(int *fds) {
         process current = currentNode->pcb;
         fds[0] = current->stdin;
         fds[1] = current->stdout;
+}
+
+void changeProcessPriority(unsigned int PID, unsigned int priority) {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return;
+        }
+
+        if (priority > MAX_PROCESS_PRIORITY) {
+                return;
+        }
+
+        process p = getFromPID(queue, PID);
+        if (p == NULL) {
+                return;
+        }
+        p->priority = priority;
+}
+
+void changeProcessStatus(unsigned int PID) {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return;
+        }
+        process p = getFromPID(queue, PID);
+        if (p == NULL || p->status == KILLED) {
+                return;
+        }
+        if (p->status == READY) {
+                lockProcessByPID(PID);
+        } else {
+                unlockProcessByPID(PID);
+        }
 }
 
 #endif /* SCHEDULER */

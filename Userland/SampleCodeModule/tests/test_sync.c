@@ -29,7 +29,7 @@ int64_t global; //shared memory
 void slowInc(int64_t *p, int64_t inc)
 {
         uint64_t aux = *p;
-        /* giveUpCPU(); //This makes the race condition highly probable */
+        giveUpCPU(); //This makes the race condition highly probable
         aux += inc;
         *p = aux;
 }
@@ -96,10 +96,10 @@ int test_sync(uint64_t argc, char *argv[])
         }
 
         // TODO: What's this?
-        /* for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) { */
-        /*         my_wait(pids[i]); */
-        /*         my_wait(pids[i + TOTAL_PAIR_PROCESSES]); */
-        /* } */
+        for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) { 
+                waitPID(pids[i]); 
+                waitPID(pids[i + TOTAL_PAIR_PROCESSES]);
+        }
 
         printf("Final value: %d\n", global);
 

@@ -4,8 +4,9 @@
 #include <string.h>
 
 /* Header to test */
-#define MEM_HEAP_SIZE (2 * 1024 * 1024) // 2 MiB. For faster tests
 #include "../../../Kernel/include/mem/memory.h"
+#undef MEM_HEAP_SIZE
+#define MEM_HEAP_SIZE (2 * 1024 * 1024) // 2 MiB. For faster tests
 
 /* This file's header */
 #include "memory.h"

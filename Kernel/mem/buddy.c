@@ -18,8 +18,13 @@
 
 #ifdef TESTING
 #pragma message("TESTING defined")
+
+#undef MEM_HEAP_SIZE
+#define MEM_HEAP_SIZE (2 * 1024 * 1024) // 2 MiB. For faster tests
+
 #undef MEM_HEAP_START_ADDR
 #define MEM_HEAP_START_ADDR (test_get_mem_heap_start_addr())
+
 #endif /* TESTING */
 
 /* ------------------------------ */
@@ -54,7 +59,7 @@ enum { AVAILABLE = 0, IN_USE = 1 };
 typedef struct NODE {
         int state;
         unsigned int index;
-        /* unsigned int level; */
+        unsigned int level;
 
         void *address;
 } node_t;
@@ -62,18 +67,21 @@ typedef struct NODE {
 /* ------------------------------ */
 
 /* Prototypes */
-static void mem_init();
+static inline void mem_init();
 static unsigned int get_level(size_t size);
 static node_t *get_leftmost_node(unsigned int level);
+static void info_update_malloc(node_t *ptr);
+static void info_update_free(node_t *ptr);
 
 #ifdef TESTING
-inline static uint64_t test_get_mem_heap_start_addr();
+static inline uint64_t test_get_mem_heap_start_addr();
 #endif /* TESTING */
 
 /* ------------------------------ */
 
 /* Globals */
 static node_t *tree_root = NULL;
+static somem_info_t memory_information = {};
 
 /* ------------------------------ */
 
@@ -89,7 +97,7 @@ void *somalloc(size_t size)
         if (tree_root[0].address != NULL)
                 return NULL;
 
-        unsigned int level = get_level(size);
+        const unsigned int level = get_level(size);
         node_t *node = get_leftmost_node(level);
         if (node == NULL)
                 return NULL;
@@ -107,8 +115,9 @@ void *somalloc(size_t size)
          *
          * See: https://en.wikipedia.org/wiki/Binary_tree#Properties_of_binary_trees
          */
-        unsigned int n_blocks_level = POW2(level);
-        unsigned int first_index_in_level = POW2(level) - 1;
+        const unsigned int n_blocks_level = POW2(level);
+        const unsigned int first_index_in_level =
+                n_blocks_level - 1; // 2^(level) - 1
 
         /* This is the operator[] equation that C uses for arrays under the 
          * hood.
@@ -120,6 +129,9 @@ void *somalloc(size_t size)
         node->address = (void *)(MEM_HEAP_START_ADDR +
                                  (MEM_HEAP_START_ADDR / n_blocks_level) *
                                          (node->index - first_index_in_level));
+
+        // Update information for Userland
+        info_update_malloc(node);
 
         return node->address;
 }
@@ -158,6 +170,9 @@ void sofree(void *ptr)
                 if (index >= BUDDY_TREE_SIZE)
                         return;
         }
+
+        // Update information for Userland
+        info_update_free(&tree_root[index]);
 
         tree_root[index].address = NULL;
         tree_root[index].state = AVAILABLE;
@@ -200,17 +215,15 @@ void sofree(void *ptr)
 
 somem_info_t *somem_getinformation()
 {
-        return NULL;
+        return &memory_information;
 }
 
 /* ------------------------------ */
 
-static void mem_init()
+static inline void mem_init()
 {
-        size_t buddy_tree_size = BUDDY_TREE_SIZE;
-
-        somemset(BUDDY_TREE_START, 0, BUDDY_TREE_SIZE);
         BUDDY_TREE_LEVELS; // Calculate max level
+        somemset(BUDDY_TREE_START, 0, BUDDY_TREE_SIZE);
 
         tree_root = (node_t *)BUDDY_TREE_START;
         tree_root->address = NULL;
@@ -253,13 +266,13 @@ static node_t *get_leftmost_node(unsigned int level)
         if (level > BUDDY_TREE_LEVELS)
                 return NULL;
 
+        const unsigned int n_blocks_level = POW2(level);
+        const unsigned int first_index_in_level =
+                n_blocks_level - 1; // 2^(level) - 1
         unsigned int parent = 0;
-        unsigned int n_blocks_level = POW2(level);
-        unsigned int first_index_in_level = n_blocks_level - 1; // 2^(level) - 1
 
         unsigned int index = first_index_in_level;
         int found = 0;
-
         while (found == 0) {
                 while (tree_root[index].state != AVAILABLE) {
                         index++;
@@ -290,6 +303,7 @@ static node_t *get_leftmost_node(unsigned int level)
 
         tree_root[index].index = index;
         tree_root[index].state = IN_USE;
+        tree_root[index].level = level;
 
         // Mark parents as "IN_USE"
         parent = 0;
@@ -297,7 +311,7 @@ static node_t *get_leftmost_node(unsigned int level)
                 parent = TREE_PARENT(index);
 
         tree_root[0].state = IN_USE;
-        while (parent != 0) {
+        while (parent > 0) {
                 tree_root[parent].state = IN_USE;
                 tree_root[parent].address = NULL;
 
@@ -305,69 +319,83 @@ static node_t *get_leftmost_node(unsigned int level)
         }
 
         return &tree_root[index];
-        /*
-        unsigned int current_level = 0;
-        // How many times to the right we've descended
-        unsigned int rdepth = 0;
-        // How many times have we hit tree_root node
-        int hit_root = 0;
+}
 
-        while (hit_root < 2) {
-                while (current_level < level) {
-                        index = TREE_LEFT_CHILD(index);
-                        current_level++;
+/* ------------------------------ */
+
+static void info_update_malloc(node_t *ptr)
+{
+        if (ptr == NULL)
+                return;
+
+        memory_information.n_reserved_blocks++;
+
+        const size_t mod_size = MEM_HEAP_SIZE / POW2(ptr->level);
+
+        memory_information.reserved_size += mod_size;
+        memory_information.user_size += mod_size;
+        memory_information.free_size -= mod_size;
+
+        if (ptr->address < memory_information.first_address)
+                memory_information.first_address = ptr->address;
+}
+
+/* ------------------------------ */
+
+static void info_update_free(node_t *ptr)
+{
+        if (ptr == NULL)
+                return;
+
+        memory_information.n_reserved_blocks--;
+
+        const unsigned int n_blocks_level = POW2(ptr->level);
+
+        // MEM_HEAP_SIZE / 2^(level)
+        const size_t mod_size = MEM_HEAP_SIZE / n_blocks_level;
+
+        memory_information.reserved_size -= mod_size;
+        memory_information.user_size -= mod_size;
+        memory_information.free_size += mod_size;
+
+        if (ptr->address == memory_information.first_address) {
+                // No blocks reserved
+                if (tree_root[0].state == AVAILABLE) {
+                        memory_information.first_address = NULL;
+                        return;
                 }
 
-                if (tree_root[index].state == AVAILABLE) {
-                        tree_root[index].index = index;
-                        tree_root[index].state = IN_USE;
+                unsigned int overflow_index = POW2(BUDDY_TREE_LEVELS) - 1;
+                unsigned int index = 0;
+                unsigned int child = 0;
 
-                        // Mark parents as "IN_USE"
-                        unsigned int parent = TREE_PARENT(index);
-                        tree_root[0].state = IN_USE;
-                        while (parent != 0) {
-                                tree_root[parent].state = IN_USE;
-                                parent = TREE_PARENT(parent);
-                        }
+                while (index < overflow_index &&
+                       tree_root[index].address == NULL) {
+                        child = TREE_LEFT_CHILD(index);
 
-                        return &tree_root[index];
+                        if (tree_root[child].state == IN_USE)
+                                index = child;
+                        else
+                                index = TREE_RIGHT_CHILD(index);
                 }
 
-                if (index % 2 == 0) { // Right child
-                        while (rdepth > 0) {
-                                index = TREE_PARENT(index);
-                                rdepth--;
-                                current_level--;
-                        }
-
-                        index = TREE_PARENT(index);
-                        if (index == 0)
-                                hit_root++;
-
-                        index = TREE_RIGHT_CHILD(index);
-
-                        rdepth = 1;
-                } else { // Left child
-                        index = TREE_PARENT(index);
-                        if (index == 0)
-                                hit_root++;
-
-                        index = TREE_RIGHT_CHILD(index);
-                        rdepth++;
-                }
+                if (index == overflow_index)
+                        memory_information.first_address = NULL;
+                else
+                        memory_information.first_address =
+                                tree_root[index].address;
         }
-
-        // Hit root == 2 --> no blocks available
-        return NULL;
-        */
 }
 
 /* ------------------------------ */
 
 #ifdef TESTING
-inline static uint64_t test_get_mem_heap_start_addr()
+static inline uint64_t test_get_mem_heap_start_addr()
 {
-        static uint64_t heap_mem_addr[MEM_HEAP_SIZE + (POW2(22 + 1))] = { 0 };
+        // Hardcoded to avoid creating a VLA.
+        // 15 = BUDDY_TREE_LEVELS = log2(MEM_HEAP_SIZE / MINIMUM_BLOCK_SIZE)
+        // Where MEM_HEAP_SIZE = 2MiB and MINIMUM_BLOCK_SIZE = 64
+        static uint64_t heap_mem_addr[MEM_HEAP_SIZE + (POW2(15 + 1))] = { 0 };
 
         return (uint64_t)&heap_mem_addr;
 }

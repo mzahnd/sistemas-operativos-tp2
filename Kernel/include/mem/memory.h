@@ -17,10 +17,7 @@
 // Pure64 free memory starts at 0x100000. Leave 256 MiB for non-heap stuff
 #define MEM_HEAP_START_ADDR (0x100000 << 8)
 
-// HEAP_SIZE can be externally defined
-#ifndef MEM_HEAP_SIZE
 #define MEM_HEAP_SIZE (256 * 1024 * 1024) // 256 MiB
-#endif
 
 typedef struct {
         unsigned int n_reserved_blocks;

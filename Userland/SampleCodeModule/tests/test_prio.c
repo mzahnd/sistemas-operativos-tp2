@@ -96,4 +96,6 @@ int test_prio(int argc, char *argv[])
                 char **cargv = create_argv("commandKill", &cargc, 1, pids[i]);
                 commandKill(cargc, cargv);
         }
+
+        return 0;
 }

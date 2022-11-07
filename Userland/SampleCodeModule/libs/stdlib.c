@@ -166,7 +166,8 @@ mem_info_t *mem_getinformation()
         return result;
 }
 
-void giveUpCPU() {
+void giveUpCPU()
+{
         giveUpCPUSyscall();
 }
 

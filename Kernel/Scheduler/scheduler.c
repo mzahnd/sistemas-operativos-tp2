@@ -399,7 +399,8 @@ void changeProcessStatus(unsigned int PID)
         }
 }
 
-void giveUpCPU() {
+void giveUpCPU()
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return;
         }

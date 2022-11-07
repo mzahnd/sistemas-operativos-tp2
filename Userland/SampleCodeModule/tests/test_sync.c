@@ -96,8 +96,8 @@ int test_sync(uint64_t argc, char *argv[])
         }
 
         // TODO: What's this?
-        for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) { 
-                waitPID(pids[i]); 
+        for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
+                waitPID(pids[i]);
                 waitPID(pids[i + TOTAL_PAIR_PROCESSES]);
         }
 

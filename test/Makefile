@@ -46,7 +46,7 @@ $(EXE_TEST): $(ALL_OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 %.o: %.c
-	$(CC) -c $(CCFLAGS) -I$(INCLUDE) $< -o $@
+	$(CC) -c $(CCFLAGS) $(EXTRA_CFLAGS) -I$(INCLUDE) $< -o $@
 
 clean:
 	$(RMDIR) $(EXE_TEST) $(ALL_OBJS)

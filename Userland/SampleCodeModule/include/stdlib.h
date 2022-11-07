@@ -16,6 +16,7 @@
 #endif /* NULL */
 
 #include <stddef.h> /* size_t */
+#include <syscalls_definitions.h> /* mem_info_t */
 
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);
@@ -29,5 +30,6 @@ void reverseStr(char str[]);
 void *malloc(unsigned int size);
 void *calloc(size_t nmemb, size_t size);
 void free(void *ptr);
+mem_info_t *mem_getinformation();
 
 #endif /* STDLIB_H */

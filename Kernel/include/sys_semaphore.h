@@ -95,6 +95,6 @@ void sys_sosem_wait(sosem_t *sem, int *result);
  * @param sem Address of the unnamed semaphore to wait
  * @param result 0 on success; -1 otherwise
  */
-void sys_sosem_getinformation(sosem_t *sem, sosem_info_t **result);
+void sys_sosem_getinformation(sosem_info_t *last, sosem_info_t **result);
 
 #endif /* SYS_SEMAPHORE_H */

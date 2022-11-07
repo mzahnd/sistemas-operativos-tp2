@@ -61,9 +61,9 @@ int sem_wait(sem_t *sem)
         return ret;
 }
 
-sem_info_t *sem_getinformation(sem_t *restrict sem)
+sem_info_t *sem_getinformation(sem_info_t *restrict last)
 {
         sem_info_t *sp;
-        semaphoreGetInformationSyscall(sem, &sp);
+        semaphoreGetInformationSyscall(last, &sp);
         return sp;
 }

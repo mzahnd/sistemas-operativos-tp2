@@ -30,12 +30,14 @@ void getTimeSyscall(uint8_t mode, uint8_t *target);
 void getTicksSyscall(uint64_t *ticks);
 void getRegistersSyscall(uint64_t *registers);
 void getMemSyscall(uint64_t, uint64_t *, uint8_t);
+
 void readErrorSyscall(uint64_t *err);
 void setTimerFunctionSyscall(int index, int tickInterval, void (*)());
 void deleteTimerFunctionSyscall(int index);
 void mallocSyscall(size_t size, void **result);
 void callocSyscall(size_t nmemb, size_t size, void **result);
 void freeSyscall(void *ptr);
+void memGetInformationSyscall(mem_info_t** result);
 void createProcessSyscall(char *name, int (*mainFunction)(int, char **),
                           int argc, char **argv, uint64_t foreground,
                           uint64_t *returnedPID);
@@ -43,14 +45,16 @@ void getSchedulerInfoSyscall(schInfo_t *);
 void waitPIDSyscall(uint64_t pid);
 
 void pipeCloseSyscall(int fd, int *toReturn);
-void pipeGetInformationSyscall(int fd, pipe_info_t **toReturn);
+void pipeGetInformationSyscall(pipe_info_t *restrict last,
+                               pipe_info_t **toReturn);
 void pipePipeSyscall(int fildes[PIPE_N_FD], int *toReturn);
 void pipeReadSyscall(int fd, char *buf, size_t count, ssize_t *toReturn);
 void pipeWriteSyscall(int fd, const char *buf, size_t count, ssize_t *toReturn);
 
 void semaphoreCloseSyscall(sem_t *sem, int *toReturn);
 void semaphoreDestroySyscall(sem_t *sem, int *toReturn);
-void semaphoreGetInformationSyscall(sem_t *restrict sem, sem_info_t **toReturn);
+void semaphoreGetInformationSyscall(sem_info_t *restrict sem,
+                                    sem_info_t **toReturn);
 void semaphoreGetValueSyscall(sem_t *sem, unsigned int *restrict sval,
                               int *toReturn);
 void semaphoreInitSyscall(sem_t *sem, unsigned int initialValue, int *toReturn);

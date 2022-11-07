@@ -66,6 +66,6 @@ void sys_soclose(int fd, int *result);
  * @param fd File descriptor of a pipe
  * @param result Structure with information about the pipe that contains fd
  */
-void sys_sopipe_getinformation(int fd, pipe_info_t **result);
+void sys_sopipe_getinformation(sopipe_info_t * last, sopipe_info_t **result);
 
 #endif /* SYS_PIPES_H */

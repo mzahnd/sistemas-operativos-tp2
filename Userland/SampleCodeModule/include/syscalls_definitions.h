@@ -24,6 +24,14 @@
 
 #define SEM_MAX_WAITING (2 << 4) // 32
 
+/* ---------- memory manager ---------- */
+#define MEM_HEAP_START_ADDR (0x100000 << 8)
+
+// HEAP_SIZE can be externally defined
+#ifndef MEM_HEAP_SIZE
+#define MEM_HEAP_SIZE (256 * 1024 * 1024) // 256 MiB
+#endif
+
 /* ------------------------------ */
 
 /* ---------- scheduler ---------- */
@@ -48,7 +56,7 @@ typedef struct SOSEM_INFO {
 
         unsigned int value;
 
-        uint64_t waiting_pid[SEM_MAX_WAITING];
+        uint64_t *waiting_pid;
         size_t n_waiting;
 } sem_info_t;
 
@@ -70,5 +78,18 @@ typedef struct SOSEM {
 
         _sem_pid_t _processes;
 } sem_t;
+
+/* ---------- memory manager ---------- */
+typedef struct {
+        unsigned int n_reserved_blocks;
+
+        size_t reserved_size;
+        size_t user_size;
+        size_t free_size;
+
+        // Allocated memory blocks are between
+        // first_address and MEM_HEAP_START_ADDR + MEM_HEAP_SIZE
+        void *first_address;
+} mem_info_t;
 
 #endif /* SYSCALL_DEF_H */

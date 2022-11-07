@@ -38,9 +38,9 @@ static void processCommand(char *command, commandList commands,
                            unsigned int *indexPtr);
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim);
-static processFunciton getProcess(char *name);
 void setupArgv(char **argv, int argc, char *command, unsigned int commandLen);
 void printOnShell(char *str, int dim);
+static void initCommands(commandList list);
 
 static shellLinesQueue lines;
 
@@ -64,13 +64,16 @@ int runShell(int argc, char **argv)
         unsigned int commandLineIndex = 0;
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
-        addCommand(commands, "test", testPipes);
-        addCommand(commands, "testRead", testRead);
-        addCommand(commands, "testWrite", testWrite);
+        initCommands(commands);
+        // addCommand(commands, "test", testPipes);
+        // addCommand(commands, "testRead", testRead);
+        // addCommand(commands, "testWrite", testWrite);
 
         lines = newShellLines(64);
 
         setConsoleUpdateFunction(printOnShell);
+        printf("Welcome to our Operating Systems proyect!\n");
+        printf("For further options, enter 'help'");
 
         if (commandLine == NULL) {
                 //TODO: Exit
@@ -284,11 +287,6 @@ int testProcessShell(int argc, char **argv)
         return 0;
 }
 
-static processFunciton getProcess(char *name)
-{
-        return (processFunciton)testProcessShell;
-}
-
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim)
 {
@@ -303,6 +301,29 @@ static void addArgToArgv(char **argv, unsigned int index, char *str,
 
         strcpy(argv[index], str);
         argv[index][strDim + 1] = '\0';
+}
+
+static void initCommands(commandList list) {
+        if(list == NULL) {
+                return;
+        }
+        addCommand(list, "test", testPipes);
+        addCommand(list, "testRead", testRead);
+        addCommand(list, "testWrite", testWrite);
+//         addCommand(list, "sh", commandSh);
+        addCommand(list, "help", commandHelp);
+        addCommand(list, "mem", commandMem);
+        addCommand(list, "ps", commandPs);
+//         addCommand(list, "loop", commandLoop);
+//         addCommand(list, "kill", commandKill);
+//         addCommand(list, "nice", commandNice);
+//         addCommand(list, "block", commandBlock);
+        addCommand(list, "sem", commandSem);
+//         addCommand(list, "cat", commandCat);
+//         addCommand(list, "wc", commandWc);
+//         addCommand(list, "filter", commandFilter);
+        addCommand(list, "pipe", commandPipe);
+//         addCommand(list, "phylo", commandPhylo);
 }
 
 #endif /* BETTER_SHELL */

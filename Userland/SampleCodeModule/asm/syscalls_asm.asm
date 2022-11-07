@@ -14,6 +14,7 @@ GLOBAL deleteTimerFunctionSyscall
 GLOBAL mallocSyscall
 GLOBAL callocSyscall
 GLOBAL freeSyscall
+GLOBAL memGetInformationSyscall
 GLOBAL createProcessSyscall
 GLOBAL pipeCloseSyscall
 GLOBAL pipeGetInformationSyscall
@@ -208,6 +209,17 @@ freeSyscall:
     mov rbp, rsp
 
     mov rax, 18 ;ID sys_sofree
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+memGetInformationSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 19 ;ID sys_somem_getinformation
     int 80h
 
     mov rsp, rbp

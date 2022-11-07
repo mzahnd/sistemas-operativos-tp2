@@ -19,22 +19,24 @@
 enum pipe_fd { PIPE_FD_READ = 0, PIPE_FD_WRITE, PIPE_N_FD };
 
 // Information for Userland.
+#define USERLAND_FD_CLOSED -1
 typedef struct {
         const char *buffer;
         size_t size;
 
-        int fd[PIPE_N_FD];
-        int active;
-} pipe_info_t;
+        int fd[PIPE_N_FD]; // One element could be USERLAND_FD_CLOSED
+} sopipe_info_t;
 
 int sopipe(int fildes[PIPE_N_FD]);
 ssize_t soread(int fd, char *buf, size_t count);
 ssize_t sowrite(int fd, const char *buf, size_t count);
 int soclose(int fd);
 
-// Given a fd, look up for the pipe that contains it and return information
-// about it. Usefull in Userland.
-// Returns NULL if the file descriptor is not associated with any pipe.
-pipe_info_t *sopipe_getinformation(int fd);
+/* Return another pipe information.
+ *
+ * When last is NULL it returns the oldest pipe information.
+ *
+ */
+sopipe_info_t *sopipe_getinformation(sopipe_info_t *restrict last);
 
 #endif /* PIPES_H */

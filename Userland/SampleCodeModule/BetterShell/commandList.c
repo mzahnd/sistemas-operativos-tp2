@@ -74,17 +74,3 @@ processMainFunction_t getCommand(commandList list, char *name,
         *type = node->type;
         return node->command;
 }
-
-int testA(int argc, char **argv)
-{
-        printf("He vivido\n");
-        return 0;
-}
-
-void initProcesses(commandList list)
-{
-        if (list == NULL) {
-                return;
-        }
-        addCommand(list, "test", testA);
-}

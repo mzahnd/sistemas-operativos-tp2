@@ -33,3 +33,10 @@ inline void sys_sofree(void *ptr)
 {
         sofree(ptr);
 }
+
+/* ------------------------------ */
+
+void sys_somem_getinformation(somem_info_t **result)
+{
+        (*result) = somem_getinformation();
+}

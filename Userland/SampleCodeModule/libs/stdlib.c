@@ -141,4 +141,11 @@ void free(void *ptr)
         freeSyscall(ptr);
 }
 
+mem_info_t *mem_getinformation()
+{
+        mem_info_t *result;
+        memGetInformationSyscall(&result);
+        return result;
+}
+
 #endif /* STD_LIB_C */

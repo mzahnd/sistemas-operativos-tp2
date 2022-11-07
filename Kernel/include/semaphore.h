@@ -36,7 +36,7 @@ typedef struct SOSEM_INFO {
 
         unsigned int value;
 
-        uint64_t waiting_pid[SEM_MAX_WAITING];
+        uint64_t *waiting_pid;
         size_t n_waiting;
 } sosem_info_t;
 
@@ -71,6 +71,6 @@ int sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval);
 int sosem_post(sosem_t *sem);
 int sosem_wait(sosem_t *sem);
 
-sosem_info_t *sosem_getinformation(sosem_t *restrict sem);
+sosem_info_t *sosem_getinformation(sosem_info_t *restrict last);
 
 #endif /* SEMAPHORE_H */

@@ -4,8 +4,9 @@
 #include <string.h>
 
 /* Header to test */
-#define MEM_HEAP_SIZE (2 * 1024 * 1024) // 2 MiB. For faster tests
 #include "../../../Kernel/include/mem/memory.h"
+#undef MEM_HEAP_SIZE
+#define MEM_HEAP_SIZE (2 * 1024 * 1024) // 2 MiB. For faster tests
 
 /* This file's header */
 #include "memory.h"
@@ -59,6 +60,11 @@ CuSuite *test_get_memory_suite(void)
 {
         CuSuite *const suite = CuSuiteNew();
 
+#ifdef BUDDY
+        printf("[INFO] Memory model: Buddy\n");
+#else
+        printf("[INFO] Memory model: K&R\n");
+#endif /* BUDDY */
         printf("[INFO] MEM_HEAP_SIZE: %ld\n", MEM_HEAP_SIZE);
         printf("[INFO] sizeof(memory_block): %ld\n", sizeof(memory_block));
 
@@ -81,9 +87,11 @@ CuSuite *test_get_memory_suite(void)
         /* sofree */
         SUITE_ADD_TEST(suite, test_sofree_free_old_allocs);
         SUITE_ADD_TEST(suite, test_sofree_free_all_heap);
+#ifndef BUDDY
         SUITE_ADD_TEST(suite, test_sofree_right_join_middle);
         SUITE_ADD_TEST(suite, test_sofree_left_join_middle);
         SUITE_ADD_TEST(suite, test_sofree_free_between_blocks);
+#endif /* BUDDY */
 
         printf("[INFO] Loaded memory suite.\n");
         return suite;
@@ -276,10 +284,17 @@ void test_sofree_free_old_allocs(CuTest *const ct)
 void test_sofree_free_all_heap(CuTest *const ct)
 {
         uint8_t ok_buffer[MEM_HEAP_SIZE] = { 0 };
+        size_t extra_space_for_header = 0;
+        size_t wanted_size = 0;
 
-        size_t extra_space_for_header = memblock_size + BYTE_ALIGNMENT -
-                                        (MEM_HEAP_SIZE & BYTE_ALIGNMENT_MASK);
-        size_t wanted_size = MEM_HEAP_SIZE - extra_space_for_header;
+#ifdef BUDDY
+        extra_space_for_header = 0;
+        wanted_size = MEM_HEAP_SIZE;
+#else
+        extra_space_for_header = memblock_size + BYTE_ALIGNMENT -
+                                 (MEM_HEAP_SIZE & BYTE_ALIGNMENT_MASK);
+        wanted_size = MEM_HEAP_SIZE - extra_space_for_header;
+#endif /* BUDDY */
 
         uint8_t *somalloc_all_heap = (uint8_t *)somalloc(wanted_size);
         CuAssertPtrNotNull(ct, somalloc_all_heap);

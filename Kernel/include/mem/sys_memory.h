@@ -12,6 +12,7 @@
 #define SYS_MEMORY_H
 
 #include <stddef.h> /* size_t */
+#include <mem/memory.h> /* somem_info_t */
 
 /** 
  * Wrapper around Kernel's somalloc() for Userland.
@@ -43,5 +44,15 @@ void sys_socalloc(size_t nmemb, size_t size, void **result);
  *            sys_socalloc()
  */
 void sys_sofree(void *ptr);
+
+
+/**
+ * Wrapper around Kernel's somem_getinformation() for Userland.
+ *
+ * @see Kernel's function: Kernel/include/mem/memory.h 
+ *
+ * @param result Address of memory information structure
+ */
+void sys_somem_getinformation(somem_info_t **result);
 
 #endif /* SYS_MEMORY_H */

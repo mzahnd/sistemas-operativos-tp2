@@ -38,6 +38,6 @@ int sem_getvalue(sem_t *restrict sem, unsigned int *restrict sval);
 int sem_post(sem_t *sem);
 int sem_wait(sem_t *sem);
 
-sem_info_t *sem_getinformation(sem_t *restrict sem);
+sem_info_t *sem_getinformation(sem_info_t *restrict sem);
 
 #endif /* SEMAPHORE_USER_H */

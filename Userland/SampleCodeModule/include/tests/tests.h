@@ -7,27 +7,20 @@
  *                    López, P.
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
+ *
+ * Test provistos por la cátedra.
  */
+#ifndef TESTS_H
+#define TESTS_H
+
+#include <tests/test_util.h>
+#include <stdio.h>
 #include <syscalls_asm.h>
-#include <pipeUser.h>
 
-int pipe(int fildes[PIPE_N_FD])
-{
-        int ret;
-        pipePipeSyscall(fildes, &ret);
-        return ret;
-}
+int test_mm(int argc, char *argv[]);
+int test_processes(int argc, char *argv[]);
+int test_prio(int argc, char *argv[]);
+int test_sync(int argc, char *argv[]);
+int test_no_sync(int argc, char *argv[]);
 
-int close(int fd)
-{
-        int ret;
-        pipeCloseSyscall(fd, &ret);
-        return ret;
-}
-
-pipe_info_t *pipe_getinformation(pipe_info_t *restrict last)
-{
-        pipe_info_t *ret;
-        pipeGetInformationSyscall(last, &ret);
-        return ret;
-}
+#endif

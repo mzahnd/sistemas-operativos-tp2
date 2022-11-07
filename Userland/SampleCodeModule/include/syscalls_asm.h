@@ -40,6 +40,7 @@ void freeSyscall(void *ptr);
 void memGetInformationSyscall(mem_info_t **result);
 void createProcessSyscall(char *name, int (*mainFunction)(int, char **),
                           int argc, char **argv, uint64_t foreground,
+                          uint64_t stdin, uint64_t stdout,
                           uint64_t *returnedPID);
 void getSchedulerInfoSyscall(schInfo_t *);
 void waitPIDSyscall(uint64_t pid);
@@ -62,5 +63,15 @@ void semaphoreOpenSyscall(const char *name, unsigned int initialValue,
                           sem_t **toReturn);
 void semaphorePostSyscall(sem_t *sem, int *toReturn);
 void semaphoreWaitSyscall(sem_t *sem, int *toReturn);
+
+void getCurrentProcessFDSyscall(int fd[2]);
+void niceSyscall(unsigned int pid, unsigned int priority, int *result);
+
+void getPIDSyscall(unsigned int *);
+
+void changeProcessPrioritySyscall(unsigned int pid, unsigned int newPriority);
+void changeProcessStatusSyscall(unsigned int pid);
+void killProcessSyscall(unsigned int pid);
+void sleepSyscall(unsigned int seconds);
 
 #endif /* SYSCALLS_ASM_H */

@@ -32,6 +32,7 @@
 void writeStr(registerStruct *registers);
 void getDateInfo(uint8_t mode, uint8_t *target);
 void syscallCreateProcess(registerStruct *reg);
+void syscallRead(registerStruct *reg);
 
 void syscallHandler(registerStruct *registers)
 {
@@ -171,6 +172,10 @@ void syscallHandler(registerStruct *registers)
                 //rsi -> int (*)(int, char**): Puntero a la funcion principal del procesp
                 //rdx -> int: argc
                 //rcx -> char**: argv
+                //r8 -> unsigned int: foreground Flag
+                //r9 -> uiint64_t: stdin
+                //r10 -> uint64_t: stdout
+                //r11 -> unsigned int*: address to return PID
                 syscallCreateProcess(registers);
                 break;
 
@@ -182,6 +187,33 @@ void syscallHandler(registerStruct *registers)
         case 22: // waitPID
                 //rdi -> unsigned int: pid of process to wait
                 waitForPID((uint64_t)registers->rdi);
+                break;
+
+        case 23: // Change Process Priority
+                //rdi -> unsigned int: pid
+                //rsi -> unsigned int: new priority
+                changeProcessPriority((unsigned int)registers->rdi,
+                                      registers->rsi);
+                break;
+
+        case 24: // Change Process status
+                //rdi -> unsigned int: pid
+                changeProcessStatus((unsigned int)registers->rdi);
+                break;
+
+        case 25: // Kill Process
+                //rdi -> unsigned int PID
+                killProcessByPID((unsigned int)registers->rdi);
+                break;
+
+        case 26: // Sleep
+                //rdi -> unsigned int seconds
+                putProcessToSleep((unsigned int)registers->rdi);
+                break;
+
+        case 27: //Get Current Process Pid
+                //rdi -> unsigned int *: pointer to int
+                *((unsigned int *)registers->rdi) = getCurrentProcessPID();
                 break;
 
         case 30:
@@ -264,8 +296,8 @@ void syscallHandler(registerStruct *registers)
                 //rsi -> char *: buf
                 //rdx -> size_t: count
                 //rcx -> ssize_t *: result
-                sys_soread((int)registers->rdi, (char *)registers->rsi,
-                           (size_t)registers->rdx, (ssize_t *)registers->rcx);
+                syscallRead(registers);
+
                 break;
 
         case 43:
@@ -282,6 +314,11 @@ void syscallHandler(registerStruct *registers)
                 //rsi -> pipe_info_t **: result
                 sys_sopipe_getinformation((sopipe_info_t *)registers->rdi,
                                           (sopipe_info_t **)registers->rsi);
+                break;
+
+        case 45:
+                //rdi -> int[2]: array to file descriptors
+                getCurrentProcessFDs((int *)registers->rdi);
                 break;
         }
 }
@@ -326,12 +363,33 @@ void writeStr(registerStruct *registers)
 
 void syscallCreateProcess(registerStruct *reg)
 {
-        uint64_t *addressToReturn = (uint64_t *)reg->r9;
+        uint64_t *addressToReturn = (uint64_t *)reg->r11;
         uint64_t result = createAndAddProcess((char *)reg->rdi,
                                               (int (*)(int, char **))reg->rsi,
                                               (int)reg->rdx, (char **)reg->rcx,
-                                              reg->r8);
+                                              reg->r8, reg->r9, reg->r10);
         *addressToReturn = result;
+}
+
+void syscallRead(registerStruct *reg)
+{
+        int fd = (int)reg->rdi;
+        if (fd == 0) { //STDIN
+                int currentProcessStdin = getCurrentStdin();
+                if (currentProcessStdin == -1) {
+                        return; // Not initialized
+                }
+                if (currentProcessStdin == 0) {
+                        char *buff = (int *)reg->rsi;
+                        uint64_t size = (uint64_t)reg->rdx;
+                        uint64_t *resultPtr = (uint64_t *)reg->rcx;
+                        readKeyboard(buff, size, resultPtr);
+                        return;
+                }
+                // if the stdin pipe of the process is not 0, it has a pipe where it wants to read from
+                fd = currentProcessStdin;
+        }
+        sys_soread(fd, (char *)reg->rsi, (size_t)reg->rdx, (ssize_t *)reg->rcx);
 }
 
 #endif /* SYSCALLS */

@@ -21,9 +21,13 @@
 #include <BetterShell/commandList.h>
 #include <processManagement.h>
 #include <processes.h>
+#include <pipeUser.h>
+#include <tests/tests.h> /* test_mm(); test_processes(); test_prio();
+                          * test_sync(); test_no_sync() */
 
 #define SHELL_BG_COLOR 0x001017 //BUTTERFLY_BUSH
 #define DETACH_PROCESS_CHAR '&'
+#define MAX_COMMAND_TOKENS 128
 
 typedef int (*processFunciton)(int, char *);
 
@@ -38,11 +42,35 @@ static void processCommand(char *command, commandList commands,
                            unsigned int *indexPtr);
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim);
+static void addToTokens(char *tokens[MAX_COMMAND_TOKENS], char *token,
+                        unsigned int *index);
+static void executeCommand(commandList commands, char **argv, int argc,
+                           unsigned int stdin, unsigned int stdout);
+
 void setupArgv(char **argv, int argc, char *command, unsigned int commandLen);
 void printOnShell(char *str, int dim);
 static void initCommands(commandList list);
 
 static shellLinesQueue lines;
+
+int testPrint1(int argc, char **argv)
+{
+        printf("123\n");
+        printf("456\n");
+        printf("567\n");
+        printf("890\n");
+
+        return 0;
+}
+
+int testRead1(int argc, char **argv)
+{
+        char *buffer[64] = { 0 };
+        read(STDIN, buffer, 64);
+        printf("Read from STDIN: [%s]\n", buffer);
+
+        return 0;
+}
 
 int testProcess2(int argc, char **argv)
 {
@@ -55,7 +83,10 @@ int testProcess2(int argc, char **argv)
 
 int testProcess3(int argc, char **argv)
 {
-        printf("I'm alive");
+        for (int i = 0; i < 50; i++) {
+                printf("ASDASDSADASDA: %d\n", i);
+        }
+
         return 0;
 }
 
@@ -65,10 +96,6 @@ int runShell(int argc, char **argv)
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
         initCommands(commands);
-        // addCommand(commands, "test", testPipes);
-        // addCommand(commands, "testRead", testRead);
-        // addCommand(commands, "testWrite", testWrite);
-
         lines = newShellLines(64);
 
         setConsoleUpdateFunction(printOnShell);
@@ -174,47 +201,73 @@ static void processCommand(char *command, commandList commands,
                 return;
         }
 
-        unsigned int foreground = 1; // Process is foreground by default
-        unsigned int argc = 1; // At least 1
+        char *tokens[MAX_COMMAND_TOKENS];
+        unsigned int totalTokens = 0;
 
+        char token[MAX_COMMAND_LENGTH] = { 0 };
+        unsigned int tokenIndex = 0;
         for (int i = 0; i < commandLen; i++) {
-                if (command[i] == DETACH_PROCESS_CHAR && i > 0 &&
-                    command[i - 1] == ' ') {
-                        foreground = 0;
-                        argc--;
+                if (command[i] == ' ') {
+                        if (tokenIndex == 0) {
+                                continue;
+                        }
+                        addToTokens(tokens, token, &totalTokens);
+                        //push to argv
+                        for (int j = 0; j < tokenIndex; j++) {
+                                token[j] = '\0';
+                        }
+                        tokenIndex = 0;
+                        continue;
                 }
-                if (command[i] == ' ' && command[i + 1] &&
-                    command[i + 1] != '\n' &&
-                    command[i + 1] != DETACH_PROCESS_CHAR &&
-                    command[i + 1] != ' ') {
-                        argc++;
+                token[tokenIndex] = command[i];
+                tokenIndex++;
+        }
+        token[tokenIndex - 1] = '\0'; //To remove \n
+        addToTokens(tokens, token, &totalTokens);
+
+        int totalCommands = 0;
+        unsigned int argc = 0;
+        char **argv = malloc(sizeof(char *));
+
+        int pipes[MAX_COMMAND_TOKENS][2] = { 0 };
+        int pipeIndex = 0;
+
+        for (int i = 0; i < totalTokens; i++) {
+                if (strcmp(tokens[i], "|") == 0) {
+                        pipe(pipes[pipeIndex]);
+                        if (pipeIndex == 0) { // If it is the first command
+                                executeCommand(commands, argv, argc, 0,
+                                               pipes[0][PIPE_FD_WRITE]);
+                        } else {
+                                executeCommand(
+                                        commands, argv, argc,
+                                        pipes[pipeIndex - 1][PIPE_FD_READ],
+                                        pipes[pipeIndex][PIPE_FD_WRITE]);
+                        }
+                        for (int j = 0; j < argc; j++) {
+                                argv[j] = NULL;
+                        }
+                        argc = 0;
+                        pipeIndex++;
+                        totalCommands++;
+                        continue;
                 }
+                argv[argc] = tokens[i];
+                argc++;
         }
 
-        char **argv = malloc(argc * sizeof(char *));
-
-        // setupArgv handles **argv == NULL
-        setupArgv(argv, argc, command, commandLen);
-
-        unsigned int commandType = 0;
-        processMainFunction_t function =
-                getCommand(commands, argv[0], &commandType); //-V522
-        if (function) {
-                // Here I have argc and argv
-                //createProcess(argv[0], (int(*)(int,char**))(getProcess(argv[0])), argc, argv, foreground);
-                uint64_t test2 =
-                        createProcess(argv[0], function, 0, NULL, foreground);
-                if (foreground) {
-                        waitPID(test2);
-                }
+        if (pipeIndex > 0) {
+                executeCommand(commands, argv, argc,
+                               pipes[pipeIndex - 1][PIPE_FD_READ], 1);
         } else {
-                printf("[%s] Is not a valid command\n", argv[0]);
+                executeCommand(commands, argv, argc, 0, 1);
         }
 
-        for (int i = 0; i < argc; i++) {
-                free(argv[i]);
-        }
         free(argv);
+        for (int i = 0; i < totalTokens; i++) {
+                free(tokens[i]);
+        }
+
         clearCommandLine(command, lenPtr);
         displayCommandLine(command, *lenPtr);
 }
@@ -303,28 +356,66 @@ static void addArgToArgv(char **argv, unsigned int index, char *str,
         argv[index][strDim + 1] = '\0';
 }
 
+static void addToTokens(char *tokens[MAX_COMMAND_TOKENS], char *token,
+                        unsigned int *index)
+{
+        tokens[*index] = malloc(*index * sizeof(char));
+        strcpy(tokens[*index], token);
+        (*index)++;
+}
+
+static void executeCommand(commandList commands, char **argv, int argc,
+                           unsigned int stdin, unsigned int stdout)
+{
+        unsigned int type = 0;
+        processMainFunction_t function = getCommand(commands, argv[0], &type);
+        unsigned int foreground = 1;
+        if (argc > 1 && strcmp(argv[argc - 1], "&") == 0) {
+                argv[argc - 1] = NULL;
+                argc--;
+                foreground = 0;
+        }
+
+        for (int i = 0; i < argc; i++) {
+                printf("ARG %d: [%s]\n", i, argv[i]);
+        }
+
+        if (function == NULL) {
+                printf("[%s] Is not a valid command\n", argv[0]);
+                return;
+        }
+        uint64_t pid = createProcessWithFD(argv[0], function, argc, argv,
+                                           foreground, stdin, stdout);
+        if (foreground) {
+                waitPID(pid);
+        }
+}
 static void initCommands(commandList list)
 {
         if (list == NULL) {
                 return;
         }
         addCommand(list, "test", testPipes);
-        addCommand(list, "testRead", testRead);
-        addCommand(list, "testWrite", testWrite);
-        //         addCommand(list, "sh", commandSh);
+        addCommand(list, "testRead", testRead1);
+        addCommand(list, "testWrite", testPrint1);
         addCommand(list, "help", commandHelp);
         addCommand(list, "mem", commandMem);
         addCommand(list, "ps", commandPs);
-        //         addCommand(list, "loop", commandLoop);
-        //         addCommand(list, "kill", commandKill);
-        //         addCommand(list, "nice", commandNice);
-        //         addCommand(list, "block", commandBlock);
+        addCommand(list, "loop", commandLoop);
+        addCommand(list, "kill", commandKill);
+        addCommand(list, "nice", commandNice);
+        addCommand(list, "block", commandBlock);
+        // addCommand(list, "unblock", commandUnblock);
         addCommand(list, "sem", commandSem);
-        //         addCommand(list, "cat", commandCat);
-        //         addCommand(list, "wc", commandWc);
-        //         addCommand(list, "filter", commandFilter);
+        addCommand(list, "cat", commandCat);
+        addCommand(list, "wc", commandWc);
+        addCommand(list, "filter", commandFilter);
         addCommand(list, "pipe", commandPipe);
-        //         addCommand(list, "phylo", commandPhylo);
+        addCommand(list, "phylo", commandPhylo); //falta
+        addCommand(list, "test_mm", test_mm);
+        addCommand(list, "test_prio", test_prio);
+        addCommand(list, "test_processes", test_processes);
+        addCommand(list, "test_sync", test_sync);
 }
 
 #endif /* BETTER_SHELL */

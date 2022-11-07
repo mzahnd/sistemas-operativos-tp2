@@ -25,8 +25,6 @@ typedef struct {
 } pipe_info_t;
 
 int pipe(int fildes[PIPE_N_FD]);
-ssize_t read(int fd, char *buf, size_t count);
-ssize_t write(int fd, const char *buf, size_t count);
 int close(int fd);
 
 pipe_info_t *pipe_getinformation(pipe_info_t *restrict last);

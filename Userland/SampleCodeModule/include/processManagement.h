@@ -10,11 +10,15 @@
  */
 #ifndef PROCESS_MANAGEMENT_H
 #define PROCESS_MANAGEMENT_H
-
 #include <stdint.h>
 
 uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,
                        char **argv, unsigned int foreground);
+uint64_t createProcessWithFD(char *name, int (*mainF)(int, char **), int argc,
+                             char **argv, unsigned int foreground,
+                             unsigned int stdin, unsigned int stdout);
 void waitPID(uint64_t pid);
+void sleep(unsigned int seconds);
+unsigned int getPid();
 
 #endif /* PROCESS_MANAGEMENT_H */

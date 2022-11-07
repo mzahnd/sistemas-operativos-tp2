@@ -8,26 +8,27 @@
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
  */
+
+#include <processes.h>
 #include <syscalls_asm.h>
-#include <pipeUser.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-int pipe(int fildes[PIPE_N_FD])
-{
-        int ret;
-        pipePipeSyscall(fildes, &ret);
-        return ret;
-}
+#define EOF -1
 
-int close(int fd)
+int commandWc(int argc, char **argv)
 {
-        int ret;
-        pipeCloseSyscall(fd, &ret);
-        return ret;
-}
+        char c;
+        int lineCount = 0;
 
-pipe_info_t *pipe_getinformation(pipe_info_t *restrict last)
-{
-        pipe_info_t *ret;
-        pipeGetInformationSyscall(last, &ret);
-        return ret;
+        while ((c = getChar()) != EOF) {
+                putChar(c);
+
+                if (c == '\n') {
+                        lineCount++;
+                }
+        }
+        printf("\n\nLine Count: %d\n", lineCount);
+        processKiller();
+        return 0;
 }

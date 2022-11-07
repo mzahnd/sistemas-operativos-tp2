@@ -8,26 +8,14 @@
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
  */
+
+#include <processes.h>
 #include <syscalls_asm.h>
-#include <pipeUser.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <phylo.h>
 
-int pipe(int fildes[PIPE_N_FD])
+int commandPhylo(int argc, char **argv)
 {
-        int ret;
-        pipePipeSyscall(fildes, &ret);
-        return ret;
-}
-
-int close(int fd)
-{
-        int ret;
-        pipeCloseSyscall(fd, &ret);
-        return ret;
-}
-
-pipe_info_t *pipe_getinformation(pipe_info_t *restrict last)
-{
-        pipe_info_t *ret;
-        pipeGetInformationSyscall(last, &ret);
-        return ret;
+        return 0;
 }

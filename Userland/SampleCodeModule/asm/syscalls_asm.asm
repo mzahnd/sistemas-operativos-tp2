@@ -31,6 +31,12 @@ GLOBAL semaphorePostSyscall
 GLOBAL semaphoreWaitSyscall
 GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
+GLOBAL getPIDSyscall
+GLOBAL getCurrentProcessFDSyscall
+GLOBAL changeProcessPrioritySyscall
+GLOBAL changeProcessStatusSyscall
+GLOBAL killProcessSyscall
+GLOBAL sleepSyscall
 
 section .text
 
@@ -230,6 +236,9 @@ createProcessSyscall:
     push rbp
     mov rbp, rsp
 
+    mov r10, [rbp+2*8] ;sexto argumento
+    mov r11, [rbp+3*8] ;septimo argumento
+
     mov rax, 20 ;ID createProcess
     int 80h
 
@@ -396,6 +405,73 @@ waitPIDSyscall:
     mov rbp, rsp
 
     mov rax, 22; ID waitForPID
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+getPIDSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 27; getCurrentPRocessPID syscall
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+getCurrentProcessFDSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 45; ID getCurrentProcessFD
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+changeProcessPrioritySyscall:    ;changeProcessPriority
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 23
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+    
+changeProcessStatusSyscall:    ;change Status
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 24
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+killProcessSyscall:    ;kill Process
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 25
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+sleepSyscall:    ;sleep
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 26
     int 80h
 
     mov rsp, rbp

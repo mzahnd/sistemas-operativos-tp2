@@ -11,12 +11,16 @@
 #ifndef STDLIB_H
 #define STDLIB_H
 
+#include <stddef.h> /* size_t */
+#include <syscalls_definitions.h> /* mem_info_t */
+
 #ifndef NULL
 #define NULL 0
 #endif /* NULL */
 
-#include <stddef.h> /* size_t */
-#include <syscalls_definitions.h> /* mem_info_t */
+#ifndef EOF
+#define EOF -1
+#endif /* EOF */
 
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);
@@ -25,6 +29,7 @@ int iabs(int num);
 int atohex(char *str);
 char toUpper(char letter);
 char toLower(char letter);
+int isVowel(char letter);
 int round(double number);
 void reverseStr(char str[]);
 void *malloc(unsigned int size);

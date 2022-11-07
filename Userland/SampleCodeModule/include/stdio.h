@@ -12,11 +12,15 @@
 #define STDIO_H
 
 #include <stdint.h>
+#include <sys/types.h>
 
 #define KEY_UP (char)200
 #define KEY_LEFT (char)203
 #define KEY_RIGHT (char)205
 #define KEY_DOWN (char)208
+
+#define STDIN 0
+#define STDOUT 1
 
 void scanf(char *buffer);
 void printf(char *fmt, ...);
@@ -26,5 +30,8 @@ void setFunctionKey(int index, void (*func)());
 int getChar();
 uint64_t getError();
 void format(char *str, int value);
+
+ssize_t read(int fd, char *buf, size_t count);
+ssize_t write(int fd, const char *buf, size_t count);
 
 #endif /* STDIO_H */

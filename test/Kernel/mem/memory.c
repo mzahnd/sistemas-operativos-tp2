@@ -62,6 +62,8 @@ CuSuite *test_get_memory_suite(void)
 
 #ifdef BUDDY
         printf("[INFO] Memory model: Buddy\n");
+#else
+        printf("[INFO] Memory model: K&R\n");
 #endif /* BUDDY */
         printf("[INFO] MEM_HEAP_SIZE: %ld\n", MEM_HEAP_SIZE);
         printf("[INFO] sizeof(memory_block): %ld\n", sizeof(memory_block));

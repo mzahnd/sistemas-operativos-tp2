@@ -166,4 +166,8 @@ mem_info_t *mem_getinformation()
         return result;
 }
 
+void giveUpCPU() {
+        giveUpCPUSyscall();
+}
+
 #endif /* STD_LIB_C */

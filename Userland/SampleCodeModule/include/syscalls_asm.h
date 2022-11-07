@@ -72,5 +72,6 @@ void changeProcessPrioritySyscall(unsigned int pid, unsigned int newPriority);
 void changeProcessStatusSyscall(unsigned int pid);
 void killProcessSyscall(unsigned int pid);
 void sleepSyscall(unsigned int seconds);
+void giveUpCPUSyscall();
 
 #endif /* SYSCALLS_ASM_H */

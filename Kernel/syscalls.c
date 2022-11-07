@@ -214,6 +214,10 @@ void syscallHandler(registerStruct *registers)
                 //rdi -> unsigned int *: pointer to int
                 *((unsigned int *)registers->rdi) = getCurrentProcessPID();
                 break;
+        
+        case 28: // Give Up CPU
+                giveUpCPU();
+                break;
 
         case 30:
                 // rdi -> const char *: name

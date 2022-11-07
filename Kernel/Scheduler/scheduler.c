@@ -391,4 +391,13 @@ void changeProcessStatus(unsigned int PID) {
         }
 }
 
+void giveUpCPU() {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return;
+        }
+        currentProcessCycle = MAX_PROCESS_PRIORITY + 1;
+        _sti();
+        forceTimerTick();
+}
+
 #endif /* SCHEDULER */

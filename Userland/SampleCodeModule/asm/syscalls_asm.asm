@@ -37,6 +37,7 @@ GLOBAL changeProcessPrioritySyscall
 GLOBAL changeProcessStatusSyscall
 GLOBAL killProcessSyscall
 GLOBAL sleepSyscall
+GLOBAL giveUpCPUSyscall
 
 section .text
 
@@ -472,6 +473,17 @@ sleepSyscall:    ;sleep
     mov rbp, rsp
 
     mov rax, 26
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+giveUpCPUSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 28 ;giveUpCPUSyscall
     int 80h
 
     mov rsp, rbp

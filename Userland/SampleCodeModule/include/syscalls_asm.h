@@ -74,5 +74,6 @@ void changeProcessStatusSyscall(unsigned int pid);
 void killProcessSyscall(unsigned int pid);
 void sleepSyscall(unsigned int seconds);
 void giveUpCPUSyscall();
+void isProcessActiveSyscall(unsigned int pid, unsigned int *result);
 
 #endif /* SYSCALLS_ASM_H */

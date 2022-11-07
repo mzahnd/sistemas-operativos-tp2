@@ -55,10 +55,12 @@ static shellLinesQueue lines;
 
 int testPrint1(int argc, char **argv)
 {
-        printf("123\n");
-        printf("456\n");
-        printf("567\n");
-        printf("890\n");
+
+        printf("P %d: [%d]\n", 100, isProcessActive(100));
+        printf("P %d: [%d]\n", 2, isProcessActive(2));
+        printf("P %d: [%d]\n", 101, isProcessActive(101));
+        printf("P %d: [%d]\n", 102, isProcessActive(102));
+        printf("P %d: [%d]\n", 3000, isProcessActive(3000));
 
         return 0;
 }

@@ -45,7 +45,6 @@ void sys_socalloc(size_t nmemb, size_t size, void **result);
  */
 void sys_sofree(void *ptr);
 
-
 /**
  * Wrapper around Kernel's somem_getinformation() for Userland.
  *

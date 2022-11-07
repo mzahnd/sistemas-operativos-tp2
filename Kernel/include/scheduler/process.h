@@ -48,7 +48,8 @@ typedef struct process_t {
 typedef process_t *process;
 
 process createProcess(char *name, uint64_t pid, uint64_t ppid,
-                      int (*mainF)(int, char **), int argc, char **argv, uint64_t stdin, uint64_t stdout);
+                      int (*mainF)(int, char **), int argc, char **argv,
+                      uint64_t stdin, uint64_t stdout);
 void freeProcess(process p);
 
 #endif /* PROCESS_H */

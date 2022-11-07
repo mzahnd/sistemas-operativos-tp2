@@ -128,7 +128,8 @@ void addProcess(process p)
 }
 
 uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
-                             char **argv, uint64_t foreground, uint64_t stdin, uint64_t stdout)
+                             char **argv, uint64_t foreground, uint64_t stdin,
+                             uint64_t stdout)
 {
         if (!scheduler_initialized || queue == NULL) {
                 return 0;
@@ -153,7 +154,8 @@ uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
                 foregroundProcessPID = pid;
         }
 
-        process p = createProcess(name, pid, ppid, mainF, argc, argv, stdin, stdout);
+        process p = createProcess(name, pid, ppid, mainF, argc, argv, stdin,
+                                  stdout);
         addToQueue(queue, p);
         totalReady++;
         return pid;
@@ -206,7 +208,8 @@ void unlockCurrentProcess()
         totalReady++;
 }
 
-void lockProcessByPID(uint64_t pid) {
+void lockProcessByPID(uint64_t pid)
+{
         if (!scheduler_initialized || queue == NULL || queue->size == 0) {
                 return;
         }
@@ -218,13 +221,12 @@ void lockProcessByPID(uint64_t pid) {
                 p->status = BLOCKED;
                 totalReady--;
                 if (currentNode->pcb->pid == p->pid) {
-                        currentProcessCycle =
-                                MAX_PROCESS_PRIORITY + 1; // To force the context Switch
+                        currentProcessCycle = MAX_PROCESS_PRIORITY +
+                                              1; // To force the context Switch
                         _sti();
                         forceTimerTick();
                 }
         }
-        
 }
 
 void unlockProcessByPID(uint64_t pid)
@@ -250,7 +252,8 @@ void unlockProcessByPID(uint64_t pid)
         }
 }
 
-void killProcessByPID(unsigned int pid) {
+void killProcessByPID(unsigned int pid)
+{
         if (!scheduler_initialized || queue == NULL || queue->size == 0) {
                 return;
         }
@@ -264,9 +267,9 @@ void killProcessByPID(unsigned int pid) {
         p->status = KILLED;
         if (p->pid == currentNode->pcb->pid) {
                 currentProcessCycle =
-                                MAX_PROCESS_PRIORITY + 1; // To force the context Switch
-                        _sti();
-                        forceTimerTick();
+                        MAX_PROCESS_PRIORITY + 1; // To force the context Switch
+                _sti();
+                forceTimerTick();
         }
 }
 
@@ -337,21 +340,24 @@ void unlockWaitingProcesses(process p)
         }
 }
 
-int getCurrentStdin() {
+int getCurrentStdin()
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return -1;
         }
         return currentNode->pcb->stdin;
 }
 
-int getCurrentStdout() {
+int getCurrentStdout()
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return -1;
         }
         return currentNode->pcb->stdout;
 }
 
-void getCurrentProcessFDs(int *fds) {
+void getCurrentProcessFDs(int *fds)
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return -1;
         }
@@ -360,7 +366,8 @@ void getCurrentProcessFDs(int *fds) {
         fds[1] = current->stdout;
 }
 
-void changeProcessPriority(unsigned int PID, unsigned int priority) {
+void changeProcessPriority(unsigned int PID, unsigned int priority)
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return;
         }
@@ -376,7 +383,8 @@ void changeProcessPriority(unsigned int PID, unsigned int priority) {
         p->priority = priority;
 }
 
-void changeProcessStatus(unsigned int PID) {
+void changeProcessStatus(unsigned int PID)
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return;
         }

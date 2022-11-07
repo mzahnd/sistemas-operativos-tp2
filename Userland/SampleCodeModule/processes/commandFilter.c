@@ -14,23 +14,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int commandFilter(int argc, char **argv) {
-    char c;
+int commandFilter(int argc, char **argv)
+{
+        char c;
 
-    char buffer[50];
-    unsigned int i = 0;
+        char buffer[50];
+        unsigned int i = 0;
 
-    while((c = getChar()) != '\n'){
-        putChar(c);
-        if(!isVowel(c)) {
-            // strcat(buffer, c, &i);
-            buffer[i++] = c;
+        while ((c = getChar()) != '\n') {
+                putChar(c);
+                if (!isVowel(c)) {
+                        // strcat(buffer, c, &i);
+                        buffer[i++] = c;
+                }
         }
-    }
-    buffer[i] = 0;
-    printf("\n");
-    printf("Filtered word: %s\n", buffer);
-    processKiller();
+        buffer[i] = 0;
+        printf("\n");
+        printf("Filtered word: %s\n", buffer);
+        processKiller();
 
-    return 0;
+        return 0;
 }

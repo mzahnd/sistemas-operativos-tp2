@@ -16,19 +16,19 @@
 
 #define EOF -1
 
+int commandWc(int argc, char **argv)
+{
+        char c;
+        int lineCount = 0;
 
-int commandWc(int argc, char **argv){
-    char c;
-    int lineCount = 0;
+        while ((c = getChar()) != EOF) {
+                putChar(c);
 
-    while ((c = getChar()) != EOF) {
-        putChar(c);
-
-        if (c == '\n') {
-            lineCount++;
+                if (c == '\n') {
+                        lineCount++;
+                }
         }
-    }
-    printf("\n\nLine Count: %d\n", lineCount);
-    processKiller();
-    return 0;
+        printf("\n\nLine Count: %d\n", lineCount);
+        processKiller();
+        return 0;
 }

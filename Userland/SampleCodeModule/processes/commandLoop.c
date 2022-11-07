@@ -15,21 +15,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+int commandLoop(int argc, char **argv)
+{
+        if (argc != 2) {
+                printf("ERROR: Must have a interval parameter in seconds!\n");
+                return -1;
+        }
 
-int commandLoop(int argc, char **argv) {
+        int interval = atoi(argv[1]);
+        printf("Interval: %s\n", argv[1]);
 
-    if (argc != 2) {
-        printf("ERROR: Must have a interval parameter in seconds!\n");
-        return -1;
-    }
+        while (1) {
+                printf("Hello, this is the LOOP command. Current PID is %d\n",
+                       getPid());
+                sleep(3);
+        }
 
-    int interval = atoi(argv[1]);
-    printf("Interval: %s\n", argv[1]);
-    
-    while (1) {
-        printf("Hello, this is the LOOP command. Current PID is %d\n", getPid());
-        sleep(3);
-    }
-
-    return 0;
+        return 0;
 }

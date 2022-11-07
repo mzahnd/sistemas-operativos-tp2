@@ -21,15 +21,18 @@ uint64_t createProcess(char *name, int (*mainF)(int, char **), int argc,
                        char **argv, unsigned int foreground)
 {
         uint64_t returnPID = 0;
-        createProcessSyscall(name, mainF, argc, argv, foreground, STDIN, STDOUT, &returnPID);
+        createProcessSyscall(name, mainF, argc, argv, foreground, STDIN, STDOUT,
+                             &returnPID);
         return returnPID;
 }
 
 uint64_t createProcessWithFD(char *name, int (*mainF)(int, char **), int argc,
-                       char **argv, unsigned int foreground, unsigned int stdin, unsigned int stdout)
+                             char **argv, unsigned int foreground,
+                             unsigned int stdin, unsigned int stdout)
 {
         uint64_t returnPID = 0;
-        createProcessSyscall(name, mainF, argc, argv, foreground, stdin, stdout, &returnPID);
+        createProcessSyscall(name, mainF, argc, argv, foreground, stdin, stdout,
+                             &returnPID);
         return returnPID;
 }
 
@@ -38,14 +41,16 @@ void waitPID(uint64_t pid)
         waitPIDSyscall(pid);
 }
 
-void sleep(unsigned int seconds) {
+void sleep(unsigned int seconds)
+{
         sleepSyscall(seconds);
 }
 
-unsigned int getPid(){
-    unsigned int pid;
-    getPIDSyscall(&pid);
-    return pid;
+unsigned int getPid()
+{
+        unsigned int pid;
+        getPIDSyscall(&pid);
+        return pid;
 }
 
 #endif /* PROCESS_MANAGEMENT */

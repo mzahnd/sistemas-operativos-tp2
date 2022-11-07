@@ -16,13 +16,13 @@
 
 #define EOF -1
 
-int commandCat(int argc, char **argv) {
-  
-    char c;
-    while((c = getChar()) != EOF) {
-      putChar(c);
-    }
-    printf("\n");
-    processKiller();
-    return 0;
+int commandCat(int argc, char **argv)
+{
+        char c;
+        while ((c = getChar()) != EOF) {
+                putChar(c);
+        }
+        printf("\n");
+        processKiller();
+        return 0;
 }

@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <phylo.h>
 
-int commandPhylo(int argc, char **argv) {
-    return 0;
+int commandPhylo(int argc, char **argv)
+{
+        return 0;
 }

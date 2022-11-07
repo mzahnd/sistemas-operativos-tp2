@@ -26,7 +26,8 @@ static void initStack(reg_t rbp, reg_t rsp,
                       char **argv, uint8_t *processStatus);
 
 process createProcess(char *name, uint64_t pid, uint64_t ppid,
-                      int (*mainF)(int, char **), int argc, char **argv, uint64_t stdin, uint64_t stdout)
+                      int (*mainF)(int, char **), int argc, char **argv,
+                      uint64_t stdin, uint64_t stdout)
 {
         process p = somalloc(sizeof(process_t));
         // ncPrint("###############");

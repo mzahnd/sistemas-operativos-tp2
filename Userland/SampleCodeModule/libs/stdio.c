@@ -41,7 +41,7 @@ ssize_t write(int fd, const char *buf, size_t count)
 {
         int fdToWrite = fd;
         if (fd == STDOUT) {
-                int fds[2] = {-1, -1};
+                int fds[2] = { -1, -1 };
                 getCurrentProcessFDSyscall(fds);
                 if (fds[STDOUT] == STDOUT) {
                         updateConsolePointer(buf, count);
@@ -113,7 +113,6 @@ void printf(char *fmt, ...)
                 }
                 i++;
         }
-        
 
         va_end(vl);
 

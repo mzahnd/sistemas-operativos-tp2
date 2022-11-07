@@ -21,5 +21,5 @@ int commandHelp(int argc, char **argv)
         printf("\t filter - deletes vowels from the input\n");
         printf("\t pipe - displays list of pipes with their properties\n");
         printf("\t phylo - starts phylo app\n"); 
-        return 1;
+        return 0;
 }

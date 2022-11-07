@@ -14,20 +14,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int block(int pid) {
-    int ans;
-    blockSyscall(pid, &ans); 
-    return ans;
-}
+// static int block(int pid) {
+//     int ans;
+//     blockSyscall(pid, &ans); 
+//     return ans;
+// }
 
 int commandBlock(int argc, char **argv) {
-    putChar('\n');
+
     unsigned int id = atoi(argv[1]);
-    if(block(id) == 0) {
-        printf("Process successfully blocked\n");
-    } else {
-        printf("Process failed to block\n");
-    }
+
+    changeProcessStatusSyscall(id);
+    // if(block(id) == 0) {
+    //     printf("Process successfully blocked\n");
+    // } else {
+    //     printf("Process failed to block\n");
+    // }
     
-    return 1;
+    return 0;
 }

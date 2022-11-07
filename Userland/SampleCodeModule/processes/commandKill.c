@@ -14,20 +14,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int kill(int pid){
-    int ans;
-    killSyscall(pid, &ans);
-    return ans;
-}
+// static int kill(int pid){
+//     int ans;
+//     killProcessSyscall(pid);
+//     return ans;
+// }
 
 int commandKill(int argc, char **argv) {
-    printf('\n');
+    printf("\n");
     unsigned int id = atoi(argv[1]);
-    if(kill(id) == 0) 
-        printf("Process successfully killed\n");
-    else
-        printf("Process kill failed\n");
-    
-    return 1;
+    // if(kill(id) == 0) 
+    //     printf("Process successfully killed\n");
+    // else
+    //     printf("Process kill failed\n");
+    killProcessSyscall(id);
+    return 0;
 }
 

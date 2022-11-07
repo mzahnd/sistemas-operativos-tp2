@@ -38,7 +38,6 @@ GLOBAL changeProcessPrioritySyscall
 GLOBAL changeProcessStatusSyscall
 GLOBAL killProcessSyscall
 
-GLOBAL niceSyscall
 section .text
 
 

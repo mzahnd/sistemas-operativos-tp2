@@ -22,7 +22,7 @@ int commandWc(int argc, char **argv){
     int lineCount = 0;
 
     while ((c = getChar()) != EOF) {
-        printf(c);
+        putChar(c);
 
         if (c == '\n') {
             lineCount++;
@@ -30,5 +30,5 @@ int commandWc(int argc, char **argv){
     }
     printf("\n\nLine Count: %d\n", lineCount);
     processKiller();
-    return 1;
+    return 0;
 }

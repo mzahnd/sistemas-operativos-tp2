@@ -16,5 +16,5 @@
 #include <phylo.h>
 
 int commandPhylo(int argc, char **argv) {
-    return 1;
+    return 0;
 }

@@ -20,9 +20,9 @@ int commandCat(int argc, char **argv) {
   
     char c;
     while((c = getChar()) != EOF) {
-      printf(c);
+      putChar(c);
     }
-    printf('\n');
+    printf("\n");
     processKiller();
-    return 1;
+    return 0;
 }

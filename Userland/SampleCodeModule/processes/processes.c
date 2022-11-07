@@ -1,10 +1,12 @@
+#include <processes.h>
 #include <stdio.h>
+#include <syscalls_asm.h>
 
 void processKiller(){
     int pid;
     getPIDSyscall(&pid);
-    int ans;
-    killSyscall(pid,&ans);
+    
+    killProcessSyscall(pid);
     while (1);
 }
 

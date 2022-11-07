@@ -3,6 +3,7 @@
 
 #include <test_util.h>
 #include <stdio.h>
+#include <syscalls_asm.h>
 
 void test_mm();
 void test_processes();

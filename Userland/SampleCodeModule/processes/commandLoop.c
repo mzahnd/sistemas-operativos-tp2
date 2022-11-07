@@ -17,7 +17,7 @@
 
 int commandLoop(int argc, char **argv) {
     unsigned int pid = getPid();
-    printf('\n');
+    printf("\n");
     
     while(1) {
         printf("Hi! You ran the loop command, the PID is: %d. To quit the loop, press F5\n", pid);
@@ -28,5 +28,5 @@ int commandLoop(int argc, char **argv) {
         }
     }
 
-    return 1;
+    return 0;
 }

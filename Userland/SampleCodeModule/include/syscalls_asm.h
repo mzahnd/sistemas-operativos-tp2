@@ -37,7 +37,7 @@ void deleteTimerFunctionSyscall(int index);
 void mallocSyscall(size_t size, void **result);
 void callocSyscall(size_t nmemb, size_t size, void **result);
 void freeSyscall(void *ptr);
-void memGetInformationSyscall(mem_info_t** result);
+void memGetInformationSyscall(mem_info_t **result);
 void createProcessSyscall(char *name, int (*mainFunction)(int, char **),
                           int argc, char **argv, uint64_t foreground,
                           uint64_t *returnedPID);

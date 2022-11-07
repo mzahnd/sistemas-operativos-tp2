@@ -303,27 +303,28 @@ static void addArgToArgv(char **argv, unsigned int index, char *str,
         argv[index][strDim + 1] = '\0';
 }
 
-static void initCommands(commandList list) {
-        if(list == NULL) {
+static void initCommands(commandList list)
+{
+        if (list == NULL) {
                 return;
         }
         addCommand(list, "test", testPipes);
         addCommand(list, "testRead", testRead);
         addCommand(list, "testWrite", testWrite);
-//         addCommand(list, "sh", commandSh);
+        //         addCommand(list, "sh", commandSh);
         addCommand(list, "help", commandHelp);
         addCommand(list, "mem", commandMem);
         addCommand(list, "ps", commandPs);
-//         addCommand(list, "loop", commandLoop);
-//         addCommand(list, "kill", commandKill);
-//         addCommand(list, "nice", commandNice);
-//         addCommand(list, "block", commandBlock);
+        //         addCommand(list, "loop", commandLoop);
+        //         addCommand(list, "kill", commandKill);
+        //         addCommand(list, "nice", commandNice);
+        //         addCommand(list, "block", commandBlock);
         addCommand(list, "sem", commandSem);
-//         addCommand(list, "cat", commandCat);
-//         addCommand(list, "wc", commandWc);
-//         addCommand(list, "filter", commandFilter);
+        //         addCommand(list, "cat", commandCat);
+        //         addCommand(list, "wc", commandWc);
+        //         addCommand(list, "filter", commandFilter);
         addCommand(list, "pipe", commandPipe);
-//         addCommand(list, "phylo", commandPhylo);
+        //         addCommand(list, "phylo", commandPhylo);
 }
 
 #endif /* BETTER_SHELL */

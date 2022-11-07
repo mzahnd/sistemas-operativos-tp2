@@ -12,7 +12,6 @@
 // static void printWelcomeMessage();
 // static void philosopherManager(int phyloSem);
 
-
 // int totalPhilosophers = BASE_PHYLOS;
 // PhyloData philosophers[MAX_PHYLOS];
 
@@ -85,7 +84,7 @@
 
 //     while(philosophers[currentPhylo].isAlive != DEAD || philosophers[currentPhylo].state == EAT) {
 //         sem_wait(phyloSem);
-        
+
 //         // If eating, make the philosopher wait
 //         if(philosophers[currentPhylo].state) {
 //             phyloLeaveFork(currentPhylo);
@@ -101,7 +100,7 @@
 //     }
 //     sem_close(phyloSem);
 //     processKiller();
-// } 
+// }
 
 // static void printWelcomeMessage() {
 //     printf("Welcome to the Philosophers Problem!\n");
@@ -115,7 +114,7 @@
 
 //     while(1) {
 //         c = getChar();
-        
+
 //         if(c != '\0') {
 //             switch(c) {
 //                 case 'a':

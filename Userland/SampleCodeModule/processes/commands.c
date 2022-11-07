@@ -1,7 +1,7 @@
 // static void commandLoop(int argc, char **argv) {
 //     unsigned int pid = getPid();
 //     putChar('\n');
-    
+
 //     while(1) {
 //         printf("Hi! You ran the loop command, the PID is: %d. To quit the loop, press F5\n", pid);
 
@@ -20,11 +20,11 @@
 // int commandKill(int argc, char **argv) {
 //     putChar('\n');
 //     unsigned int id = atoi(argv[1]);
-//     if(kill(id) == 0) 
+//     if(kill(id) == 0)
 //         printf("Process successfully killed\n");
 //     else
 //         printf("Process kill failed\n");
-    
+
 //     return 1;
 // }
 
@@ -41,7 +41,7 @@
 //     } else {
 //         printf("Priority successfully changed\n");
 //     }
-    
+
 //     return 1;
 // }
 
@@ -53,7 +53,7 @@
 //     } else {
 //         printf("Process failed to block\n");
 //     }
-    
+
 //     return 1;
 // }
 
@@ -127,8 +127,6 @@
 //     return buildProcess("filter", filter, args);
 // }
 
-
-
 // int commandPhylo(int argc, char **argv) {
 //     return phyloProcess("phylo", philosopherProblem(), args);
 // }
@@ -136,13 +134,13 @@
 // static int phyloProcess(char *name, void (*entryPoint) (/*int, */char [][MAX_ARG_LEN]), char args[][MAX_ARG_LEN]) {
 //     int j = 0;
 //     unsigned int argc = atoi(args[j++]);
-    
+
 //     int foreground = atoi(args[j++]);
 
 //     int fds[2];
-//     fds[0] = atoi(args[j++]);  
+//     fds[0] = atoi(args[j++]);
 //     fds[1] = atoi(args[j++]);
-    
+
 //     // First arg for name
 //     char argv[argc+1][MAX_ARG_LEN];
 
@@ -159,13 +157,11 @@
 //         strcpy(argv[i], args[i + 3]);
 //     }
 
-//     int size = argc + 2; 
+//     int size = argc + 2;
 //     char *argv_p[size];
 //     for(i=0; i<argc+1; i++)
 //       argv_p[i] = argv[i];
 //     argv_p[size - 1] = 0;
-    
+
 //     return createProcess(entryPoint, foreground, argv_p, fds);
 // }
-
-

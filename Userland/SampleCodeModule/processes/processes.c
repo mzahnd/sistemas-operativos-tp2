@@ -3,11 +3,11 @@
 #include <syscalls_asm.h>
 
 void processKiller(){
-    int pid;
-    getPIDSyscall(&pid);
+    // int pid;
+    // getPIDSyscall(&pid);
     
-    killProcessSyscall(pid);
-    while (1);
+    // killProcessSyscall(pid);
+    // while (1);
 }
 
 

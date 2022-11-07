@@ -353,7 +353,7 @@ int getCurrentStdout() {
 
 void getCurrentProcessFDs(int *fds) {
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
-                return -1;
+                return;
         }
         process current = currentNode->pcb;
         fds[0] = current->stdin;

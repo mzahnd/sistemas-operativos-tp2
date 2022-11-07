@@ -87,9 +87,9 @@ static void initStack(reg_t rbp, reg_t rsp,
 }
 
 static void mainFunctionWrapper(int (*mainF)(int, char **), int argc,
-                                char **agrv, uint8_t *processStatus)
+                                char **argv, uint8_t *processStatus)
 {
-        mainF(argc, agrv);
+        mainF(argc, argv);
         *processStatus = KILLED;
         forceTimerTick();
         return;

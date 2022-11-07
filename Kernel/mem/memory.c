@@ -12,6 +12,9 @@
  *
  * See: https://github.com/FreeRTOS/FreeRTOS-Kernel/blob/main/portable/MemMang/heap_4.c
  */
+#ifndef BUDDY
+#pragma message("Memory manager: K&R")
+
 #include <lib.h>
 #include <mem/memory.h>
 
@@ -182,11 +185,11 @@ void *socalloc(size_t nmemb, size_t size)
 
 void sofree(void *ptr)
 {
-        // Prevent user trying to free memory out of heap boundaries
-        if (ptr < (void *)MEM_HEAP_START_ADDR || //-V566
-            ptr > (void *)(MEM_HEAP_START_ADDR + MEM_HEAP_SIZE)) //-V566
+        if (ptr == NULL)
                 return;
-        else if (ptr == NULL)
+        // Prevent user trying to free memory out of heap boundaries
+        else if (ptr < (void *)MEM_HEAP_START_ADDR || //-V566
+                 ptr > (void *)(MEM_HEAP_START_ADDR + MEM_HEAP_SIZE)) //-V566
                 return;
 
         memory_block *block_to_free =
@@ -407,3 +410,5 @@ inline static uint64_t test_get_mem_heap_start_addr()
         return (uint64_t)&heap_mem_addr;
 }
 #endif /* TESTING */
+
+#endif /* BUDDY */

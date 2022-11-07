@@ -63,9 +63,8 @@ int testPrint1(int argc, char **argv)
         return 0;
 }
 
-int testRead1(int argc, char **argv)
-{
-        char *buffer[64] = { 0 };
+int testRead1(int argc, char** argv) {
+        char buffer[64] = {0};
         read(STDIN, buffer, 64);
         printf("Read from STDIN: [%s]\n", buffer);
 
@@ -229,7 +228,7 @@ static void processCommand(char *command, commandList commands,
         unsigned int argc = 0;
         char **argv = malloc(sizeof(char *));
 
-        int pipes[MAX_COMMAND_TOKENS][2] = { 0 };
+        int pipes[MAX_COMMAND_TOKENS][2] = {{0}}; 
         int pipeIndex = 0;
 
         for (int i = 0; i < totalTokens; i++) {
@@ -374,10 +373,6 @@ static void executeCommand(commandList commands, char **argv, int argc,
                 argv[argc - 1] = NULL;
                 argc--;
                 foreground = 0;
-        }
-
-        for (int i = 0; i < argc; i++) {
-                printf("ARG %d: [%s]\n", i, argv[i]);
         }
 
         if (function == NULL) {

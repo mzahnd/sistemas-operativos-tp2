@@ -215,6 +215,10 @@ void syscallHandler(registerStruct *registers)
                 //rdi -> unsigned int *: pointer to int
                 *((unsigned int *)registers->rdi) = getCurrentProcessPID();
                 break;
+        
+        case 28: // Give Up CPU
+                giveUpCPU();
+                break;
 
         case 30:
                 // rdi -> const char *: name
@@ -380,10 +384,10 @@ void syscallRead(registerStruct *reg)
                         return; // Not initialized
                 }
                 if (currentProcessStdin == 0) {
-                        char *buff = (int *)reg->rsi;
-                        uint64_t size = (uint64_t)reg->rdx;
-                        uint64_t *resultPtr = (uint64_t *)reg->rcx;
-                        readKeyboard(buff, size, resultPtr);
+                        char* buff =  (char *)reg->rsi;
+                        uint64_t size = (uint64_t)reg->rdx; 
+                        uint64_t* resultPtr = (uint64_t *)reg->rcx;
+                        readKeyboard((int *)buff, size, resultPtr);
                         return;
                 }
                 // if the stdin pipe of the process is not 0, it has a pipe where it wants to read from

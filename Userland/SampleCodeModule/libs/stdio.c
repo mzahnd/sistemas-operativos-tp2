@@ -44,7 +44,7 @@ ssize_t write(int fd, const char *buf, size_t count)
                 int fds[2] = { -1, -1 };
                 getCurrentProcessFDSyscall(fds);
                 if (fds[STDOUT] == STDOUT) {
-                        updateConsolePointer(buf, count);
+                        updateConsolePointer((char *)buf, count);
                         return count;
                 }
                 fdToWrite = fds[STDOUT];
@@ -134,8 +134,8 @@ void putChar(char ch)
 int getChar()
 {
         int ch = 0;
-        uint64_t count;
-        pipeReadSyscall(STDIN, &ch, 1, &count);
+        ssize_t count;
+        pipeReadSyscall(STDIN, (char *)&ch, 1, &count);
         return ch;
 }
 

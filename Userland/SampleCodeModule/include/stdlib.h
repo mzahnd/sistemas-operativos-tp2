@@ -35,6 +35,7 @@ void reverseStr(char str[]);
 void *malloc(unsigned int size);
 void *calloc(size_t nmemb, size_t size);
 void free(void *ptr);
+void giveUpCPU();
 mem_info_t *mem_getinformation();
 
 #endif /* STDLIB_H */

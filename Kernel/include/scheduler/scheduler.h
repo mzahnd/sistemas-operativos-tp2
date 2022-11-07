@@ -57,5 +57,6 @@ void changeProcessPriority(unsigned int PID, unsigned int priority);
 void changeProcessStatus(unsigned int PID);
 void killProcessByPID(unsigned int pid);
 void putProcessToSleep(unsigned int seconds);
+void giveUpCPU();
 
 #endif /* SCHEDULER_H */

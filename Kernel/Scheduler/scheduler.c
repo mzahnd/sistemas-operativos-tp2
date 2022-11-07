@@ -359,7 +359,7 @@ int getCurrentStdout()
 void getCurrentProcessFDs(int *fds)
 {
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
-                return -1;
+                return;
         }
         process current = currentNode->pcb;
         fds[0] = current->stdin;
@@ -397,6 +397,15 @@ void changeProcessStatus(unsigned int PID)
         } else {
                 unlockProcessByPID(PID);
         }
+}
+
+void giveUpCPU() {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return;
+        }
+        currentProcessCycle = MAX_PROCESS_PRIORITY + 1;
+        _sti();
+        forceTimerTick();
 }
 
 #endif /* SCHEDULER */

@@ -11,13 +11,16 @@
 #ifndef STDLIB_H
 #define STDLIB_H
 
-#ifndef NULL
-#define NULL 0
-#define EOF -1
-#endif /* NULL */
-
 #include <stddef.h> /* size_t */
 #include <syscalls_definitions.h> /* mem_info_t */
+
+#ifndef NULL
+#define NULL 0
+#endif /* NULL */
+
+#ifndef EOF
+#define EOF -1
+#endif /* EOF */
 
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);

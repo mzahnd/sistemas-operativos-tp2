@@ -1,7 +1,6 @@
 #include <processes.h>
 #include <stdio.h>
 
-
 int commandHelp(int argc, char **argv)
 {
         putChar('\n');
@@ -20,6 +19,10 @@ int commandHelp(int argc, char **argv)
         printf("\t wc - prints amount of input lines\n");
         printf("\t filter - deletes vowels from the input\n");
         printf("\t pipe - displays list of pipes with their properties\n");
-        printf("\t phylo - starts phylo app\n"); 
+        printf("\t phylo - starts phylo app\n");
+        printf("\t test_mm - memory manager test\n");
+        printf("\t test_prio - priority test \n");
+        printf("\t test_processes - processes test \n");
+        printf("\t test_sync - sync test\n");
         return 0;
 }

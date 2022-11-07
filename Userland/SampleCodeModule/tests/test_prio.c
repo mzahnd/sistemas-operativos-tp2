@@ -1,171 +1,99 @@
-// #include <stdint.h>
-// #include <stdio.h>
-// #include <tests.h>
-// #include <processes.h>
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/**
+ * This file is part of sistemas-operativos-tp2
+ * Licensed under BSD 3-Clause "New" or "Revised" License.
+ * Copyright (c) 2022 Flores Levalle, M.
+ *                    López, P.
+ *                    Sierra Pérez, C.
+ *                    Zahnd, M. E.
+ *
+ * Test provistos por la cátedra.
+ */
+#include <stdint.h>
+#include <stdio.h>
+#include <tests/test_util.h>
+/* #include "syscall.h" */
+#include <stdlib.h> /* NULL */
+#include <processManagement.h> /* createProcess(); */
+#include <processes.h> /* commandBlock(); commandKill(); commandNice();
+                        * commandUnblock(); */
 
+#define MINOR_WAIT \
+        1000000 // TODO: Change this value to prevent a process from flooding the screen
+#define WAIT \
+        10000000 // TODO: Change this value to make the wait long enough to see theese processes beeing run at least twice
 
-// #define MINOR_WAIT 1000000                               // TODO: To prevent a process from flooding the screen
-// #define WAIT      10000000                              // TODO: Long enough to see theese processes beeing run at least twice
+#define TOTAL_PROCESSES 3
+#define LOWEST 0 //TODO: Change as required
+#define MEDIUM 1 //TODO: Change as required
+#define HIGHEST 2 //TODO: Change as required
 
-// int prioGetpid() {
-//     return getPid();
-// }
+int64_t prio[TOTAL_PROCESSES] = { LOWEST, MEDIUM, HIGHEST };
 
-// int prioNice(int pid, int newPrio) {
-//     changeProcessPrioritySyscall(pid, newPrio);
-//     return 0;
-// }
+int test_prio(int argc, char *argv[])
+{
+        int64_t pids[TOTAL_PROCESSES];
+        uint64_t i;
 
-// int prioKill(int pid) {
-//     killProcessSyscall(pid);
-//     return 0;
-// }
+        /* char *argv[] = { 0 }; */
+        /* pids[i] = my_create_process("endless_loop_print", 0, argv); */
+        for (i = 0; i < TOTAL_PROCESSES; i++) {
+                int cargc = 0;
+                char **cargv = create_argv("endless_loop_print", &cargc, 1, 0);
+                pids[i] = createProcess("endless_loop_print",
+                                        &endless_loop_print, cargc, cargv, 0);
+        }
 
-// int prioBlock(int pid) {
-//     changeProcessStatusSyscall(pid);
-//     return 0;
-// }
+        bussy_wait(WAIT);
+        printf("\nCHANGING PRIORITIES...\n");
 
-// // int prioUnblock(int pid) {
-// //     changeProcessState(pid);
-// //     return 0;
-// // }
+        /* my_nice(pids[i], prio[i]); */
+        for (i = 0; i < TOTAL_PROCESSES; i++) {
+                int cargc = 0;
+                char **cargv =
+                        create_argv("commandNice", &cargc, 2, pids[i], prio[i]);
+                commandNice(cargc, cargv);
+        }
 
-// void prioBusyWait(int n) {
-//     int i;
-//     for (i = 0; i < n; i++);
-// }
+        bussy_wait(WAIT);
+        printf("\nBLOCKING...\n");
 
-// void prioEndlessLoop() {
-//     int pid = prioGetpid();
+        /* my_block(pids[i]); */
+        for (i = 0; i < TOTAL_PROCESSES; i++) {
+                int cargc = 0;
+                char **cargv = create_argv("commandBlock", &cargc, 1, pids[i]);
+                commandBlock(cargc, cargv);
+        }
 
-//     while (1) {
-//         char b[10]={0};
-//         itoaTruncate(pid, b, 10);
-//         print(b);
-//         prioBusyWait(MINOR_WAIT);
-//     }
-// }
+        printf("CHANGING PRIORITIES WHILE BLOCKED...\n");
 
-// #define TOTAL_PROCESSES 3
+        /* my_nice(pids[i], MEDIUM); */
+        for (i = 0; i < TOTAL_PROCESSES; i++) {
+                int cargc = 0;
+                char **cargv =
+                        create_argv("commandNice", &cargc, 2, pids[i], MEDIUM);
+                commandNice(cargc, cargv);
+        }
 
-// void testPrio() {
-//     uint64_t pids[TOTAL_PROCESSES];
-//     uint64_t i;
+        printf("UNBLOCKING...\n");
 
-//     // for (i = 0; i < TOTAL_PROCESSES; i++)
-//     //     pids[i] = prioCreateProcess((uint64_t * ) & prioEndlessLoop);
+        /* my_unblock(pids[i]); */
+        for (i = 0; i < TOTAL_PROCESSES; i++) {
+                int cargc = 0;
+                char **cargv =
+                        create_argv("commandUnblock", &cargc, 1, pids[i]);
+                // Unblock
+                commandBlock(cargc, cargv);
+        }
 
-//     prioBusyWait(WAIT);
-//     println("");
-//     println("CHANGING PRIORITIES...");
+        bussy_wait(WAIT);
+        printf("\nKILLING...\n");
 
-//     for (i = 0; i < TOTAL_PROCESSES; i++) {
-//         switch (i % 3) {
-//             case 0:
-//                 prioNice(pids[i], 1); //lowest priority
-//                 break;
-//             case 1:
-//                 prioNice(pids[i], 3); //medium priority
-//                 break;
-//             case 2:
-//                 prioNice(pids[i], 5); //highest priority
-//                 break;
-//         }
-//     }
-
-//     prioBusyWait(WAIT);
-//     println("");
-//     println("BLOCKING...");
-
-//     for (i = 0; i < TOTAL_PROCESSES; i++)
-//         prioBlock(pids[i]);
-
-//     println("CHANGING PRIORITIES WHILE BLOCKED...");
-//     for (i = 0; i < TOTAL_PROCESSES; i++) {
-//         switch (i % 3) {
-//             case 0:
-//                 prioNice(pids[i], 1); //medium priority
-//                 break;
-//             case 1:
-//                 prioNice(pids[i], 1); //medium priority
-//                 break;
-//             case 2:
-//                 prioNice(pids[i], 1); //medium priority
-//                 break;
-//         }
-//     }
-
-//     println("UNBLOCKING...");
-
-//     for (i = 0; i < TOTAL_PROCESSES; i++)
-//         prioUnblock(pids[i]);
-
-//     prioBusyWait(WAIT);
-//     println("");
-//     println("KILLING...");
-
-//     for (i = 0; i < TOTAL_PROCESSES; i++)
-//         prioKill(pids[i]);
-// }
-
-// // #define TOTAL_PROCESSES 3
-
-// // void test_prio(){
-// //   int pids[TOTAL_PROCESSES];
-// //   int i;
-
-// //   for(i = 0; i < TOTAL_PROCESSES; i++)
-
-// //   bussy_wait(WAIT);
-// //   printf("\nCHANGING PRIORITIES...\n");
-
-// //   for(i = 0; i < TOTAL_PROCESSES; i++){
-// //     switch (i % 3){
-// //       case 0:
-// //         my_nice(pids[i], 1); //lowest priority 
-// //         break;
-// //       case 1:
-// //         my_nice(pids[i], 5); //medium priority
-// //         break;
-// //       case 2:
-// //         my_nice(pids[i], 10); //highest priority
-// //         break;
-// //     }
-// //   }
-
-// //   bussy_wait(WAIT);
-// //   printf("\nBLOCKING...\n");
-
-// //   for(i = 0; i < TOTAL_PROCESSES; i++)
-// //     my_block(pids[i]);
-
-// //   printf("CHANGING PRIORITIES WHILE BLOCKED...\n");
-// //   for(i = 0; i < TOTAL_PROCESSES; i++){
-// //     switch (i % 3){
-// //       case 0:
-// //         my_nice(pids[i], 3); //medium priority 
-// //         break;
-// //       case 1:
-// //         my_nice(pids[i], 3); //medium priority
-// //         break;
-// //       case 2:
-// //         my_nice(pids[i], 3); //medium priority
-// //         break;
-// //     }
-// //   }
-
-// //   printf("UNBLOCKING...\n");
-
-// //   for(i = 0; i < TOTAL_PROCESSES; i++)
-// //     my_unblock(pids[i]);
-
-// //   bussy_wait(WAIT);
-// //   printf("\nKILLING...\n");
-
-// //   for(i = 0; i < TOTAL_PROCESSES; i++)
-// //     my_kill(pids[i]);
-
-// //   printf("Passed\n");  
-// //   processKiller();
-// // }
+        /* my_kill(pids[i]); */
+        for (i = 0; i < TOTAL_PROCESSES; i++) {
+                int cargc = 0;
+                char **cargv = create_argv("commandKill", &cargc, 1, pids[i]);
+                commandKill(cargc, cargv);
+        }
+}

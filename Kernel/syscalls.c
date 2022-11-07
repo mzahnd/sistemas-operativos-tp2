@@ -204,6 +204,16 @@ void syscallHandler(registerStruct *registers)
                 //rdi -> unsigned int PID
                 killProcessByPID((unsigned int)registers->rdi);
                 break;
+        
+        case 26: // Sleep
+                //rdi -> unsigned int seconds
+                putProcessToSleep((unsigned int)registers->rdi);
+                break;
+
+        case 27: //Get Current Process Pid
+                //rdi -> unsigned int *: pointer to int
+                *((unsigned int *)registers->rdi) = getCurrentProcessPID();
+                break;
 
         case 30:
                 // rdi -> const char *: name

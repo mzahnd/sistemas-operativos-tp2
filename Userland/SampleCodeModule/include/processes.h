@@ -33,6 +33,5 @@ int commandPipe(int argc, char **argv);
 int commandPhylo(int argc, char **argv);
 
 void processKiller();
-int getPid();
 
 #endif /* PROCESSES_H */

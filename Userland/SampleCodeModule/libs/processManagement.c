@@ -38,4 +38,14 @@ void waitPID(uint64_t pid)
         waitPIDSyscall(pid);
 }
 
+void sleep(unsigned int seconds) {
+        sleepSyscall(seconds);
+}
+
+unsigned int getPid(){
+    unsigned int pid;
+    getPIDSyscall(&pid);
+    return pid;
+}
+
 #endif /* PROCESS_MANAGEMENT */

@@ -364,6 +364,10 @@ static void executeCommand(commandList commands, char ** argv, int argc, unsigne
                 foreground = 0;
         }
 
+        for (int i = 0; i < argc; i++) {
+                printf("ARG %d: [%s]\n", i, argv[i]);
+        }
+
         if (function == NULL) {
                 printf("[%s] Is not a valid command\n", argv[0]);
                 return;

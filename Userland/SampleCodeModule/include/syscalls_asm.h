@@ -66,10 +66,11 @@ void semaphoreWaitSyscall(sem_t *sem, int *toReturn);
 void getCurrentProcessFDSyscall(int fd[2]);
 void niceSyscall(unsigned int pid, unsigned int priority, int *result);
 
-void getPIDSyscall(int *);
+void getPIDSyscall(unsigned int *);
 
 void changeProcessPrioritySyscall(unsigned int pid, unsigned int newPriority);
 void changeProcessStatusSyscall(unsigned int pid);
 void killProcessSyscall(unsigned int pid);
+void sleepSyscall(unsigned int seconds);
 
 #endif /* SYSCALLS_ASM_H */

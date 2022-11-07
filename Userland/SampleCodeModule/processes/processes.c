@@ -10,12 +10,6 @@ void processKiller(){
     while (1);
 }
 
-int getPid(){
-    int pid;
-    getPIDSyscall(&pid);
-    return pid;
-}
-
 
 
 

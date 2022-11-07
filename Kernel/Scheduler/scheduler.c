@@ -30,7 +30,6 @@ static unsigned int maxPID = 100;
 static unsigned int currentProcessCycle = 0;
 static unsigned int foregroundProcessPID = KERNEL_PROCESS_PID;
 
-void putProcessToSleep(unsigned int seconds);
 void unlockWaitingProcesses(process p);
 
 int haltProcess(int argc, char **argv)

@@ -33,10 +33,10 @@ GLOBAL getSchedulerInfoSyscall
 GLOBAL waitPIDSyscall
 GLOBAL getPIDSyscall
 GLOBAL getCurrentProcessFDSyscall
-
 GLOBAL changeProcessPrioritySyscall
 GLOBAL changeProcessStatusSyscall
 GLOBAL killProcessSyscall
+GLOBAL sleepSyscall
 
 section .text
 
@@ -415,7 +415,7 @@ getPIDSyscall:
     push rbp
     mov rbp, rsp
 
-    mov rax, 16; getCurrentPRocessPID syscall
+    mov rax, 27; getCurrentPRocessPID syscall
     int 80h
 
     mov rsp, rbp
@@ -445,7 +445,7 @@ changeProcessPrioritySyscall:    ;changeProcessPriority
     ret
 
     
-changeProcessStatusSyscall:    ;changeProcessPriority
+changeProcessStatusSyscall:    ;change Status
     push rbp
     mov rbp, rsp
 
@@ -456,11 +456,22 @@ changeProcessStatusSyscall:    ;changeProcessPriority
     pop rbp
     ret
 
-killProcessSyscall:    ;changeProcessPriority
+killProcessSyscall:    ;kill Process
     push rbp
     mov rbp, rsp
 
     mov rax, 25
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+sleepSyscall:    ;sleep
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 26
     int 80h
 
     mov rsp, rbp

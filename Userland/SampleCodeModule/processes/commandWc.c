@@ -21,7 +21,7 @@ int commandWc(int argc, char **argv)
         char c;
         int lineCount = 0;
 
-        char buffer[1024] = {0};
+        char buffer[1024] = { 0 };
         read(STDIN, buffer, 1024);
         for (int i = 0; i < 1024 && buffer[i] != 0; i++) {
                 if (buffer[i] == '\n') {

@@ -38,4 +38,7 @@ void free(void *ptr);
 void giveUpCPU();
 mem_info_t *mem_getinformation();
 
+int rand();
+void srand(unsigned seed);
+
 #endif /* STDLIB_H */

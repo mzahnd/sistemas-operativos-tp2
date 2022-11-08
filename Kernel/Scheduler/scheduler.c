@@ -257,6 +257,9 @@ void killProcessByPID(unsigned int pid)
         if (!scheduler_initialized || queue == NULL || queue->size == 0) {
                 return;
         }
+        if (pid == HALT_PROCESS_PID) { // HALT PROCESS CANNOT BE KILLED
+                return;
+        }
         process p = getFromPID(queue, pid);
         if (p == NULL) {
                 return;

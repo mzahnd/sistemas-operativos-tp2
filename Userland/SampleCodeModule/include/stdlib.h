@@ -19,8 +19,10 @@
 #endif /* NULL */
 
 #ifndef EOF
-#define EOF -1
+#define EOF 0
 #endif /* EOF */
+
+#define MAX_PROCESS_PRIORITY 10
 
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);

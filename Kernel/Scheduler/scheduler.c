@@ -291,6 +291,8 @@ void getSchedulerInfo(schInfo_t *infoBlock)
                 processInfo->ppid = p->ppid;
                 processInfo->priority = p->priority;
                 processInfo->status = p->status;
+                processInfo->foreground = foregroundProcessPID == p->pid;
+                processInfo->stack = p->stackPointer;
         }
 }
 

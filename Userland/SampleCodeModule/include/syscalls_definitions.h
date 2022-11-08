@@ -41,6 +41,9 @@ typedef struct processInfo_t {
         unsigned int ppid;
         unsigned int priority;
         unsigned int status;
+        unsigned int foreground;
+        void * stack;
+
 } processInfo_t;
 
 typedef struct schInfo_t {

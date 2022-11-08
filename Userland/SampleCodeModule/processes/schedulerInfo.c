@@ -19,7 +19,7 @@ int schedulerInfo(int argc, char **argv)
         schInfo_t info;
         getSchedulerInfoSyscall(&info);
         printf("\n");
-        printf("NAME\tPID\tPPID\tSTATUS\n");
+        printf("NAME\tPID\tPPID\tSTATUS\tFOREGROUND\tSTACK\n");
         for (int i = 0; i < info.totalProcesses; i++) {
                 char *status;
                 if (info.processes[i].status == 1) {
@@ -31,8 +31,8 @@ int schedulerInfo(int argc, char **argv)
                 } else {
                         status = "ERROR";
                 }
-                printf("%s\t%d\t%d\t%s\n", info.processes[i].name, //-V576
-                       info.processes[i].pid, info.processes[i].ppid, status);
+                printf("%s\t%d\t%d\t%s\t%d\t%X\n", info.processes[i].name, //-V576
+                       info.processes[i].pid, info.processes[i].ppid, status, info.processes[i].foreground, info.processes[i].stack);
         }
 
         return 0;

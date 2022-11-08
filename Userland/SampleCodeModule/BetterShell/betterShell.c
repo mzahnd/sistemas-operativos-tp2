@@ -261,9 +261,10 @@ static void processCommand(char *command, commandList commands,
                                         pipes[pipeIndex][PIPE_FD_WRITE],
                                         resourceList);
                         }
-                        for (int j = 0; j < argc; j++) {
-                                argv[j] = NULL;
-                        }
+                        // for (int j = 0; j < argc; j++) {
+                        //         argv[j] = NULL;
+                        // }
+                        argv = malloc(sizeof(char *) * 64);
                         argc = 0;
                         pipeIndex++;
                         totalCommands++;

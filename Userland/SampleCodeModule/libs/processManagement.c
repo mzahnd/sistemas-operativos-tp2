@@ -53,7 +53,8 @@ unsigned int getPid()
         return pid;
 }
 
-unsigned int isProcessActive(unsigned int pid) {
+unsigned int isProcessActive(unsigned int pid)
+{
         unsigned int result;
         isProcessActiveSyscall(pid, &result);
         return result;

@@ -409,7 +409,8 @@ void giveUpCPU()
         forceTimerTick();
 }
 
-int isProcessActive(uint64_t pid) {
+int isProcessActive(uint64_t pid)
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return 0;
         }

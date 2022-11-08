@@ -328,9 +328,9 @@ void syscallHandler(registerStruct *registers)
         case 46:
                 //rdi -> unsigned int: pid
                 //rsi -> unsigned int *: to return
-                *((unsigned int *)registers->rsi) = (uint64_t)(isProcessActive(registers->rdi));
+                *((unsigned int *)registers->rsi) =
+                        (uint64_t)(isProcessActive(registers->rdi));
                 break;
-                
         }
 }
 

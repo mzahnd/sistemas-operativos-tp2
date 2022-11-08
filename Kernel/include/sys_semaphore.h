@@ -26,7 +26,7 @@ void sys_sosem_open(const char *name, unsigned int initial_value,
                     sosem_t **result);
 
 /** 
- * Wrapper around Kernel's sys_sosem_close() for Userland.
+ * Wrapper around Kernel's sosem_close() for Userland.
  *
  * @see Kernel's function: Kernel/include/semaphore.h 
  *
@@ -36,7 +36,7 @@ void sys_sosem_open(const char *name, unsigned int initial_value,
 void sys_sosem_close(sosem_t *sem, int *result);
 
 /** 
- * Wrapper around Kernel's sys_sosem_init() for Userland.
+ * Wrapper around Kernel's sosem_init() for Userland.
  *
  * @see Kernel's function: Kernel/include/semaphore.h 
  *
@@ -46,7 +46,7 @@ void sys_sosem_close(sosem_t *sem, int *result);
 void sys_sosem_init(sosem_t *sem, unsigned int initial_value, int *result);
 
 /** 
- * Wrapper around Kernel's sys_sosem_destroy() for Userland.
+ * Wrapper around Kernel's sosem_destroy() for Userland.
  *
  * @see Kernel's function: Kernel/include/semaphore.h 
  *
@@ -56,7 +56,7 @@ void sys_sosem_init(sosem_t *sem, unsigned int initial_value, int *result);
 void sys_sosem_destroy(sosem_t *sem, int *result);
 
 /** 
- * Wrapper around Kernel's sys_sosem_getvalue() for Userland.
+ * Wrapper around Kernel's sosem_getvalue() for Userland.
  *
  * @see Kernel's function: Kernel/include/semaphore.h 
  *
@@ -68,7 +68,7 @@ void sys_sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval,
                         int *result);
 
 /** 
- * Wrapper around Kernel's sys_sosem_post() for Userland.
+ * Wrapper around Kernel's sosem_post() for Userland.
  *
  * @see Kernel's function: Kernel/include/semaphore.h 
  *
@@ -78,7 +78,7 @@ void sys_sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval,
 void sys_sosem_post(sosem_t *sem, int *result);
 
 /** 
- * Wrapper around Kernel's sys_sosem_wait() for Userland.
+ * Wrapper around Kernel's sosem_wait() for Userland.
  *
  * @see Kernel's function: Kernel/include/semaphore.h 
  *
@@ -96,5 +96,16 @@ void sys_sosem_wait(sosem_t *sem, int *result);
  * @param result 0 on success; -1 otherwise
  */
 void sys_sosem_getinformation(sosem_info_t *last, sosem_info_t **result);
+
+/** 
+ * Wrapper around Kernel's sosem_init_bin() for Userland.
+ *
+ * @see Kernel's function: Kernel/include/semaphore.h 
+ *
+ * @param sem Address of the unnamed semaphore to iniitlize
+ * @param result 0 on success; -1 otherwise
+ */
+void sys_sosem_init_bin(sosem_t *sem, unsigned int initial_value,
+                               int *result);
 
 #endif /* SYS_SEMAPHORE_H */

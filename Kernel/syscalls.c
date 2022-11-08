@@ -215,7 +215,7 @@ void syscallHandler(registerStruct *registers)
                 //rdi -> unsigned int *: pointer to int
                 *((unsigned int *)registers->rdi) = getCurrentProcessPID();
                 break;
-        
+
         case 28: // Give Up CPU
                 giveUpCPU();
                 break;
@@ -280,6 +280,15 @@ void syscallHandler(registerStruct *registers)
                 // rsi -> result (sosem_info_t **)
                 sys_sosem_getinformation((sosem_info_t *)registers->rdi,
                                          (sosem_info_t **)registers->rsi);
+                break;
+
+        case 38:
+                // rdi -> semaphore pointer (sosem_t *)
+                // rsi -> initial value
+                // rdx -> result (int*)
+                sys_sosem_init_bin((sosem_t *)registers->rdi,
+                                   (unsigned int)registers->rsi,
+                                   (int *)registers->rdx);
                 break;
 
         // Pipes from 40
@@ -384,9 +393,9 @@ void syscallRead(registerStruct *reg)
                         return; // Not initialized
                 }
                 if (currentProcessStdin == 0) {
-                        char* buff =  (char *)reg->rsi;
-                        uint64_t size = (uint64_t)reg->rdx; 
-                        uint64_t* resultPtr = (uint64_t *)reg->rcx;
+                        char *buff = (char *)reg->rsi;
+                        uint64_t size = (uint64_t)reg->rdx;
+                        uint64_t *resultPtr = (uint64_t *)reg->rcx;
                         readKeyboard((int *)buff, size, resultPtr);
                         return;
                 }

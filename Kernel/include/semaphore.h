@@ -54,6 +54,8 @@ typedef struct SOSEM {
         atomic_flag lock;
         atomic_uint _n_waiting;
 
+        int binary;
+
         sosem_info_t userland;
 
         _sosem_pid_t _processes;
@@ -65,6 +67,8 @@ sosem_t *sosem_open(const char *name, unsigned int initial_value);
 int sosem_close(sosem_t *sem);
 // Create an unnamed semaphore starting with initial_value.
 int sosem_init(sosem_t *sem, unsigned int initial_value);
+// Create a binary unnamed semaphore starting with initial_value.
+int sosem_init_bin(sosem_t *sem, unsigned int initial_value);
 // Close an unnamed semaphore
 int sosem_destroy(sosem_t *sem);
 int sosem_getvalue(sosem_t *restrict sem, unsigned int *restrict sval);

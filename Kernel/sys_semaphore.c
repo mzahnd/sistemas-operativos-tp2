@@ -70,3 +70,11 @@ inline void sys_sosem_getinformation(sosem_info_t *last, sosem_info_t **result)
 {
         *result = sosem_getinformation(last);
 }
+
+/* ------------------------------ */
+
+inline void sys_sosem_init_bin(sosem_t *sem, unsigned int initial_value,
+                               int *result)
+{
+        *result = sosem_init_bin(sem, initial_value);
+}

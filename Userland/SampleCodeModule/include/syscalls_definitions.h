@@ -50,7 +50,7 @@ typedef struct schInfo_t {
 } schInfo_t;
 
 /* ---------- semaphores ---------- */
-typedef struct SOSEM_INFO {
+typedef struct SEM_INFO {
         char *name;
         size_t len;
 
@@ -61,18 +61,20 @@ typedef struct SOSEM_INFO {
 } sem_info_t;
 
 // Circular queue with locked processes' PID
-typedef struct _SOSEM_PID {
+typedef struct _SEM_PID {
         unsigned int _n_waiting;
         uint64_t _queue[SEM_MAX_WAITING];
         unsigned int _index;
 } _sem_pid_t;
 
-typedef struct SOSEM {
+typedef struct SEM {
         char name[SEM_MAX_NAME_LEN + 1];
 
         atomic_uint value;
         atomic_flag lock;
         atomic_uint _n_waiting;
+
+        int binary;
 
         sem_info_t userland;
 

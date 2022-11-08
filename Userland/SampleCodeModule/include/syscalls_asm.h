@@ -59,6 +59,8 @@ void semaphoreGetInformationSyscall(sem_info_t *restrict sem,
 void semaphoreGetValueSyscall(sem_t *sem, unsigned int *restrict sval,
                               int *toReturn);
 void semaphoreInitSyscall(sem_t *sem, unsigned int initialValue, int *toReturn);
+
+void semaphoreInitBinarySyscall(sem_t *sem, unsigned int initialValue, int *toReturn);
 void semaphoreOpenSyscall(const char *name, unsigned int initialValue,
                           sem_t **toReturn);
 void semaphorePostSyscall(sem_t *sem, int *toReturn);

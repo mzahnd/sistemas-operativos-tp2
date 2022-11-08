@@ -32,6 +32,8 @@ sem_t *sem_open(const char *name, unsigned int initial_value);
 int sem_close(sem_t *sem);
 // Create an unnamed semaphore starting with initial_value.
 int sem_init(sem_t *sem, unsigned int initial_value);
+// Create a binary unnamed semaphore starting with initial_value.
+int sem_init_bin(sem_t *sem, unsigned int initial_value);
 // Close an unnamed semaphore
 int sem_destroy(sem_t *sem);
 int sem_getvalue(sem_t *restrict sem, unsigned int *restrict sval);

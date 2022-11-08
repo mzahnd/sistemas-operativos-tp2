@@ -129,8 +129,33 @@ int sosem_init(sosem_t *sem, unsigned int initial_value)
                 return -1;
 
         sem->name[0] = '\0';
+        sem->binary = 0;
 
         atomic_store(&sem->value, initial_value);
+        atomic_flag_clear(&sem->lock);
+        atomic_store(&sem->_n_waiting, 0);
+
+        userland_init(sem, &sem->userland);
+        pid_queue_init(sem);
+
+        return 0;
+}
+
+/* ------------------------------ */
+
+int sosem_init_bin(sosem_t *sem, unsigned int initial_value)
+{
+        if (sem == NULL)
+                return -1;
+
+        sem->name[0] = '\0';
+        sem->binary = 1;
+
+        if (initial_value > 1)
+                initial_value = 1;
+
+        atomic_store(&sem->value, initial_value);
+
         atomic_flag_clear(&sem->lock);
         atomic_store(&sem->_n_waiting, 0);
 
@@ -177,7 +202,10 @@ int sosem_post(sosem_t *sem)
         if (pid_queue_shift(sem, &pid) == 0) {
                 unlockProcessByPID(pid);
         }
-        atomic_fetch_add(&sem->value, 1);
+        if (sem->binary == 1)
+                atomic_store(&sem->value, 1);
+        else
+                atomic_fetch_add(&sem->value, 1);
 
         if (try_acquire(&(sem->lock)) == 0) {
                 // Userland
@@ -346,6 +374,8 @@ static int create_named_semaphore(const char *name, unsigned int initial_value,
         size_t len = strnlen(name, SEM_MAX_NAME_LEN);
         somemcpy(&(*sem)->name, name, len);
         (*sem)->name[len] = '\0';
+
+        (*sem)->binary = 0;
 
         atomic_store(&(*sem)->value, initial_value);
         atomic_flag_clear(&(*sem)->lock);

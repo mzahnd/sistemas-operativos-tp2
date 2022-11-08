@@ -26,6 +26,7 @@ GLOBAL semaphoreDestroySyscall
 GLOBAL semaphoreGetInformationSyscall
 GLOBAL semaphoreGetValueSyscall
 GLOBAL semaphoreInitSyscall
+GLOBAL semaphoreInitBinarySyscall
 GLOBAL semaphoreOpenSyscall
 GLOBAL semaphorePostSyscall
 GLOBAL semaphoreWaitSyscall
@@ -351,6 +352,17 @@ semaphoreInitSyscall:
     mov rbp, rsp
 
     mov rax, 35 ;ID sys_sosem_init
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+semaphoreInitBinarySyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 38 ;ID sys_sosem_init_bin
     int 80h
 
     mov rsp, rbp

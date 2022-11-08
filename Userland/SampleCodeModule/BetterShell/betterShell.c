@@ -16,6 +16,7 @@
 #include <stdGraphics.h>
 #include <stringUtils.h>
 #include <colors.h>
+#include <semaphoreUser.h>
 #include <BetterShell/betterShell.h>
 #include <BetterShell/shellLines.h>
 #include <BetterShell/processRscList.h>
@@ -29,6 +30,7 @@
 #define SHELL_BG_COLOR 0x001017 //BUTTERFLY_BUSH
 #define DETACH_PROCESS_CHAR '&'
 #define MAX_COMMAND_TOKENS 128
+
 
 typedef int (*processFunciton)(int, char *);
 
@@ -50,7 +52,6 @@ static void executeCommand(commandList commands, char **argv, int argc,
 
 void setupArgv(char **argv, int argc, char *command, unsigned int commandLen);
 void printOnShell(char *str, int dim);
-int checkResources(int argc, char** argv);
 static void initCommands(commandList list);
 
 static shellLinesQueue lines;
@@ -118,10 +119,9 @@ int runShell(int argc, char **argv)
                 commandLine[i] = '\0';
         }
 
-        createProcess("RSC Clean", checkResources, 0, NULL, 0);
-
         displayCommandLine(commandLine, commandLineIndex);
         displayLines(lines);
+        unsigned long strokes = 0;
         // Game Loop
         while (1) {
                 int inputChar = getChar();
@@ -131,7 +131,10 @@ int runShell(int argc, char **argv)
                         processCommand(commandLine, commands,
                                        &commandLineIndex, resourceList);
                 }
-                //checkAndFreeRsc(resourceList);
+                if (strokes % 10 == 0) { // Every 10 strokes, clean the resources of dead processes
+                        checkAndFreeRsc(resourceList);
+                }
+                strokes++;
         }
 
         free(commandLine);
@@ -261,7 +264,7 @@ static void processCommand(char *command, commandList commands,
                         argc = 0;
                         pipeIndex++;
                         totalCommands++;
-                        free(tokens[i]); // The pipe token doesn't do anything
+                        //free(tokens[i]); // The pipe token doesn't do anything
                         continue;
                 }
                 argv[argc] = tokens[i];
@@ -426,13 +429,6 @@ static void initCommands(commandList list)
         addCommand(list, "test_prio", test_prio);
         addCommand(list, "test_processes", test_processes);
         addCommand(list, "test_sync", test_sync);
-}
-
-int checkResources(int argc, char** argv) {
-        while(1) {
-                checkAndFreeRsc(resourceList);
-                sleep(1);
-        }
 }
 
 #endif /* BETTER_SHELL */

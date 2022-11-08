@@ -4,9 +4,11 @@
 #include <BetterShell/processRscList.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <pipeUser.h>
 #include <processManagement.h>
 
 static void freeArgv(int argc, char ** argv);
+static void closeFDs(int stdin, int stdout);
 
 rscList newRscList() {
     rscList list = malloc(sizeof(rscList_t));
@@ -77,6 +79,7 @@ void checkAndFreeRsc(rscList list) {
         if (!isProcessActive(node->pid)) {
             rscNode next = node->next;
             freeArgv(node->argc, node->argv);
+            //closeFDs(node->stdin, node->stdout);
             if (node == list->first) {
                 list->first = next;
             } else {
@@ -101,6 +104,16 @@ static void freeArgv(int argc, char ** argv) {
         free(argv[i]);
     }
     free(argv);
+}
+
+static void closeFDs(int stdin, int stdout) {
+    if (stdin != STDIN) {
+        close(stdin);
+    }
+
+    if (stdout != STDOUT) {
+        close(stdout);
+    }
 }
 
 #endif

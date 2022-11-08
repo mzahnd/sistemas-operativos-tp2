@@ -324,6 +324,13 @@ void syscallHandler(registerStruct *registers)
                 //rdi -> int[2]: array to file descriptors
                 getCurrentProcessFDs((int *)registers->rdi);
                 break;
+
+        case 46:
+                //rdi -> unsigned int: pid
+                //rsi -> unsigned int *: to return
+                *((unsigned int *)registers->rsi) = (uint64_t)(isProcessActive(registers->rdi));
+                break;
+                
         }
 }
 

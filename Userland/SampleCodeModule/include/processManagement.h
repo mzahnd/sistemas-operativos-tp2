@@ -20,5 +20,6 @@ uint64_t createProcessWithFD(char *name, int (*mainF)(int, char **), int argc,
 void waitPID(uint64_t pid);
 void sleep(unsigned int seconds);
 unsigned int getPid();
+unsigned int isProcessActive(unsigned int pid);
 
 #endif /* PROCESS_MANAGEMENT_H */

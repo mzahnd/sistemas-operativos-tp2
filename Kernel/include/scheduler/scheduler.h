@@ -58,5 +58,6 @@ void changeProcessStatus(unsigned int PID);
 void killProcessByPID(unsigned int pid);
 void putProcessToSleep(unsigned int seconds);
 void giveUpCPU();
+int isProcessActive(uint64_t pid);
 
 #endif /* SCHEDULER_H */

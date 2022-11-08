@@ -409,4 +409,15 @@ void giveUpCPU()
         forceTimerTick();
 }
 
+int isProcessActive(uint64_t pid) {
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return 0;
+        }
+        process p = getFromPID(queue, pid);
+        if (p == NULL || p->status == KILLED) {
+                return 0;
+        }
+        return 1;
+}
+
 #endif /* SCHEDULER */

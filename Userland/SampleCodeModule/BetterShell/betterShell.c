@@ -421,10 +421,10 @@ static void initCommands(commandList list)
         addCommand(list, "mem", commandMem);
         addCommand(list, "ps", commandPs);
         addCommand(list, "loop", commandLoop);
+        addCommand(list, "activeLoop", commandActiveLoop);
         addCommand(list, "kill", commandKill);
         addCommand(list, "nice", commandNice);
         addCommand(list, "block", commandBlock);
-        // addCommand(list, "unblock", commandUnblock);
         addCommand(list, "sem", commandSem);
         addCommand(list, "cat", commandCat);
         addCommand(list, "wc", commandWc);

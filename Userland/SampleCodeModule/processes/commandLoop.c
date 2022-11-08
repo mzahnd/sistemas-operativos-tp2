@@ -20,7 +20,7 @@ int commandLoop(int argc, char **argv)
         while (1) {
                 printf("Hello, this is the LOOP command. Current PID is %d\n",
                        getPid());
-                sleep(3);
+                sleep(1);
         }
 
         return 0;

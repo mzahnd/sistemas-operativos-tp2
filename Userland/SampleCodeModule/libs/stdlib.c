@@ -24,7 +24,7 @@ int atoi(char *str)
 {
         int aux = 0;
         while (*str != 0) {
-                aux = aux * 10 + (*str) + '0';
+                aux = aux * 10 + (*str) - '0';
                 str++;
         }
         return aux;

@@ -14,20 +14,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define EOF -1
+#define EOF 0
 
 int commandWc(int argc, char **argv)
 {
         char c;
         int lineCount = 0;
 
-        while ((c = getChar()) != EOF) {
-                putChar(c);
-
-                if (c == '\n') {
+        char buffer[1024] = { 0 };
+        read(STDIN, buffer, 1024);
+        for (int i = 0; i < 1024 && buffer[i] != 0; i++) {
+                if (buffer[i] == '\n') {
                         lineCount++;
                 }
         }
+
+        // while ((c = getChar()) != EOF) {
+        //         putChar(c);
+
+        //         if (c == '\n') {
+        //                 lineCount++;
+        //         }
+        // }
+        printf("[%s]\n", buffer);
         printf("\n\nLine Count: %d\n", lineCount);
         processKiller();
         return 0;

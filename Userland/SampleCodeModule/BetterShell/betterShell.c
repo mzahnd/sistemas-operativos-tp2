@@ -16,8 +16,10 @@
 #include <stdGraphics.h>
 #include <stringUtils.h>
 #include <colors.h>
+#include <semaphoreUser.h>
 #include <BetterShell/betterShell.h>
 #include <BetterShell/shellLines.h>
+#include <BetterShell/processRscList.h>
 #include <BetterShell/commandList.h>
 #include <processManagement.h>
 #include <processes.h>
@@ -39,32 +41,35 @@ static void undrawLastChar(char *commandLine, unsigned int index);
 static void drawLastChar(char *commandLine, unsigned int index);
 static void clearCommandLine(char *commandLine, unsigned int *index);
 static void processCommand(char *command, commandList commands,
-                           unsigned int *indexPtr);
+                           unsigned int *indexPtr, rscList resourceList);
 static void addArgToArgv(char **argv, unsigned int index, char *str,
                          unsigned int strDim);
 static void addToTokens(char *tokens[MAX_COMMAND_TOKENS], char *token,
                         unsigned int *index);
 static void executeCommand(commandList commands, char **argv, int argc,
-                           unsigned int stdin, unsigned int stdout);
+                           unsigned int stdin, unsigned int stdout,
+                           rscList resourceList);
 
 void setupArgv(char **argv, int argc, char *command, unsigned int commandLen);
 void printOnShell(char *str, int dim);
 static void initCommands(commandList list);
 
 static shellLinesQueue lines;
+static rscList resourceList;
 
 int testPrint1(int argc, char **argv)
 {
-        printf("123\n");
-        printf("456\n");
-        printf("567\n");
-        printf("890\n");
+        printf("Argc: [%d]\n", argc);
+        for (int i = 0; i < argc; i++) {
+                printf("Arg[%d]: [%s]\n", i, argv[i]);
+        }
 
         return 0;
 }
 
-int testRead1(int argc, char** argv) {
-        char buffer[64] = {0};
+int testRead1(int argc, char **argv)
+{
+        char buffer[64] = { 0 };
         read(STDIN, buffer, 64);
         printf("Read from STDIN: [%s]\n", buffer);
 
@@ -91,6 +96,11 @@ int testProcess3(int argc, char **argv)
 
 int runShell(int argc, char **argv)
 {
+        resourceList = newRscList();
+        if (resourceList == NULL) {
+                return -1;
+        }
+
         unsigned int commandLineIndex = 0;
         char *commandLine = malloc((MAX_COMMAND_LENGTH + 1) * sizeof(char));
         commandList commands = newCommandList();
@@ -111,15 +121,21 @@ int runShell(int argc, char **argv)
 
         displayCommandLine(commandLine, commandLineIndex);
         displayLines(lines);
+        unsigned long strokes = 0;
         // Game Loop
         while (1) {
                 int inputChar = getChar();
                 // Write the char
                 if (writeToCommandLine(inputChar, commandLine,
                                        &commandLineIndex, lines)) {
-                        processCommand(commandLine, commands,
-                                       &commandLineIndex);
+                        processCommand(commandLine, commands, &commandLineIndex,
+                                       resourceList);
                 }
+                if (strokes % 10 ==
+                    0) { // Every 10 strokes, clean the resources of dead processes
+                        checkAndFreeRsc(resourceList);
+                }
+                strokes++;
         }
 
         free(commandLine);
@@ -188,7 +204,7 @@ static void clearCommandLine(char *commandLine, unsigned int *index)
 }
 
 static void processCommand(char *command, commandList commands,
-                           unsigned int *lenPtr)
+                           unsigned int *lenPtr, rscList resourceList)
 {
         if (command == NULL) {
                 //print ERROR
@@ -226,9 +242,9 @@ static void processCommand(char *command, commandList commands,
 
         int totalCommands = 0;
         unsigned int argc = 0;
-        char **argv = malloc(sizeof(char *));
+        char **argv = malloc(sizeof(char *) * 64);
 
-        int pipes[MAX_COMMAND_TOKENS][2] = {{0}}; 
+        int pipes[MAX_COMMAND_TOKENS][2] = { { 0 } };
         int pipeIndex = 0;
 
         for (int i = 0; i < totalTokens; i++) {
@@ -236,19 +252,23 @@ static void processCommand(char *command, commandList commands,
                         pipe(pipes[pipeIndex]);
                         if (pipeIndex == 0) { // If it is the first command
                                 executeCommand(commands, argv, argc, 0,
-                                               pipes[0][PIPE_FD_WRITE]);
+                                               pipes[0][PIPE_FD_WRITE],
+                                               resourceList);
                         } else {
                                 executeCommand(
                                         commands, argv, argc,
                                         pipes[pipeIndex - 1][PIPE_FD_READ],
-                                        pipes[pipeIndex][PIPE_FD_WRITE]);
+                                        pipes[pipeIndex][PIPE_FD_WRITE],
+                                        resourceList);
                         }
-                        for (int j = 0; j < argc; j++) {
-                                argv[j] = NULL;
-                        }
+                        // for (int j = 0; j < argc; j++) {
+                        //         argv[j] = NULL;
+                        // }
+                        argv = malloc(sizeof(char *) * 64);
                         argc = 0;
                         pipeIndex++;
                         totalCommands++;
+                        //free(tokens[i]); // The pipe token doesn't do anything
                         continue;
                 }
                 argv[argc] = tokens[i];
@@ -257,15 +277,16 @@ static void processCommand(char *command, commandList commands,
 
         if (pipeIndex > 0) {
                 executeCommand(commands, argv, argc,
-                               pipes[pipeIndex - 1][PIPE_FD_READ], 1);
+                               pipes[pipeIndex - 1][PIPE_FD_READ], 1,
+                               resourceList);
         } else {
-                executeCommand(commands, argv, argc, 0, 1);
+                executeCommand(commands, argv, argc, 0, 1, resourceList);
         }
 
-        free(argv);
-        for (int i = 0; i < totalTokens; i++) {
-                free(tokens[i]);
-        }
+        // free(argv);
+        // for (int i = 0; i < totalTokens; i++) {
+        //         free(tokens[i]);
+        // }
 
         clearCommandLine(command, lenPtr);
         displayCommandLine(command, *lenPtr);
@@ -364,12 +385,14 @@ static void addToTokens(char *tokens[MAX_COMMAND_TOKENS], char *token,
 }
 
 static void executeCommand(commandList commands, char **argv, int argc,
-                           unsigned int stdin, unsigned int stdout)
+                           unsigned int stdin, unsigned int stdout,
+                           rscList resourceList)
 {
         unsigned int type = 0;
         processMainFunction_t function = getCommand(commands, argv[0], &type);
         unsigned int foreground = 1;
         if (argc > 1 && strcmp(argv[argc - 1], "&") == 0) {
+                free(argv[argc - 1]); // FREE THE "&"
                 argv[argc - 1] = NULL;
                 argc--;
                 foreground = 0;
@@ -381,6 +404,7 @@ static void executeCommand(commandList commands, char **argv, int argc,
         }
         uint64_t pid = createProcessWithFD(argv[0], function, argc, argv,
                                            foreground, stdin, stdout);
+        addResources(resourceList, pid, argc, argv, stdin, stdout);
         if (foreground) {
                 waitPID(pid);
         }

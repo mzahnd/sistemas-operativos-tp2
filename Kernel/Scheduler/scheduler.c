@@ -399,13 +399,26 @@ void changeProcessStatus(unsigned int PID)
         }
 }
 
-void giveUpCPU() {
+void giveUpCPU()
+{
         if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
                 return;
         }
         currentProcessCycle = MAX_PROCESS_PRIORITY + 1;
         _sti();
         forceTimerTick();
+}
+
+int isProcessActive(uint64_t pid)
+{
+        if (!scheduler_initialized || queue == NULL || currentNode == NULL) {
+                return 0;
+        }
+        process p = getFromPID(queue, pid);
+        if (p == NULL || p->status == KILLED) {
+                return 0;
+        }
+        return 1;
 }
 
 #endif /* SCHEDULER */

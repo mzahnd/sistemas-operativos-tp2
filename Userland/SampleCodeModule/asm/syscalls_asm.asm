@@ -39,6 +39,7 @@ GLOBAL changeProcessStatusSyscall
 GLOBAL killProcessSyscall
 GLOBAL sleepSyscall
 GLOBAL giveUpCPUSyscall
+GLOBAL isProcessActiveSyscall
 
 section .text
 
@@ -496,6 +497,17 @@ giveUpCPUSyscall:
     mov rbp, rsp
 
     mov rax, 28 ;giveUpCPUSyscall
+    int 80h
+
+    mov rsp, rbp
+    pop rbp
+    ret
+
+isProcessActiveSyscall:
+    push rbp
+    mov rbp, rsp
+
+    mov rax, 46 ;isProcessActive
     int 80h
 
     mov rsp, rbp

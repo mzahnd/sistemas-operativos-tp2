@@ -104,12 +104,15 @@ ssize_t soread(int fd, char *buf, size_t count)
                 read_idx = (read_idx + 1) % PIPE_BUFFER_SIZE;
 
                 n++;
-        } while (read_idx != pipes[index].write.index && n - 1 < count);
+        } while (read_idx != pipes[index].write.index && n < count);
 
         pipes[index].read.index = read_idx; // Update. Downside of the alias (:
 
         userland_update(&pipes[index]);
 
+        if (pipes[index].read.index != pipes[index].write.index) { // If I have things to read
+                sosem_post(&pipes[index].read.sem);
+        }
         // sosem_post(&pipes[index].write.sem);
 
         return n;

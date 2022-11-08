@@ -21,7 +21,7 @@ int commandFilter(int argc, char **argv)
         char buffer[50];
         unsigned int i = 0;
 
-        while ((c = getChar()) != '\n') {
+        while ((c = getChar()) != 0) {
                 putChar(c);
                 if (!isVowel(c)) {
                         // strcat(buffer, c, &i);

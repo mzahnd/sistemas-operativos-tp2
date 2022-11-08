@@ -15,29 +15,18 @@
 #include <stdlib.h>
 
 #define EOF 0
+#define MAX_BUFFER_SIZE 2048
 
 int commandWc(int argc, char **argv)
 {
-        char c;
         int lineCount = 0;
 
-        char buffer[1024] = { 0 };
-        read(STDIN, buffer, 1024);
-        for (int i = 0; i < 1024 && buffer[i] != 0; i++) {
-                if (buffer[i] == '\n') {
+        char c;
+        while ((c = getChar()) != EOF) {
+                if (c == '\n') {
                         lineCount++;
                 }
         }
-
-        // while ((c = getChar()) != EOF) {
-        //         putChar(c);
-
-        //         if (c == '\n') {
-        //                 lineCount++;
-        //         }
-        // }
-        printf("[%s]\n", buffer);
-        printf("\n\nLine Count: %d\n", lineCount);
-        processKiller();
+        printf("Line Count: %d\n", lineCount);
         return 0;
 }

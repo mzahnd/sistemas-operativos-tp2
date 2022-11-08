@@ -283,10 +283,7 @@ static void processCommand(char *command, commandList commands,
                 executeCommand(commands, argv, argc, 0, 1, resourceList);
         }
 
-        // free(argv);
-        // for (int i = 0; i < totalTokens; i++) {
-        //         free(tokens[i]);
-        // }
+        giveUpCPU();
 
         clearCommandLine(command, lenPtr);
         displayCommandLine(command, *lenPtr);

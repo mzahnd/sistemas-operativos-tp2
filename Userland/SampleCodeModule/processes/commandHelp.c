@@ -3,7 +3,6 @@
 
 int commandHelp(int argc, char **argv)
 {
-        putChar('\n');
         printf("This is the Help Center\n");
         printf("\tCommands:\n");
         printf("\t sh [ARGUMENT] - execute applications\n");

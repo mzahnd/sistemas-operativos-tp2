@@ -83,7 +83,7 @@ void checkAndFreeRsc(rscList list)
                 if (!isProcessActive(node->pid)) {
                         rscNode next = node->next;
                         freeArgv(node->argc, node->argv);
-                        //closeFDs(node->stdin, node->stdout);
+                        closeFDs(node->stdin, node->stdout);
                         if (node == list->first) {
                                 list->first = next;
                         } else {

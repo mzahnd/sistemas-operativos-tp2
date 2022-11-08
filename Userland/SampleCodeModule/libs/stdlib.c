@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <syscalls_asm.h>
 
+static unsigned __rand_seed = 1;
+
 int atoi(char *str);
 int intToString(unsigned long long num, char *buffer);
 int strcmp(char *str1, char *str2);
@@ -166,8 +168,27 @@ mem_info_t *mem_getinformation()
         return result;
 }
 
-void giveUpCPU() {
+void giveUpCPU()
+{
         giveUpCPUSyscall();
+}
+
+void srand(unsigned seed)
+{
+        __rand_seed = seed;
+}
+
+int rand()
+{
+        // Very simple LCG
+        // See: https://en.wikipedia.org/wiki/Linear_congruential_generator
+        const uint64_t m = 1 << 31; // Modulus
+        const uint64_t a = 1103515245; // Multiplier
+        const uint64_t c = 12345; // Increment
+
+        __rand_seed = (unsigned int)(a * __rand_seed + c) % m;
+
+        return (int)__rand_seed;
 }
 
 #endif /* STD_LIB_C */

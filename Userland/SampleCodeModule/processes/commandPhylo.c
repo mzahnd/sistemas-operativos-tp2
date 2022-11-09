@@ -7,6 +7,9 @@
  *                    López, P.
  *                    Sierra Pérez, C.
  *                    Zahnd, M. E.
+ *
+ * Dijkstra's solution
+ * See: https://en.wikipedia.org/wiki/Dining_philosophers_problem#Dijkstra's_solution
  */
 #include <stdio.h>
 #include <stdlib.h>

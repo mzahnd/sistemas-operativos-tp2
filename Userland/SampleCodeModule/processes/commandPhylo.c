@@ -26,8 +26,8 @@
 #define SEM_TABLE_NAME "_phylo_sem_table"
 #define SEM_PRINT_NAME "_phylo_sem_print"
 
-#define LEFT(i) (((i) + n_philosophers_table - 1) % n_philosophers_table)
-#define RIGHT(i) (((i) + 1) % n_philosophers_table)
+#define LEFT(i) (((i) + *n_philosophers_table - 1) % *n_philosophers_table)
+#define RIGHT(i) (((i) + 1) % *n_philosophers_table)
 
 /* ------------------------------ */
 
@@ -41,16 +41,27 @@ typedef struct PHYLO {
 /* ------------------------------ */
 
 static phylo_t philosophers_table[MAX_PHYLOS] = {};
-static unsigned int n_philosophers_table = 0;
+static unsigned int n_philosophers_table_parent = 0;
+static unsigned int *n_philosophers_table = NULL;
 
 /* ------------------------------ */
 
 static void print_table()
 {
-        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 1);
-        /* sem_wait(sem_print); */
+        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 0);
+        if (sem_print == NULL) {
+                printf("Failed: sem_print\n");
+                return;
+        }
 
-        for (int i = 0; i < n_philosophers_table; i++) {
+        sem_wait(sem_print);
+
+        printf("Info:\n");
+        printf("\tn_philosophers_table = %p\n", n_philosophers_table);
+        printf("\t*n_philosophers_table = %d\n", *n_philosophers_table);
+        printf("\tphilosophers_table = %p\n\n", philosophers_table);
+
+        for (int i = 0; i < *n_philosophers_table; i++) {
                 if (philosophers_table[i].state == EATING)
                         printf("E ");
                 else
@@ -58,7 +69,7 @@ static void print_table()
         }
         putChar('\n');
 
-        /* sem_post(sem_print); */
+        sem_post(sem_print);
 }
 
 static void try_forks(unsigned index)
@@ -67,25 +78,40 @@ static void try_forks(unsigned index)
             philosophers_table[LEFT(index)].state != EATING &&
             philosophers_table[RIGHT(index)].state != EATING) {
                 philosophers_table[index].state = EATING;
+
                 sem_post(&philosophers_table[index].both_forks_available);
         }
 }
 
-static int philosopher(int argc, char **argv)
+int philosopher(int argc, char **argv)
 {
         const int index = atoi(argv[1]);
         phylo_t *phil = &philosophers_table[index];
-        sem_t *forks_sem = sem_open(SEM_PHYLO_NAME, 1);
-        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 1);
+        sem_t *forks_sem = sem_open(SEM_PHYLO_NAME, 0);
+        if (forks_sem == NULL) {
+                printf("Failed: forks_sem\n");
+                return 1;
+        }
+
+        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 0);
+        if (sem_print == NULL) {
+                printf("Failed: sem_print\n");
+                return 1;
+        }
 
         phil->state = THINKING;
         sem_init_bin(&phil->both_forks_available, 0);
 
-        /* sem_wait(sem_print); */
+        sem_wait(sem_print);
         printf("A new philosopher has arrived!\n");
-        /* sem_post(sem_print); */
 
-        /* print_table(); */
+        printf("Info:\n");
+        printf("\tn_philosophers_table = %p\n", n_philosophers_table);
+        printf("\t*n_philosophers_table = %d\n", *n_philosophers_table);
+        printf("\tphilosophers_table = %p\n", philosophers_table);
+        sem_post(sem_print);
+
+        print_table();
 
         while (phil->state != DEAD) {
                 // Thinks for 1 to 3 second;
@@ -125,77 +151,93 @@ static int philosopher(int argc, char **argv)
 
 static void remove_philosopher()
 {
-        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 1);
-        sem_t *sem_philosophers_table = sem_open(SEM_TABLE_NAME, 1);
+        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 0);
+        if (sem_print == NULL) {
+                printf("Failed: sem_print\n");
+                return;
+        }
+
+        sem_t *sem_philosophers_table = sem_open(SEM_TABLE_NAME, 0);
+        if (sem_philosophers_table == NULL) {
+                printf("Failed: sem_philosophers_table\n");
+        }
 
         sem_wait(sem_philosophers_table);
-        int remove = rand() % n_philosophers_table;
+        int remove = rand() % *n_philosophers_table;
 
         phylo_t *phil = &philosophers_table[remove];
 
         phil->state = DEAD;
         sem_destroy(&phil->both_forks_available);
 
-        n_philosophers_table--;
+        *n_philosophers_table -= 1;
 
-        /* sem_wait(sem_print); */
+        sem_wait(sem_print);
         printf("Removed philosopher number %d\n", remove);
-        printf("There are %d philosophers left\n", n_philosophers_table);
-        /* sem_post(sem_print); */
+        printf("There are %d philosophers left\n", *n_philosophers_table);
+        sem_post(sem_print);
 
         sem_post(sem_philosophers_table);
 }
 
 static void add_philosopher()
 {
-        sem_t *sem_philosophers_table = sem_open(SEM_TABLE_NAME, 1);
+        sem_t *sem_philosophers_table = sem_open(SEM_TABLE_NAME, 0);
+        if (sem_philosophers_table == NULL) {
+                printf("Failed: sem_philosophers_table\n");
+                return;
+        }
 
         int argc = 3;
         char **argv = calloc(3, sizeof(char *));
 
         sem_wait(sem_philosophers_table);
+        *n_philosophers_table += 1;
+
         argv[0] = calloc(strlen("philosopher") + 1, sizeof(char));
         memcpy(argv[0], "philosopher", strlen("philosopher"));
 
         argv[1] = calloc(16, sizeof(char));
-        intToString(n_philosophers_table, argv[1]);
+        intToString(*n_philosophers_table, argv[1]);
 
         argv[2] = 0;
 
         createProcess(argv[0], &philosopher, argc, argv, 0);
-
-        n_philosophers_table++;
         sem_post(sem_philosophers_table);
 }
 
 static int readKeyboard()
 {
         int c = getChar();
-        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 1);
+        sem_t *sem_print = sem_open(SEM_PRINT_NAME, 0);
+        if (sem_print == NULL) {
+                printf("Failed: sem_print\n");
+                return 0;
+        }
 
         switch (c) {
         case 'a':
-                if (n_philosophers_table < MAX_PHYLOS) {
+                if (*n_philosophers_table < MAX_PHYLOS) {
                         add_philosopher();
                 } else {
-                        /* sem_wait(sem_print); */
+                        sem_wait(sem_print);
                         printf("Table full.\n");
-                        /* sem_post(sem_print); */
+                        sem_post(sem_print);
                 }
                 break;
         case 'r':
 
-                if (n_philosophers_table < MIN_PHYLOS) {
+                if (*n_philosophers_table < MIN_PHYLOS) {
                         remove_philosopher();
                 } else {
-                        /* sem_wait(sem_print); */
+                        sem_wait(sem_print);
                         printf("It would be rude to live your friend "
                                "eating alone.\n");
-                        /* sem_post(sem_print); */
+                        sem_post(sem_print);
                 }
                 break;
         case 'q':
-                /* sem_post(sem_print); */
+                sem_post(sem_print);
                 printf("Good bye!");
                 return 0;
         }
@@ -219,11 +261,27 @@ int commandPhylo(int argc, char **argv)
 
         // ""Random seed""
         srand(38403);
+
         sem_t *sem_philosophers_table = sem_open(SEM_TABLE_NAME, 1);
+        if (sem_philosophers_table == NULL) {
+                printf("Failed: sem_philosophers_table\n");
+                return 1;
+        }
 
         sem_t *sem_print = sem_open(SEM_PRINT_NAME, 1);
+        if (sem_philosophers_table == NULL) {
+                printf("Failed: sem_print\n");
+                return 1;
+        }
 
         sem_t *forks_sem = sem_open(SEM_PHYLO_NAME, 0);
+        if (forks_sem == NULL) {
+                printf("Failed: forks_sem\n");
+                return 1;
+        }
+
+        n_philosophers_table = &n_philosophers_table_parent;
+
         for (int i = 0; i < INITIAL_PHYLOS; i++) {
                 add_philosopher();
         }
@@ -234,7 +292,7 @@ int commandPhylo(int argc, char **argv)
                 kb = readKeyboard();
         }
 
-        for (int i = 0; i < n_philosophers_table; i++) {
+        for (int i = 0; i < *n_philosophers_table; i++) {
                 remove_philosopher();
         }
 

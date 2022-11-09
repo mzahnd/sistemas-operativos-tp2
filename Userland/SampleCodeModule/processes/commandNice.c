@@ -11,13 +11,19 @@
 
 int commandNice(int argc, char **argv)
 {
-        int id = atoi(argv[1]);
-        int priority = atoi(argv[2]);
-        if (id < 0 || priority <= 0) {
-                printf("Invalid arguments\n");
-                return -1;
+        if (argc != 3) {
+                printf("ERROR: PID and new priority required\n");
         }
-        changeProcessPrioritySyscall(id, priority);
+
+        int pid = atoi(argv[1]);
+        int priority = atoi(argv[2]);
+        if (pid <= 0) {
+                printf("ERROR: Invalid PID\n");
+        }
+        if (priority > MAX_PROCESS_PRIORITY || priority <= 0) {
+                printf("ERROR: Proiority is bounded between 1 and %d\n", MAX_PROCESS_PRIORITY);
+        }
+        changeProcessPrioritySyscall(pid, priority);
         // if(nice(id, priority) < 0) {
         //     printf("Priority change failed\n");
         // } else {

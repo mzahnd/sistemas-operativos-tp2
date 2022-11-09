@@ -18,11 +18,10 @@ int commandFilter(int argc, char **argv)
 {
         char c;
 
-        char buffer[50];
+        char buffer[128];
         unsigned int i = 0;
 
-        while ((c = getChar()) != '\n') {
-                putChar(c);
+        while ((c = getChar()) != 0) {
                 if (!isVowel(c)) {
                         // strcat(buffer, c, &i);
                         buffer[i++] = c;

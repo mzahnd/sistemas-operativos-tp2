@@ -257,6 +257,9 @@ void killProcessByPID(unsigned int pid)
         if (!scheduler_initialized || queue == NULL || queue->size == 0) {
                 return;
         }
+        if (pid == HALT_PROCESS_PID) { // HALT PROCESS CANNOT BE KILLED
+                return;
+        }
         process p = getFromPID(queue, pid);
         if (p == NULL) {
                 return;
@@ -291,6 +294,8 @@ void getSchedulerInfo(schInfo_t *infoBlock)
                 processInfo->ppid = p->ppid;
                 processInfo->priority = p->priority;
                 processInfo->status = p->status;
+                processInfo->foreground = foregroundProcessPID == p->pid;
+                processInfo->stack = p->stackPointer;
         }
 }
 

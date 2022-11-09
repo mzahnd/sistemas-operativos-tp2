@@ -14,13 +14,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define EOF -1
+#define CAT_BREAKING '\0'
 
 int commandCat(int argc, char **argv)
 {
         char c;
-        while ((c = getChar()) != EOF) {
-                putChar(c);
+        while ((c = getChar()) != CAT_BREAKING) {
+                printf("%c", c);
         }
         printf("\n");
         processKiller();

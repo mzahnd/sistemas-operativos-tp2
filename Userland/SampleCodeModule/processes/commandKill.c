@@ -13,21 +13,17 @@
 #include <syscalls_asm.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-// static int kill(int pid){
-//     int ans;
-//     killProcessSyscall(pid);
-//     return ans;
-// }
-
 int commandKill(int argc, char **argv)
 {
-        printf("\n");
-        unsigned int id = atoi(argv[1]);
-        // if(kill(id) == 0)
-        //     printf("Process successfully killed\n");
-        // else
-        //     printf("Process kill failed\n");
-        killProcessSyscall(id);
+        if (argc != 2) {
+                printf("ERROR: PID argument required!\n");
+                return -1;
+        }
+        int pid = atoi(argv[1]);
+        if (pid <= 0) {
+                printf("ERROR: Invalid PID\n");
+                return -1;
+        }
+        killProcessSyscall(pid);
         return 0;
 }

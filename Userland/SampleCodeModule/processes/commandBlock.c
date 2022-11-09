@@ -22,9 +22,16 @@
 
 int commandBlock(int argc, char **argv)
 {
-        unsigned int id = atoi(argv[1]);
+        if (argc != 2) {
+                printf("ERROR: pid of process required\n");
+        }
 
-        changeProcessStatusSyscall(id);
+        unsigned int pid = atoi(argv[1]);
+
+        if (pid <= 100) {
+                printf("ERROR: Only can block processes from Userland\n");
+        }
+        changeProcessStatusSyscall(pid);
         // if(block(id) == 0) {
         //     printf("Process successfully blocked\n");
         // } else {

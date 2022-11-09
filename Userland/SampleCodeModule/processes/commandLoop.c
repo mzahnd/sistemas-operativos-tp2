@@ -17,19 +17,18 @@
 
 int commandLoop(int argc, char **argv)
 {
-        if (argc != 2) {
-                printf("ERROR: Must have a interval parameter in seconds!\n");
-                return -1;
-        }
-
-        int interval = atoi(argv[1]);
-        printf("Interval: %s\n", argv[1]);
-
         while (1) {
                 printf("Hello, this is the LOOP command. Current PID is %d\n",
                        getPid());
-                sleep(3);
+                sleep(1);
         }
 
         return 0;
+}
+
+int commandActiveLoop(int argc, char **argv) {
+        while(1) {
+                for (int i = 0; i < 500000000; i++);
+                printf("Hello, this is the ACTIVE LOOP command. Current PID is %d\n", getPid());
+        }
 }

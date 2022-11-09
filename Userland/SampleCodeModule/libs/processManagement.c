@@ -43,6 +43,9 @@ void waitPID(uint64_t pid)
 
 void sleep(unsigned int seconds)
 {
+        if (seconds == 0)
+                return;
+
         sleepSyscall(seconds);
 }
 

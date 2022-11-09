@@ -163,7 +163,7 @@ uint64_t createAndAddProcess(char *name, int (*mainF)(int, char **), int argc,
 
 void putProcessToSleep(unsigned int seconds)
 {
-        if (!scheduler_initialized || currentNode == NULL) {
+        if (!scheduler_initialized || currentNode == NULL || seconds == 0) {
                 return;
         }
         process p = currentNode->pcb;

@@ -188,6 +188,9 @@ int rand()
 
         __rand_seed = (unsigned int)(a * __rand_seed + c) % m;
 
+        if ((int)__rand_seed < 0)
+                return ((int)__rand_seed) * (-1);
+
         return (int)__rand_seed;
 }
 

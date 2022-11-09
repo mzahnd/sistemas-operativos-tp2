@@ -20,14 +20,20 @@
 #define MIN_PHYLOS 3
 #define INITIAL_PHYLOS 5
 
+#define PHYLO_EAT_AT_LEAST_FOR 1
+#define PHYLO_EAT_AT_MOST_FOR 3
+#define PHYLO_THINK_AT_LEAST_FOR 3
+#define PHYLO_THINK_AT_MOST_FOR 5
+
 #define TABLE_MAX_PHYLOS_PER_ROWS 5
+#define TABLE_PRINT_SLEEP 5
 
 #define SEM_PHYLO_NAME "_phylo_sem"
 #define SEM_TABLE_NAME "_phylo_sem_table"
 #define SEM_PRINT_NAME "_phylo_sem_print"
 
-#define LEFT(i) (((i) + *n_philosophers_table - 1) % *n_philosophers_table)
-#define RIGHT(i) (((i) + 1) % *n_philosophers_table)
+#define LEFT(i) (((i) + n_philosophers_table - 1) % n_philosophers_table)
+#define RIGHT(i) (((i) + 1) % n_philosophers_table)
 
 /* ------------------------------ */
 
@@ -41,35 +47,46 @@ typedef struct PHYLO {
 /* ------------------------------ */
 
 static phylo_t philosophers_table[MAX_PHYLOS] = {};
-static unsigned int n_philosophers_table_parent = 0;
-static unsigned int *n_philosophers_table = NULL;
+static unsigned int n_philosophers_table = 0;
 
 /* ------------------------------ */
 
-static void print_table()
+int print_table(int argc, char **argv)
 {
         sem_t *sem_print = sem_open(SEM_PRINT_NAME, 0);
         if (sem_print == NULL) {
                 printf("Failed: sem_print\n");
-                return;
+                return 1;
         }
 
-        sem_wait(sem_print);
+        while (1) {
+                sem_wait(sem_print);
 
-        printf("Info:\n");
-        printf("\tn_philosophers_table = %p\n", n_philosophers_table);
-        printf("\t*n_philosophers_table = %d\n", *n_philosophers_table);
-        printf("\tphilosophers_table = %p\n\n", philosophers_table);
+                printf("\n---------------\n");
 
-        for (int i = 0; i < *n_philosophers_table; i++) {
-                if (philosophers_table[i].state == EATING)
-                        printf("E ");
-                else
-                        printf(". ");
+                for (int i = 0, phylos_printed = 0; i < MAX_PHYLOS; i++) {
+                        if (philosophers_table[i].state == DEAD)
+                                continue;
+                        else if (philosophers_table[i].state == EATING)
+                                printf("E ");
+                        else
+                                printf(". ");
+
+                        phylos_printed++;
+
+                        if (phylos_printed == TABLE_MAX_PHYLOS_PER_ROWS) {
+                                phylos_printed = 0;
+                                putChar('\n');
+                        }
+                }
+                printf("\n===============\n");
+
+                sem_post(sem_print);
+
+                sleep(TABLE_PRINT_SLEEP);
         }
-        putChar('\n');
 
-        sem_post(sem_print);
+        return 0;
 }
 
 static void try_forks(unsigned index)
@@ -103,19 +120,14 @@ int philosopher(int argc, char **argv)
         sem_init_bin(&phil->both_forks_available, 0);
 
         sem_wait(sem_print);
-        printf("A new philosopher has arrived!\n");
-
-        printf("Info:\n");
-        printf("\tn_philosophers_table = %p\n", n_philosophers_table);
-        printf("\t*n_philosophers_table = %d\n", *n_philosophers_table);
-        printf("\tphilosophers_table = %p\n", philosophers_table);
+        printf("A new philosopher has arrived!\n"
+               "There are %d philosophers.\n",
+               n_philosophers_table);
         sem_post(sem_print);
 
-        print_table();
-
         while (phil->state != DEAD) {
-                // Thinks for 1 to 3 second;
-                int think_time = (rand() + 1) % 3;
+                int think_time = PHYLO_THINK_AT_LEAST_FOR +
+                                 rand() % PHYLO_THINK_AT_MOST_FOR;
                 sleep(think_time);
 
                 // Take forks
@@ -127,10 +139,9 @@ int philosopher(int argc, char **argv)
                 // Block if it could not acquire forks
                 sem_wait(&phil->both_forks_available);
 
-                print_table();
-
                 // Eat
-                int eat_time = (rand() + 1) % 3;
+                int eat_time =
+                        PHYLO_EAT_AT_LEAST_FOR + rand() % PHYLO_EAT_AT_MOST_FOR;
                 sleep(eat_time);
 
                 // Put down forks
@@ -149,6 +160,12 @@ int philosopher(int argc, char **argv)
         return 0;
 }
 
+static void print_table_in_background()
+{
+        char *argv_print_table[] = { "print_table", 0 };
+        createProcess(argv_print_table[0], print_table, 0, argv_print_table, 0);
+}
+
 static void remove_philosopher()
 {
         sem_t *sem_print = sem_open(SEM_PRINT_NAME, 0);
@@ -160,21 +177,27 @@ static void remove_philosopher()
         sem_t *sem_philosophers_table = sem_open(SEM_TABLE_NAME, 0);
         if (sem_philosophers_table == NULL) {
                 printf("Failed: sem_philosophers_table\n");
+                return;
         }
 
         sem_wait(sem_philosophers_table);
-        int remove = rand() % *n_philosophers_table;
+        int remove = 0;
+
+        do {
+                remove = rand() % MAX_PHYLOS;
+        } while (philosophers_table[remove].state == DEAD);
 
         phylo_t *phil = &philosophers_table[remove];
 
         phil->state = DEAD;
         sem_destroy(&phil->both_forks_available);
 
-        *n_philosophers_table -= 1;
+        n_philosophers_table -= 1;
 
         sem_wait(sem_print);
-        printf("Removed philosopher number %d\n", remove);
-        printf("There are %d philosophers left\n", *n_philosophers_table);
+        printf("Removed philosopher number %d\n"
+               "There are %d philosophers left\n",
+               remove + 1, n_philosophers_table);
         sem_post(sem_print);
 
         sem_post(sem_philosophers_table);
@@ -192,13 +215,13 @@ static void add_philosopher()
         char **argv = calloc(3, sizeof(char *));
 
         sem_wait(sem_philosophers_table);
-        *n_philosophers_table += 1;
+        n_philosophers_table += 1;
 
         argv[0] = calloc(strlen("philosopher") + 1, sizeof(char));
         memcpy(argv[0], "philosopher", strlen("philosopher"));
 
         argv[1] = calloc(16, sizeof(char));
-        intToString(*n_philosophers_table, argv[1]);
+        intToString(n_philosophers_table, argv[1]);
 
         argv[2] = 0;
 
@@ -217,7 +240,7 @@ static int readKeyboard()
 
         switch (c) {
         case 'a':
-                if (*n_philosophers_table < MAX_PHYLOS) {
+                if (n_philosophers_table < MAX_PHYLOS) {
                         add_philosopher();
                 } else {
                         sem_wait(sem_print);
@@ -227,12 +250,14 @@ static int readKeyboard()
                 break;
         case 'r':
 
-                if (*n_philosophers_table < MIN_PHYLOS) {
+                if (n_philosophers_table > MIN_PHYLOS) {
                         remove_philosopher();
                 } else {
                         sem_wait(sem_print);
-                        printf("It would be rude to live your friend "
-                               "eating alone.\n");
+                        printf("It would be rude to live your friends "
+                               "eating alone.\n"
+                               "(There are only %d philosophers)\n",
+                               n_philosophers_table);
                         sem_post(sem_print);
                 }
                 break;
@@ -259,8 +284,9 @@ int commandPhylo(int argc, char **argv)
         printf("And I say welcome to the show\n");
         printf("\n");
 
-        // ""Random seed""
+        // ""Random seed"". This gives us some predictability
         srand(38403);
+        n_philosophers_table = 0;
 
         sem_t *sem_philosophers_table = sem_open(SEM_TABLE_NAME, 1);
         if (sem_philosophers_table == NULL) {
@@ -280,19 +306,19 @@ int commandPhylo(int argc, char **argv)
                 return 1;
         }
 
-        n_philosophers_table = &n_philosophers_table_parent;
-
         for (int i = 0; i < INITIAL_PHYLOS; i++) {
                 add_philosopher();
         }
         sem_post(forks_sem);
+
+        print_table_in_background();
 
         int kb = 1;
         while (kb) {
                 kb = readKeyboard();
         }
 
-        for (int i = 0; i < *n_philosophers_table; i++) {
+        for (int i = 0; i < n_philosophers_table; i++) {
                 remove_philosopher();
         }
 

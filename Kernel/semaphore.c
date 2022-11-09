@@ -148,19 +148,10 @@ int sosem_init_bin(sosem_t *sem, unsigned int initial_value)
         if (sem == NULL)
                 return -1;
 
-        sem->name[0] = '\0';
+        sosem_init(sem, initial_value);
         sem->binary = 1;
-
         if (initial_value > 1)
                 initial_value = 1;
-
-        atomic_store(&sem->value, initial_value);
-
-        atomic_flag_clear(&sem->lock);
-        atomic_store(&sem->_n_waiting, 0);
-
-        userland_init(sem, &sem->userland);
-        pid_queue_init(sem);
 
         return 0;
 }
@@ -234,12 +225,18 @@ int sosem_wait(sosem_t *sem)
         if (atomic_load(&sem->value) == 0) {
                 pid_queue_push(sem, getCurrentProcessPID());
                 userland_update(sem);
+
+                release(&(sem->lock));
 #ifdef TESTING
                 lockCurrentProcess(sem);
 #else
                 lockCurrentProcess();
 #endif
         }
+
+        // In case the current process was locked
+        // Not needed in any other case
+        try_acquire(&(sem->lock));
 
         atomic_fetch_sub(&sem->value, 1);
         atomic_fetch_sub(&sem->_n_waiting, 1);

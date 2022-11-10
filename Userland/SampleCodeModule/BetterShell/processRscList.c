@@ -92,7 +92,7 @@ void checkAndFreeRsc(rscList list)
                         if (node == list->last) {
                                 list->last = next; // next is NULL
                         }
-                        printf("freeing resources of process %d\n", node->pid);
+                        //printf("freeing resources of process %d\n", node->pid);
                         free(node);
                         list->size--;
                         node = next;

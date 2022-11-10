@@ -90,15 +90,20 @@ int endless_loop(int argc, char **argv)
 
 int endless_loop_print(int argc, char **argv)
 {
-        unsigned int pid = getPid();
-        uint64_t wait = 0;
-        if (argc == 2)
-                wait = atoi(argv[1]);
+        // unsigned int pid = getPid();
+        // uint64_t wait = 0;
+        // if (argc == 2)
+        //         wait = atoi(argv[1]);
+        if (argc != 2) {
+                printf("Error: Endless loop needs an argument to print\n");
+                return 1;
+        }
 
         while (1) {
-                printf("%d ", pid);
-                bussy_wait(wait);
+                printf("%s", argv[1]);
+                bussy_wait(25000000);
         }
+        return 0;
 }
 
 char **create_argv(char *argv0, int *argc, unsigned n, ...)

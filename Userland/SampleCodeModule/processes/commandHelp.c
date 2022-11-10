@@ -5,10 +5,10 @@ int commandHelp(int argc, char **argv)
 {
         printf("This is the Help Center\n");
         printf("\tCommands:\n");
-        printf("\t sh [ARGUMENT] - execute applications\n");
         printf("\t mem - displays the memory status\n");
         printf("\t ps - displays list of processes with their properties\n");
         printf("\t loop - prints current process ID\n");
+        printf("\t activeLoop - prints current process ID but doesn't block the process while waiting\n");
         printf("\t kill [PID] - kills process with given ID\n");
         printf("\t nice [PID,priority] - switches process priority with given ID and priority\n");
         printf("\t block [PID] - switches process state to blocked with given ID\n");

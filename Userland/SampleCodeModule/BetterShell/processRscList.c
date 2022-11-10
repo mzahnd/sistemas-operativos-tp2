@@ -15,7 +15,7 @@ rscList newRscList()
         rscList list = malloc(sizeof(rscList_t));
         list->size = 0;
         list->first = NULL;
-        list->size = NULL;
+        list->size = 0;
         return list;
 }
 

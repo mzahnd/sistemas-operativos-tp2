@@ -21,7 +21,7 @@
 
 #define MAX_PHYLOS 16
 #define MIN_PHYLOS 3
-#define INITIAL_PHYLOS 5
+#define INITIAL_PHYLOS 10
 
 #define PHYLO_EAT_AT_LEAST_FOR 1
 #define PHYLO_EAT_AT_MOST_FOR 3
@@ -277,6 +277,7 @@ static int readKeyboard()
 
 int commandPhylo(int argc, char **argv)
 {
+        printf("\n");
         printf("Yeah!\n");
         printf("Hello!\n");
         printf("Here I am, here we are, we are one\n");
@@ -285,6 +286,11 @@ int commandPhylo(int argc, char **argv)
         printf("\n");
         printf("You're in the psycho circus\n");
         printf("And I say welcome to the show\n");
+        printf("\n");
+
+        printf("Use the 'a' key to add philosophers to the table\n");
+        printf("Use the 'r' key to remove philosophers from the table\n");
+        printf("Enjoy your meal!\n");
         printf("\n");
 
         // ""Random seed"". This gives us some predictability

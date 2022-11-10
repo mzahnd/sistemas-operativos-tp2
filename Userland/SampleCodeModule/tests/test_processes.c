@@ -12,6 +12,7 @@
  */
 #include <stdio.h>
 #include <tests/test_util.h>
+#include <syscalls_asm.h>
 /* #include "syscall.h" */
 #include <stdlib.h> /* NULL */
 #include <processManagement.h> /* createProcess(); */
@@ -32,11 +33,15 @@ int64_t test_processes(uint64_t argc, char *argv[])
         uint64_t max_processes;
         char *argvAux[] = { 0 };
 
-        if (argc != 1)
+        if (argc != 2) {
+                printf("Error: Number of processes required\n");
                 return -1;
+        }
 
-        if ((max_processes = satoi(argv[0])) <= 0)
+        if ((max_processes = satoi(argv[1])) <= 1) {
+                printf("Error: Number of processes must be greater than 1");
                 return -1;
+        }
 
         p_rq p_rqs[max_processes];
 
@@ -44,7 +49,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
                 // Create max_processes processes
                 for (rq = 0; rq < max_processes; rq++) {
                         p_rqs[rq].pid = createProcess(
-                                "endless_loop", &endless_loop, 0, argvAux, 0);
+                                "endless_loop", endless_loop, 1, argvAux, 0);
 
                         if (p_rqs[rq].pid == -1) {
                                 printf("test_processes: ERROR creating process\n");
@@ -61,60 +66,33 @@ int64_t test_processes(uint64_t argc, char *argv[])
                         char **cargv = NULL;
 
                         for (rq = 0; rq < max_processes; rq++) {
+                                if (p_rqs[rq].state == KILLED) {
+                                        continue;
+                                }
+                                
                                 action = GetUniform(100) % 2;
 
                                 switch (action) {
                                 case 0:
                                         if (p_rqs[rq].state == RUNNING ||
                                             p_rqs[rq].state == BLOCKED) {
-                                                cargv = create_argv(
-                                                        "test_processes_kill",
-                                                        &cargc, 1,
-                                                        p_rqs[rq].pid);
-
-                                                if (commandKill(cargc, cargv) ==
-                                                    -1) {
-                                                        printf("test_processes: ERROR killing process\n");
-                                                        return -1;
-                                                }
+                                                killProcessSyscall(p_rqs[rq].pid);
                                                 p_rqs[rq].state = KILLED;
                                                 alive--;
                                         }
                                         break;
 
                                 case 1:
+                                        changeProcessStatusSyscall(p_rqs[rq].pid);
                                         if (p_rqs[rq].state == RUNNING) {
-                                                cargv = create_argv(
-                                                        "test_processes_block",
-                                                        &cargc, 1,
-                                                        p_rqs[rq].pid);
-
-                                                if (commandBlock(cargc,
-                                                                 cargv) == -1) {
-                                                        printf("test_processes: ERROR blocking process\n");
-                                                        return -1;
-                                                }
                                                 p_rqs[rq].state = BLOCKED;
+                                        } else {
+                                                p_rqs[rq].state = RUNNING;
                                         }
                                         break;
                                 }
                         }
-
-                        // Randomly unblocks processes
-                        for (rq = 0; rq < max_processes; rq++)
-                                if (p_rqs[rq].state == BLOCKED &&
-                                    GetUniform(100) % 2) {
-                                        cargv = create_argv(
-                                                "test_processes_unblock",
-                                                &cargc, 1, p_rqs[rq].pid);
-
-                                        // Unblock
-                                        if (commandBlock(cargc, cargv) == -1) {
-                                                printf("test_processes: ERROR unblocking process\n");
-                                                return -1;
-                                        }
-                                        p_rqs[rq].state = RUNNING;
-                                }
                 }
+                sleep(1);
         }
 }

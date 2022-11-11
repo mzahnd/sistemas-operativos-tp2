@@ -3,7 +3,7 @@ LD=ld
 AR=ar
 ASM=nasm
 
-CFLAGS=-g -m64 -fno-exceptions -fno-asynchronous-unwind-tables -mno-mmx -mno-sse -mno-sse2 -fno-builtin-malloc -fno-builtin-free -fno-builtin-realloc -mno-red-zone -Wall -ffreestanding -nostdlib -Wno-int-to-pointer-cast -fno-common -std=gnu11
+CFLAGS=-m64 -fno-exceptions -fno-asynchronous-unwind-tables -mno-mmx -mno-sse -mno-sse2 -fno-builtin-malloc -fno-builtin-free -fno-builtin-realloc -mno-red-zone -Wall -ffreestanding -nostdlib -Wno-int-to-pointer-cast -fno-common -std=gnu11
 
 ARFLAGS=rvs
 ASMFLAGS=-felf64

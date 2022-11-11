@@ -47,8 +47,8 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
         // Create max_processes processes
         for (rq = 0; rq < max_processes; rq++) {
-                p_rqs[rq].pid = createProcess(
-                        "endless_loop", endless_loop, 1, argvAux, 0);
+                p_rqs[rq].pid = createProcess("endless_loop", endless_loop, 1,
+                                              argvAux, 0);
 
                 if (p_rqs[rq].pid == -1) {
                         printf("test_processes: ERROR creating process\n");
@@ -72,13 +72,13 @@ int64_t test_processes(uint64_t argc, char *argv[])
                         if (p_rqs[rq].state == KILLED) {
                                 continue;
                         }
-                        
+
                         action = GetUniform(100) % 2;
 
                         switch (action) {
                         case 0:
                                 if (p_rqs[rq].state == RUNNING ||
-                                        p_rqs[rq].state == BLOCKED) {
+                                    p_rqs[rq].state == BLOCKED) {
                                         killProcessSyscall(p_rqs[rq].pid);
                                         p_rqs[rq].state = KILLED;
                                         alive--;

@@ -31,8 +31,10 @@ int schedulerInfo(int argc, char **argv)
                 } else {
                         status = "ERROR";
                 }
-                printf("%s\t%d\t%d\t%s\t%d\t%X\n", info.processes[i].name, //-V576
-                       info.processes[i].pid, info.processes[i].ppid, status, info.processes[i].foreground, info.processes[i].stack);
+                printf("%s\t%d\t%d\t%s\t%d\t%X\n",
+                       info.processes[i].name, //-V576
+                       info.processes[i].pid, info.processes[i].ppid, status,
+                       info.processes[i].foreground, info.processes[i].stack);
         }
 
         return 0;

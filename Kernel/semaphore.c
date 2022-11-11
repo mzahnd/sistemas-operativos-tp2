@@ -171,8 +171,6 @@ int sosem_destroy(sosem_t *sem)
                 unlockProcessByPID(pid);
         }
 
-
-
         userland_destroy(sem);
 
         return 0;
@@ -206,9 +204,9 @@ int sosem_post(sosem_t *sem)
                 release(&(sem->lock));
         }
 
-        #ifndef TESTING
+#ifndef TESTING
         giveUpCPU();
-        #endif
+#endif
 
         return 0;
 }

@@ -44,7 +44,6 @@ int my_process_inc(int argc, char *argv[])
         uint64_t use_sem;
         sem_t *sem = NULL;
 
-
         if (argc != 3) {
                 printf("Error: Invalid number of arguments\n");
                 return -1;
@@ -110,11 +109,12 @@ int test_sync(uint64_t argc, char *argv[])
         uint64_t i;
         for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
                 /* pids[i] = my_create_process("my_process_inc", 3, argvDec); */
-                pids[i] = createProcess("my_process_inc", my_process_inc, 3, argvDec, 0);
+                pids[i] = createProcess("my_process_inc", my_process_inc, 3,
+                                        argvDec, 0);
                 /* pids[i + TOTAL_PAIR_PROCESSES] = */
                 /*         my_create_process("my_process_inc", 3, argvInc); */
-                pids[i + TOTAL_PAIR_PROCESSES] =
-                        createProcess("my_process_inc", my_process_inc, 3, argvInc, 0);
+                pids[i + TOTAL_PAIR_PROCESSES] = createProcess(
+                        "my_process_inc", my_process_inc, 3, argvInc, 0);
         }
 
         for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {

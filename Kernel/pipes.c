@@ -110,7 +110,8 @@ ssize_t soread(int fd, char *buf, size_t count)
 
         userland_update(&pipes[index]);
 
-        if (pipes[index].read.index != pipes[index].write.index) { // If I have things to read
+        if (pipes[index].read.index !=
+            pipes[index].write.index) { // If I have things to read
                 sosem_post(&pipes[index].read.sem);
         }
         // sosem_post(&pipes[index].write.sem);

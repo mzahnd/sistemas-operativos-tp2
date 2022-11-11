@@ -68,7 +68,6 @@ sem_info_t *sem_getinformation(sem_info_t *restrict last)
         return sp;
 }
 
-
 int sem_init_bin(sem_t *sem, unsigned int initial_value)
 {
         int ret;

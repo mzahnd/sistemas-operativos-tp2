@@ -105,7 +105,6 @@ void sys_sosem_getinformation(sosem_info_t *last, sosem_info_t **result);
  * @param sem Address of the unnamed semaphore to iniitlize
  * @param result 0 on success; -1 otherwise
  */
-void sys_sosem_init_bin(sosem_t *sem, unsigned int initial_value,
-                               int *result);
+void sys_sosem_init_bin(sosem_t *sem, unsigned int initial_value, int *result);
 
 #endif /* SYS_SEMAPHORE_H */

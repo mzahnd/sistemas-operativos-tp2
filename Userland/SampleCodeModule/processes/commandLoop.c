@@ -26,9 +26,12 @@ int commandLoop(int argc, char **argv)
         return 0;
 }
 
-int commandActiveLoop(int argc, char **argv) {
-        while(1) {
-                for (int i = 0; i < 500000000; i++);
-                printf("Hello, this is the ACTIVE LOOP command. Current PID is %d\n", getPid());
+int commandActiveLoop(int argc, char **argv)
+{
+        while (1) {
+                for (int i = 0; i < 500000000; i++)
+                        ;
+                printf("Hello, this is the ACTIVE LOOP command. Current PID is %d\n",
+                       getPid());
         }
 }

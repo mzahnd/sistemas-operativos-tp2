@@ -21,7 +21,8 @@ int commandNice(int argc, char **argv)
                 printf("ERROR: Invalid PID\n");
         }
         if (priority > MAX_PROCESS_PRIORITY || priority <= 0) {
-                printf("ERROR: Proiority is bounded between 1 and %d\n", MAX_PROCESS_PRIORITY);
+                printf("ERROR: Proiority is bounded between 1 and %d\n",
+                       MAX_PROCESS_PRIORITY);
         }
         changeProcessPrioritySyscall(pid, priority);
         // if(nice(id, priority) < 0) {

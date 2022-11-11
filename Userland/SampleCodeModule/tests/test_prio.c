@@ -43,6 +43,9 @@ int test_prio(int argc, char *argv[])
         /* pids[i] = my_create_process("endless_loop_print", 0, argv); */
         for (i = 0; i < TOTAL_PROCESSES; i++) {
                 char **new_argv = malloc(sizeof(char *) * 2);
+                if (new_argv == NULL)
+                        return -1;
+
                 new_argv[0] = childProcessName;
                 new_argv[1] = malloc(2);
                 intToBase(i, 10, new_argv[1]);

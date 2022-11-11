@@ -201,7 +201,7 @@ int philosopher(int argc, char **argv)
         if (n_initial_philosophers_table >= INITIAL_PHYLOS) {
                 sem_wait(sem_print);
 
-                printf("%s has arrived!\n"
+                printf("%s has arrived!\n" // -V576
                        "There are %d philosophers.\n",
                        get_philosopher_name(index)[PHYLOS_NAMES_NAME],
                        n_philosophers_table);
@@ -211,7 +211,8 @@ int philosopher(int argc, char **argv)
                 // Philosophers joined for the first time
                 sem_wait(sem_print);
 
-                printf("The first %d philosophers are seated the table: \n",
+                printf("The first %d philosophers " // -V576
+                       "are seated the table: \n",
                        n_philosophers_table);
                 for (int i = 0; i < MAX_PHYLOS; i++) {
                         if (philosophers_table[i].state != DEAD &&
@@ -237,7 +238,9 @@ int philosopher(int argc, char **argv)
 
                 // Try to take forks
                 sem_wait(sem_forks);
-                if (phil->state == KILLED) {
+                if (phil->state == KILLED) { // -V547
+                        // V547: This expression CAN be true because the variable is controlled
+                        // by another process
                         sem_post(sem_forks);
                         break;
                 }
@@ -248,7 +251,9 @@ int philosopher(int argc, char **argv)
 
                 // Block if it could not acquire forks
                 sem_wait(&phil->both_forks_available);
-                if (phil->state == KILLED)
+                if (phil->state == KILLED) // -V547
+                        // V547: This expression CAN be true because the
+                        // variable is controlled by another process
                         break;
 
                 // Eat
@@ -257,12 +262,16 @@ int philosopher(int argc, char **argv)
                 sleep(eat_time);
 
                 // remove_philosopher() could have been called while sleeping
-                if (phil->state == KILLED)
+                if (phil->state == KILLED) // -V547
+                        // V547: This expression CAN be true because the
+                        // variable is controlled by another process
                         break;
 
                 // Put down forks
                 sem_wait(sem_forks);
-                if (phil->state == KILLED) {
+                if (phil->state == KILLED) { // -V547
+                        // V547: This expression CAN be true because the variable is controlled
+                        // by another process
                         sem_post(sem_forks);
                         break;
                 }
@@ -283,8 +292,8 @@ int philosopher(int argc, char **argv)
         n_philosophers_table -= 1;
 
         sem_wait(sem_print);
-        printf("%s has left."
-               " %d philosophers remain.\n",
+        printf("%s has left." // -V576
+               " %d philosophers remain.\n", // -V576
                get_philosopher_name(index)[PHYLOS_NAMES_NAME],
                n_philosophers_table);
         sem_post(sem_print);
@@ -324,7 +333,7 @@ static void remove_philosopher()
 
         if (n_philosophers_table <= MIN_PHYLOS) {
                 sem_wait(sem_print);
-                printf("It would be rude to leave your friends "
+                printf("It would be rude to leave your friends " // -V576
                        "eating alone.\n"
                        "(There are only %d philosophers)\n",
                        n_philosophers_table);
@@ -401,7 +410,7 @@ static void add_philosopher()
                 return;
         }
 
-        memcpy(argv[0], "philosopher", strlen("philosopher"));
+        memcpy(argv[0], "philosopher", strlen("philosopher") + 1);
 
         argv[1] = calloc(16, sizeof(char));
         if (argv[1] == NULL) {
@@ -525,7 +534,7 @@ int commandPhylo(int argc, char **argv)
         }
 
         sem_t *sem_print = sem_open(SEM_PRINT_NAME, 1);
-        if (sem_philosophers_table == NULL) {
+        if (sem_print == NULL) {
                 printf("Failed: sem_print\n");
                 return 1;
         }

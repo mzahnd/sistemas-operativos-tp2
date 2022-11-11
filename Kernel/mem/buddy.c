@@ -367,10 +367,10 @@ static void info_update_free(node_t *ptr)
 
                 unsigned int overflow_index = POW2(BUDDY_TREE_LEVELS) - 1;
                 unsigned int index = 0;
-                unsigned int child = 0;
-
                 while (index < overflow_index &&
                        tree_root[index].address == NULL) {
+                        unsigned int child = 0;
+
                         child = TREE_LEFT_CHILD(index);
 
                         if (tree_root[child].state == IN_USE)

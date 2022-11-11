@@ -243,6 +243,8 @@ static void processCommand(char *command, commandList commands,
         int totalCommands = 0;
         unsigned int argc = 0;
         char **argv = malloc(sizeof(char *) * 64);
+        if (argv == NULL)
+                return;
 
         int pipes[MAX_COMMAND_TOKENS][2] = { { 0 } };
         int pipeIndex = 0;
@@ -261,9 +263,6 @@ static void processCommand(char *command, commandList commands,
                                         pipes[pipeIndex][PIPE_FD_WRITE],
                                         resourceList);
                         }
-                        // for (int j = 0; j < argc; j++) {
-                        //         argv[j] = NULL;
-                        // }
                         argv = malloc(sizeof(char *) * 64);
                         argc = 0;
                         pipeIndex++;
@@ -377,6 +376,9 @@ static void addToTokens(char *tokens[MAX_COMMAND_TOKENS], char *token,
                         unsigned int *index)
 {
         tokens[*index] = malloc(*index * sizeof(char));
+        if (tokens[*index] == NULL)
+                return;
+
         strcpy(tokens[*index], token);
         (*index)++;
 }

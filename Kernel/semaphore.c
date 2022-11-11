@@ -148,10 +148,11 @@ int sosem_init_bin(sosem_t *sem, unsigned int initial_value)
         if (sem == NULL)
                 return -1;
 
-        sosem_init(sem, initial_value);
-        sem->binary = 1;
         if (initial_value > 1)
                 initial_value = 1;
+
+        sosem_init(sem, initial_value);
+        sem->binary = 1;
 
         return 0;
 }

@@ -29,19 +29,16 @@ int64_t global = 0; //shared memory
 void slowInc(int64_t *p, int64_t inc)
 {
         int64_t aux = *p;
-        printf("B[%d] - ", getPid());
         giveUpCPU(); //This makes the race condition highly probable
-        printf("A [%d] - ", getPid());
         aux += inc;
         *p = aux;
-        //printf("Ready [%d] by [%d]\n", getPid(), inc);
 }
 
 int my_process_inc(int argc, char *argv[])
 {
         uint64_t n;
         int64_t inc;
-        uint64_t use_sem;
+        int64_t use_sem;
         sem_t *sem = NULL;
 
         if (argc != 3) {
@@ -58,7 +55,7 @@ int my_process_inc(int argc, char *argv[])
         } else {
                 inc = -1;
         }
-        if ((use_sem = satoi(argv[3])) < 0) {
+        if ((use_sem = satoi(argv[3])) < 0) { // -V547
                 printf("Error: Use sem is not valid\n");
                 return -1;
         }
@@ -70,17 +67,14 @@ int my_process_inc(int argc, char *argv[])
                 printf("test_sync: ERROR opening semaphore\n");
                 return -1;
         }
-        // printf("Process [%d], n: [%d] - inc: [%s]\n", getPid(), n, inc == 1 ? "1" : "-1");
 
         uint64_t i;
         for (i = 0; i < n; i++) {
                 if (sem != NULL) {
-                        printf("w[%d] - ", getPid());
                         sem_wait(sem);
                 }
                 slowInc(&global, inc);
                 if (sem != NULL) {
-                        printf("p[%d]\n", getPid());
                         sem_post(sem);
                 }
         }
@@ -96,8 +90,10 @@ int test_sync(uint64_t argc, char *argv[])
         uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
 
         if (argc != 3) {
+                printf("Error: Two arguments Needed:\n"
+                       "\t- Number of repetitions\n"
+                       "\t- Semaphore used\n");
                 return -1;
-                printf("Error: Two arguments Needed:\n\t- Number of repetitions\n\t- Semaphore used\n");
         }
 
         char *argvDec[] = { "Dec Process", argv[1], "-1", argv[2], NULL };
@@ -119,9 +115,7 @@ int test_sync(uint64_t argc, char *argv[])
 
         for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
                 waitPID(pids[i]);
-                // printf("Done [%d]\n", pids[i]);
                 waitPID(pids[i + TOTAL_PAIR_PROCESSES]);
-                // printf("Done [%d]\n", pids[i + TOTAL_PAIR_PROCESSES]);
         }
 
         int sig = 0;
@@ -129,7 +123,7 @@ int test_sync(uint64_t argc, char *argv[])
                 sig = 1;
                 global *= -1;
         }
-        printf("Final value: %s%d\n", sig ? "-" : "", global);
+        printf("Final value: %s%d\n", sig ? "-" : "", global); // -V576
 
         return 0;
 }

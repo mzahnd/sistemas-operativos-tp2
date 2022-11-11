@@ -65,9 +65,6 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
         // Randomly kills, blocks or unblocks processes until every one has been killed
         while (alive > 0) {
-                int cargc = 0;
-                char **cargv = NULL;
-
                 for (rq = 0; rq < max_processes; rq++) {
                         if (p_rqs[rq].state == KILLED) {
                                 continue;
@@ -99,4 +96,6 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
         printf("All processes killed, shouldn't have any process called \"endless_loop\" Alive\n");
         commandPs(1, NULL);
+
+        return 0;
 }

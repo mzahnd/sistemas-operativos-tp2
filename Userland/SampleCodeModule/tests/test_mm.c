@@ -29,8 +29,6 @@ int test_mm(int argc, char *argv[])
 {
         printf("TEST_MM\n");
         mm_rq mm_rqs[MAX_BLOCKS];
-        uint8_t rq;
-        uint32_t total;
         uint64_t max_memory;
 
         if (argc != 2) {
@@ -48,12 +46,12 @@ int test_mm(int argc, char *argv[])
 
         max_memory *= 0.01 * TOTAL_MEM;
 
-        printf("Testing memory manager with maximum size of %d%%\n",
+        printf("Testing memory manager with maximum size of %d%%\n", // -V576
                max_memory);
 
         while (1) {
-                rq = 0;
-                total = 0;
+                uint8_t rq = 0;
+                uint32_t total = 0;
 
                 // Request as many blocks as we can
                 while (rq < MAX_BLOCKS && total < max_memory) {
@@ -66,7 +64,7 @@ int test_mm(int argc, char *argv[])
                                 rq++;
                         } else {
                                 printf("Error: Couldn't allocate");
-                                return;
+                                return -1;
                         }
                 }
 

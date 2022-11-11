@@ -17,8 +17,9 @@
 
 int commandLoop(int argc, char **argv)
 {
-        while (1) {
-                printf("Hello, this is the LOOP command. Current PID is %d\n",
+        while (1) { // -V776
+                printf("Hello, this is the LOOP command." // -V576
+                       " Current PID is %d\n",
                        getPid());
                 sleep(1);
         }
@@ -28,10 +29,12 @@ int commandLoop(int argc, char **argv)
 
 int commandActiveLoop(int argc, char **argv)
 {
-        while (1) {
+        while (1) { // -V776
                 for (int i = 0; i < 500000000; i++)
-                        ;
-                printf("Hello, this is the ACTIVE LOOP command. Current PID is %d\n",
+                        ; // -V529
+
+                printf("Hello, this is the ACTIVE LOOP command." // -V576
+                       " Current PID is %d\n",
                        getPid());
         }
 }

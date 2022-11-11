@@ -99,7 +99,7 @@ int endless_loop_print(int argc, char **argv)
                 return 1;
         }
 
-        while (1) {
+        while (1) { // -V776
                 printf("%s", argv[1]);
                 bussy_wait(25000000);
         }
@@ -114,9 +114,11 @@ char **create_argv(char *argv0, int *argc, unsigned n, ...)
         if (argv == NULL)
                 return NULL;
 
-        argv[0] = calloc(strlen(argv0), sizeof(char));
-        if (argv[0] == NULL)
+        argv[0] = calloc(strlen(argv0) + 1, sizeof(char));
+        if (argv[0] == NULL) {
+                free(argv);
                 return NULL;
+        }
 
         strcpy(argv[0], argv0);
 
@@ -126,8 +128,13 @@ char **create_argv(char *argv0, int *argc, unsigned n, ...)
                 // uint64_t has 0xFFFFFFFFFFFFFFFF as maximum possible value:
                 // that's 20 digits in base 10
                 argv[i] = calloc(21, sizeof(char));
-                if (argv[i] == NULL)
+                if (argv[i] == NULL) {
+                        for (int j = 0; j < i; j++)
+                                free(argv[j]);
+
+                        free(argv);
                         return NULL;
+                }
 
                 intToString(va_arg(ap, unsigned long long), argv[i]);
         }
@@ -136,14 +143,4 @@ char **create_argv(char *argv0, int *argc, unsigned n, ...)
 
         *argc = n + 2;
         return argv;
-}
-
-void free_argv(int argc, char **argv)
-{
-        for (int i = 0; i < argc; i++) {
-                if (argv[i] != NULL)
-                        free(argv[i]);
-        }
-
-        free(argv);
 }

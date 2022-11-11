@@ -26,12 +26,12 @@
 #define INITIAL_PHYLOS 10
 
 #define PHYLO_EAT_AT_LEAST_FOR 1
-#define PHYLO_EAT_AT_MOST_FOR 3
-#define PHYLO_THINK_AT_LEAST_FOR 3
-#define PHYLO_THINK_AT_MOST_FOR 5
+#define PHYLO_EAT_AT_MOST_FOR 2
+#define PHYLO_THINK_AT_LEAST_FOR 4
+#define PHYLO_THINK_AT_MOST_FOR 2
 
 #define TABLE_MAX_PHYLOS_PER_ROWS 5
-#define TABLE_PRINT_SLEEP 5
+#define TABLE_PRINT_SLEEP 1
 
 #define SEM_PHYLO_NAME "_phylo_sem"
 #define SEM_TABLE_NAME "_phylo_sem_table"
@@ -87,6 +87,10 @@ static phylo_t philosophers_table[MAX_PHYLOS] = {};
 static unsigned int n_philosophers_table = 0;
 static unsigned int n_initial_philosophers_table = 0;
 
+static unsigned int phylos_pid[1000] = {0};
+static unsigned int total_invoked_phylos = 0;
+static unsigned int table_pid = 0;
+
 static bool phylo_alive = 0; // To exit processes on 'q'
 
 /* ------------------------------ */
@@ -126,7 +130,6 @@ int print_table(int argc, char **argv)
                                 putChar('\n');
                         }
                 }
-                printf("\n===============\n");
 
                 sem_post(sem_print);
                 sem_post(sem_philosophers_table);
@@ -142,7 +145,7 @@ int print_table(int argc, char **argv)
 static void print_table_in_background()
 {
         char *argv_print_table[] = { "print_table", 0 };
-        createProcess(argv_print_table[0], print_table, 0, argv_print_table, 0);
+        table_pid = createProcess(argv_print_table[0], print_table, 0, argv_print_table, 0);
 }
 
 /* ------------------------------ */
@@ -452,8 +455,8 @@ static void add_philosopher()
         argv[2] = 0;
 
         n_philosophers_table += 1;
-        createProcess(argv[0], &philosopher, argc, argv, 0);
-
+        phylos_pid[total_invoked_phylos] = createProcess(argv[0], &philosopher, argc, argv, 0);
+        total_invoked_phylos++;
         sem_post(sem_philosophers_table);
 }
 
@@ -572,6 +575,11 @@ int commandPhylo(int argc, char **argv)
 
         n_philosophers_table = 0;
         n_initial_philosophers_table = 0;
+
+        for (int i = 0; i < total_invoked_phylos; i++) {
+                killProcessSyscall(phylos_pid[i]);
+        }
+        killProcessSyscall(table_pid);
 
         sem_close(sem_forks);
         sem_close(sem_philosophers_table);

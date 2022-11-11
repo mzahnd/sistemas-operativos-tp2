@@ -206,7 +206,9 @@ int sosem_post(sosem_t *sem)
                 release(&(sem->lock));
         }
 
+        #ifndef TESTING
         giveUpCPU();
+        #endif
 
         return 0;
 }

@@ -12,7 +12,6 @@ int commandHelp(int argc, char **argv)
         printf("\t kill [PID] - kills process with given ID\n");
         printf("\t nice [PID,priority] - switches process priority with given ID and priority\n");
         printf("\t block [PID] - switches process state to blocked with given ID\n");
-        printf("\t unblock [PID] - switches process state to unblocked with given ID\n");
         printf("\t sem - displays list of semaphores with their properties\n");
         printf("\t cat - displays stdin\n");
         printf("\t wc - prints amount of input lines\n");

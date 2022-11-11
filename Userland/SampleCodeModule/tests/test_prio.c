@@ -31,8 +31,8 @@
 #define HIGHEST 5 //TODO: Change as required
 
 int64_t prio[TOTAL_PROCESSES] = { LOWEST, MEDIUM, HIGHEST };
-char ** argvs[TOTAL_PROCESSES];
-char * childProcessName = "endlessLoop";
+char **argvs[TOTAL_PROCESSES];
+char *childProcessName = "endlessLoop";
 
 int test_prio(int argc, char *argv[])
 {
@@ -42,11 +42,15 @@ int test_prio(int argc, char *argv[])
         /* char *argv[] = { 0 }; */
         /* pids[i] = my_create_process("endless_loop_print", 0, argv); */
         for (i = 0; i < TOTAL_PROCESSES; i++) {
-                char ** new_argv = malloc(sizeof(char*) * 2);
+                char **new_argv = malloc(sizeof(char *) * 2);
+                if (new_argv == NULL)
+                        return -1;
+
                 new_argv[0] = childProcessName;
                 new_argv[1] = malloc(2);
                 intToBase(i, 10, new_argv[1]);
-                pids[i] = createProcess(new_argv[0], endless_loop_print, 2, new_argv, 0);
+                pids[i] = createProcess(new_argv[0], endless_loop_print, 2,
+                                        new_argv, 0);
                 argvs[i] = new_argv;
                 // int cargc = 1;
                 // char **cargv = create_argv("endless_loop_print", &cargc, 1, 0);

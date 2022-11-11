@@ -148,10 +148,11 @@ int sosem_init_bin(sosem_t *sem, unsigned int initial_value)
         if (sem == NULL)
                 return -1;
 
-        sosem_init(sem, initial_value);
-        sem->binary = 1;
         if (initial_value > 1)
                 initial_value = 1;
+
+        sosem_init(sem, initial_value);
+        sem->binary = 1;
 
         return 0;
 }
@@ -170,8 +171,6 @@ int sosem_destroy(sosem_t *sem)
         while (pid_queue_shift(sem, &pid) == 0) {
                 unlockProcessByPID(pid);
         }
-
-
 
         userland_destroy(sem);
 
@@ -206,9 +205,9 @@ int sosem_post(sosem_t *sem)
                 release(&(sem->lock));
         }
 
-        #ifndef TESTING
+#ifndef TESTING
         giveUpCPU();
-        #endif
+#endif
 
         return 0;
 }

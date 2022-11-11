@@ -284,13 +284,13 @@ void test_sofree_free_old_allocs(CuTest *const ct)
 void test_sofree_free_all_heap(CuTest *const ct)
 {
         uint8_t ok_buffer[MEM_HEAP_SIZE] = { 0 };
-        size_t extra_space_for_header = 0;
         size_t wanted_size = 0;
 
 #ifdef BUDDY
-        extra_space_for_header = 0;
         wanted_size = MEM_HEAP_SIZE;
 #else
+        size_t extra_space_for_header = 0;
+
         extra_space_for_header = memblock_size + BYTE_ALIGNMENT -
                                  (MEM_HEAP_SIZE & BYTE_ALIGNMENT_MASK);
         wanted_size = MEM_HEAP_SIZE - extra_space_for_header;

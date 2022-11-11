@@ -47,8 +47,8 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
         // Create max_processes processes
         for (rq = 0; rq < max_processes; rq++) {
-                p_rqs[rq].pid = createProcess(
-                        "endless_loop", endless_loop, 1, argvAux, 0);
+                p_rqs[rq].pid = createProcess("endless_loop", endless_loop, 1,
+                                              argvAux, 0);
 
                 if (p_rqs[rq].pid == -1) {
                         printf("test_processes: ERROR creating process\n");
@@ -65,20 +65,17 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
         // Randomly kills, blocks or unblocks processes until every one has been killed
         while (alive > 0) {
-                int cargc = 0;
-                char **cargv = NULL;
-
                 for (rq = 0; rq < max_processes; rq++) {
                         if (p_rqs[rq].state == KILLED) {
                                 continue;
                         }
-                        
+
                         action = GetUniform(100) % 2;
 
                         switch (action) {
                         case 0:
                                 if (p_rqs[rq].state == RUNNING ||
-                                        p_rqs[rq].state == BLOCKED) {
+                                    p_rqs[rq].state == BLOCKED) {
                                         killProcessSyscall(p_rqs[rq].pid);
                                         p_rqs[rq].state = KILLED;
                                         alive--;
@@ -99,4 +96,6 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
         printf("All processes killed, shouldn't have any process called \"endless_loop\" Alive\n");
         commandPs(1, NULL);
+
+        return 0;
 }

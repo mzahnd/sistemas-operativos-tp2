@@ -51,7 +51,6 @@ int sem_post(sem_t *sem)
 {
         int ret;
         semaphorePostSyscall(sem, &ret);
-        giveUpCPUSyscall();
         return ret;
 }
 

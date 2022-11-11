@@ -45,54 +45,58 @@ int64_t test_processes(uint64_t argc, char *argv[])
 
         p_rq p_rqs[max_processes];
 
-        while (1) {
-                // Create max_processes processes
-                for (rq = 0; rq < max_processes; rq++) {
-                        p_rqs[rq].pid = createProcess(
-                                "endless_loop", endless_loop, 1, argvAux, 0);
+        // Create max_processes processes
+        for (rq = 0; rq < max_processes; rq++) {
+                p_rqs[rq].pid = createProcess(
+                        "endless_loop", endless_loop, 1, argvAux, 0);
 
-                        if (p_rqs[rq].pid == -1) {
-                                printf("test_processes: ERROR creating process\n");
-                                return -1;
-                        } else {
-                                p_rqs[rq].state = RUNNING;
-                                alive++;
-                        }
+                if (p_rqs[rq].pid == -1) {
+                        printf("test_processes: ERROR creating process\n");
+                        return -1;
+                } else {
+                        p_rqs[rq].state = RUNNING;
+                        alive++;
                 }
-
-                // Randomly kills, blocks or unblocks processes until every one has been killed
-                while (alive > 0) {
-                        int cargc = 0;
-                        char **cargv = NULL;
-
-                        for (rq = 0; rq < max_processes; rq++) {
-                                if (p_rqs[rq].state == KILLED) {
-                                        continue;
-                                }
-                                
-                                action = GetUniform(100) % 2;
-
-                                switch (action) {
-                                case 0:
-                                        if (p_rqs[rq].state == RUNNING ||
-                                            p_rqs[rq].state == BLOCKED) {
-                                                killProcessSyscall(p_rqs[rq].pid);
-                                                p_rqs[rq].state = KILLED;
-                                                alive--;
-                                        }
-                                        break;
-
-                                case 1:
-                                        changeProcessStatusSyscall(p_rqs[rq].pid);
-                                        if (p_rqs[rq].state == RUNNING) {
-                                                p_rqs[rq].state = BLOCKED;
-                                        } else {
-                                                p_rqs[rq].state = RUNNING;
-                                        }
-                                        break;
-                                }
-                        }
-                }
-                sleep(1);
         }
+
+        //Ps
+        printf("All processes created\n");
+        commandPs(1, NULL);
+
+        // Randomly kills, blocks or unblocks processes until every one has been killed
+        while (alive > 0) {
+                int cargc = 0;
+                char **cargv = NULL;
+
+                for (rq = 0; rq < max_processes; rq++) {
+                        if (p_rqs[rq].state == KILLED) {
+                                continue;
+                        }
+                        
+                        action = GetUniform(100) % 2;
+
+                        switch (action) {
+                        case 0:
+                                if (p_rqs[rq].state == RUNNING ||
+                                        p_rqs[rq].state == BLOCKED) {
+                                        killProcessSyscall(p_rqs[rq].pid);
+                                        p_rqs[rq].state = KILLED;
+                                        alive--;
+                                }
+                                break;
+
+                        case 1:
+                                changeProcessStatusSyscall(p_rqs[rq].pid);
+                                if (p_rqs[rq].state == RUNNING) {
+                                        p_rqs[rq].state = BLOCKED;
+                                } else {
+                                        p_rqs[rq].state = RUNNING;
+                                }
+                                break;
+                        }
+                }
+        }
+
+        printf("All processes killed, shouldn't have any process called \"endless_loop\" Alive\n");
+        commandPs(1, NULL);
 }

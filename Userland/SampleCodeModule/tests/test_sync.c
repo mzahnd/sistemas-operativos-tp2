@@ -22,16 +22,16 @@
                             * sem_close(); */
 
 #define SEM_ID "sem"
-#define TOTAL_PAIR_PROCESSES 8
+#define TOTAL_PAIR_PROCESSES 3
 
 int64_t global = 0; //shared memory
 
 void slowInc(int64_t *p, int64_t inc)
 {
         int64_t aux = *p;
-        // printf("B[%d] - ", getPid());
+        printf("B[%d] - ", getPid());
         giveUpCPU(); //This makes the race condition highly probable
-        // printf("A [%d] - ", getPid());
+        printf("A [%d] - ", getPid());
         aux += inc;
         *p = aux;
         //printf("Ready [%d] by [%d]\n", getPid(), inc);
@@ -76,12 +76,12 @@ int my_process_inc(int argc, char *argv[])
         uint64_t i;
         for (i = 0; i < n; i++) {
                 if (sem != NULL) {
-                        // printf("w[%d] - ", getPid());
+                        printf("w[%d] - ", getPid());
                         sem_wait(sem);
                 }
                 slowInc(&global, inc);
                 if (sem != NULL) {
-                        // printf("p[%d]\n", getPid());
+                        printf("p[%d]\n", getPid());
                         sem_post(sem);
                 }
         }

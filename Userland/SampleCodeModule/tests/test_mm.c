@@ -18,7 +18,7 @@
 #include <stringUtils.h> /* memset(); */
 
 #define MAX_BLOCKS 128
-#define TOTAL_MEM (32 * 1024 * 1024) // Half
+#define TOTAL_MEM (48 * 1024 * 1024) // Half
 
 typedef struct MM_rq {
         void *address;
@@ -88,17 +88,11 @@ int test_mm(int argc, char *argv[])
                                         return -1;
                                 }
 
-                // printf("Memory state with all allocated: \n");
-
-                // commandMem(0, NULL);
 
                 // Free
                 for (i = 0; i < rq; i++)
                         if (mm_rqs[i].address)
                                 free(mm_rqs[i].address);
-
-                // printf("Memory after FREE: \n");
-                // commandMem(0, NULL);
         }
 
 

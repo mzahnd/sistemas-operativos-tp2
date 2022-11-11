@@ -22,14 +22,16 @@
                             * sem_close(); */
 
 #define SEM_ID "sem"
-#define TOTAL_PAIR_PROCESSES 3
+#define TOTAL_PAIR_PROCESSES 8
 
-int64_t global = 4; //shared memory
+int64_t global = 0; //shared memory
 
 void slowInc(int64_t *p, int64_t inc)
 {
-        uint64_t aux = *p;
+        int64_t aux = *p;
+        // printf("B[%d] - ", getPid());
         giveUpCPU(); //This makes the race condition highly probable
+        // printf("A [%d] - ", getPid());
         aux += inc;
         *p = aux;
         //printf("Ready [%d] by [%d]\n", getPid(), inc);
@@ -69,19 +71,23 @@ int my_process_inc(int argc, char *argv[])
                 printf("test_sync: ERROR opening semaphore\n");
                 return -1;
         }
-        printf("Process [%d], n: [%d] - inc: [%s]\n", getPid(), n, inc == 1 ? "1" : "-1");
+        // printf("Process [%d], n: [%d] - inc: [%s]\n", getPid(), n, inc == 1 ? "1" : "-1");
 
         uint64_t i;
         for (i = 0; i < n; i++) {
-                if (use_sem)
+                if (sem != NULL) {
+                        // printf("w[%d] - ", getPid());
                         sem_wait(sem);
+                }
                 slowInc(&global, inc);
-                if (use_sem)
+                if (sem != NULL) {
+                        // printf("p[%d]\n", getPid());
                         sem_post(sem);
+                }
         }
 
-        if (use_sem)
-                sem_close(sem);
+        // if (use_sem)
+        //         sem_close(sem);
 
         return 0;
 }
@@ -118,7 +124,12 @@ int test_sync(uint64_t argc, char *argv[])
                 // printf("Done [%d]\n", pids[i + TOTAL_PAIR_PROCESSES]);
         }
 
-        printf("Final value: %d\n", global);
+        int sig = 0;
+        if (global < 0) {
+                sig = 1;
+                global *= -1;
+        }
+        printf("Final value: %s%d\n", sig ? "-" : "", global);
 
         return 0;
 }

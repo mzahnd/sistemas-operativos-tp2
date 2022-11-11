@@ -171,6 +171,8 @@ int sosem_destroy(sosem_t *sem)
                 unlockProcessByPID(pid);
         }
 
+
+
         userland_destroy(sem);
 
         return 0;
@@ -204,6 +206,10 @@ int sosem_post(sosem_t *sem)
                 release(&(sem->lock));
         }
 
+        #ifndef TESTING
+        giveUpCPU();
+        #endif
+
         return 0;
 }
 
@@ -222,7 +228,7 @@ int sosem_wait(sosem_t *sem)
         atomic_fetch_add(&sem->_n_waiting, 1);
 
         // Userland
-        if (atomic_load(&sem->value) == 0) {
+        while (atomic_load(&sem->value) == 0) {
                 pid_queue_push(sem, getCurrentProcessPID());
                 userland_update(sem);
 

@@ -87,7 +87,7 @@ static phylo_t philosophers_table[MAX_PHYLOS] = {};
 static unsigned int n_philosophers_table = 0;
 static unsigned int n_initial_philosophers_table = 0;
 
-static unsigned int phylos_pid[1000] = {0};
+static unsigned int phylos_pid[1000] = { 0 };
 static unsigned int total_invoked_phylos = 0;
 static unsigned int table_pid = 0;
 
@@ -145,7 +145,8 @@ int print_table(int argc, char **argv)
 static void print_table_in_background()
 {
         char *argv_print_table[] = { "print_table", 0 };
-        table_pid = createProcess(argv_print_table[0], print_table, 0, argv_print_table, 0);
+        table_pid = createProcess(argv_print_table[0], print_table, 0,
+                                  argv_print_table, 0);
 }
 
 /* ------------------------------ */
@@ -455,7 +456,8 @@ static void add_philosopher()
         argv[2] = 0;
 
         n_philosophers_table += 1;
-        phylos_pid[total_invoked_phylos] = createProcess(argv[0], &philosopher, argc, argv, 0);
+        phylos_pid[total_invoked_phylos] =
+                createProcess(argv[0], &philosopher, argc, argv, 0);
         total_invoked_phylos++;
         sem_post(sem_philosophers_table);
 }
